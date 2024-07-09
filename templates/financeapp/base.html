@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title_block %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'styles/HomeStyles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/authentications.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">CapitalCompass</div>
+        <nav>
+            <ul class="nav-left">
+                <li><a href="{% url 'financeapp:index' %}">Home</a></li>
+                <li><a href="{% url 'financeapp:about' %}">About us</a></li>
+                <li><a href="#">Share us</a></li>
+                <li><a href="#">Reviews</a></li>
+                <li><a href="#">Contact us</a></li>
+            </ul>
+            <ul class="nav-right">
+              {% if user.is_authenticated %} 
+              <li class="auth"><a href="{% url 'auth_login' %}">Login</a></li>
+              <li><a href="{% url 'auth_logout' %}?next={% url 'financeapp:index' %}">Sign out</a></li>
+              <li class="auth"><a href="{% url 'registration_register' %}">Sign up</a></li>
+              {% else %} 
+                <li class="auth"><a href="{% url 'auth_login' %}">Login</a></li>
+                <li class="auth"><a href="{% url 'registration_register' %}">Sign up</a></li>
+              {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    {% block body_block %}{% endblock %}
+
+    <footer>
+        <div class="footer-content">
+            <a href="#">About</a>
+            <a href="#">Features</a>
+            <a href="#">Contact us anytime</a>
+            <div class="social-media-icons">[Social Media Icons]</div>
+            <div class="contact-info">
+                <p>Contact: email@example.com</p>
+                <p>Phone: (123) 456-7890</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'scripts.js' %}"></script>
+</body>
+</html>

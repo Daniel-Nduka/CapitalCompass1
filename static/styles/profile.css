@@ -1,0 +1,63 @@
+/* Profile Section */
+.profile-section {
+  margin: auto;
+  padding: 20px;
+  max-width: 800px;
+}
+
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-info, .edit-profile-form, .change-password-form {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.edit-profile-form {
+  display: none;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.submit-btn {
+  display: flex;
+  justify-content: space-between;
+}
+
+.submit-btn button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit-btn .btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.submit-btn .btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}

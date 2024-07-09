@@ -1,0 +1,100 @@
+{% extends 'financeapp/loggedin_base.html' %}
+{% load static %}
+{% block title_block %} Accounts - CapitalCompass {% endblock %}
+
+{% block body_block %}
+    <main>
+        <section class="accounts-overview">
+            <h1>Accounts Overview</h1>
+            <div id="summary">
+                <p>Total Balance: $<span id="total-balance">0.00</span></p>
+                <p>Total Debt: $<span id="total-debt">0.00</span></p>
+                <p>Net Balance: $<span id="net-balance">0.00</span></p>
+            </div>
+            <button class="btn btn-primary" onclick="showCreateAccountForm()">Add Account</button>
+            <button class="btn btn-secondary">View Accounts</button>
+            <ul>
+                <li>Savings Account: Current Balance: $0.00 <button>View Transactions</button></li>
+                <li>Checking Account: Current Balance: $0.00 <button>View Transactions</button></li>
+                <!-- Add more accounts as needed -->
+            </ul>
+        </section>
+    </main>
+    <div id="create-account-form" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeCreateAccountForm()">&times;</span>
+            <h2>New Account</h2>
+            <form>
+                <div class="form-group">
+                    <label for="account-name">Account Name</label>
+                    <input id="account-name" name="account-name" type="text" placeholder="Enter account name">
+                </div>
+                <div class="form-group">
+                    <label for="account-type">Select Account Type</label>
+                    <select id="account-type" name="showAccountForm()">
+                        <option value="checking">Checking</option>
+                        <option value="savings">Savings</option>
+                        <option value="cash">Cash</option>
+                        <option value="credit-card">Credit Card</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="number-format">Account Balance</label>
+                    <input id="number-format" name="number-format" type="text" placeholder="123,456.78">
+                </div>
+
+                <div class="form-group submit-btn">
+                    <button type="button" class="btn btn-primary" onclick="addAccount()">Create Account</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeCreateAccountForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        function showCreateAccountForm() {
+            document.getElementById('create-account-form').style.display = 'flex';
+        }
+
+        function closeCreateAccountForm() {
+            document.getElementById('create-account-form').style.display = 'none';
+        }
+
+        function addAccount() {
+            // Function to handle adding an account
+            alert('Account added!');
+            // After adding an account, recalculate the totals
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const accounts = [
+                { type: 'savings', balance: 2000 },
+                { type: 'checking', balance: 1500 },
+                { type: 'credit-card', balance: -500 }
+            ];
+
+            let totalBalance = 0;
+            let totalDebt = 0;
+
+            accounts.forEach(account => {
+                if (account.balance >= 0) {
+                    totalBalance += account.balance;
+                } else {
+                    totalDebt += Math.abs(account.balance);
+                }
+            });
+
+            const netBalance = totalBalance - totalDebt;
+
+            document.getElementById('total-balance').textContent = totalBalance.toFixed(2);
+            document.getElementById('total-debt').textContent = totalDebt.toFixed(2);
+            document.getElementById('net-balance').textContent = netBalance.toFixed(2);
+        }
+
+        // Ensure modal is closed when the document is loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            closeCreateAccountForm();
+            updateSummary(); // Initial calculation
+        });
+    </script>
+{% endblock %}

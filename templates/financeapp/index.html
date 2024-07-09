@@ -1,29 +1,9 @@
+{% extends 'financeapp/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CapitalCompass</title>
-    <link rel="stylesheet" href="{% static 'styles/HomeStyles.css' %}">
-</head>
-<body>
-    <header>
-        <div class="logo">CapitalCompass</div>
-        <nav>
-            <ul class="nav-left">
-                <li><a href="{% url 'financeapp:index' %}">Home</a></li>
-                <li><a href="{% url 'financeapp:about' %}">About us</a></li>
-                <li><a href="#">Share us</a></li>
-                <li><a href="#">Reviews</a></li>
-                <li><a href="#">Contact us</a></li>
-              </ul>
-              <ul class="nav-right">
-                <li class="auth"><a href="{% url 'auth_login' %}">Login</a></li> 
-                <li class="auth"><a href="{% url 'registration_register' %}">Sign up</a></li> 
-            </ul>
-        </nav>
-    </header>
+{% block title_block %} Homepage {% endblock %}
+
+
+{% block body_block %}
 
     <section class="hero">
         <div class="hero-content">
@@ -33,7 +13,7 @@
             <button onclick="learnMore()">Learn More</button>
         </div>
         <div class="hero-image">
-            <img src="photo.jpg" alt="Financial Management">
+           <!-- <img src="photo.jpg" alt="Financial Management"> -->
         </div>
     </section>
 
@@ -77,20 +57,5 @@
         </ol>
         <button>Sign up here</button>
     </section>
-
-    <footer>
-        <div class="footer-content">
-            <a href="#">About</a>
-            <a href="#">Features</a>
-            <a href="#">Contact us anytime</a>
-            <div class="social-media-icons">[Social Media Icons]</div>
-            <div class="contact-info">
-                <p>Contact: email@example.com</p>
-                <p>Phone: (123) 456-7890</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="{% static 'scripts.js' %}"></script>
-</body>
+{% endblock %}
 </html>

@@ -1,0 +1,88 @@
+{% extends 'financeapp/loggedin_base.html' %}
+{% load static %}
+{% block title_block %} Budget Overview - CapitalCompass {% endblock %}
+
+{% block body_block %}
+<main>
+    <section class="budget-overview">
+        <h1>Budget Overview</h1>
+        <button class="btn btn-primary"onclick="showCreateBudgetForm()">Create Budget</button>
+    
+        <button class="btn btn-secondary">View Budgets</button>
+        <div class="budget-chart">
+            <!-- Placeholder for Chart -->
+            <img src="path-to-your-chart-image.jpg" alt="Photo showing a chart">
+        </div>
+    </section>
+    <section class="budget-explanations">
+        <h2>Budgeting Methods Explained</h2>
+        <div class="zero-based-budget">
+            <h3>Zero-Based Budgeting</h3>
+            <p>Zero-based budgeting involves allocating every dollar of your income to a specific expense or savings goal until your total income minus total expenses equals zero. This method ensures that you account for all of your income and expenses, helping you to manage your money more effectively.</p>
+        </div>
+        <div class="fifty-thirty-twenty-budget">
+            <h3>50/30/20 Budgeting</h3>
+            <p>The 50/30/20 rule is a simple budgeting framework that allocates 50% of your income to needs, 30% to wants, and 20% to savings and debt repayment. This method helps you maintain a balanced budget by prioritizing essential expenses while still allowing for discretionary spending and savings.</p>
+        </div>
+    </section>
+</main>
+<div id="create-budget-form" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeCreateBudgetForm()">&times;</span>
+        <h2>New Budget</h2>
+        <form>
+            <div class="form-group">
+                <label for="budget-name">Budget Name</label>
+                <input id="budget-name" name="budget-name" type="text" placeholder="Enter budget name">
+            </div>
+            <div class="form-group">
+                <label for="budgettype">Select Budget Type</label>
+                <select id="budget-type" name="showBudgetForm()">
+                    <option value="zero-based">Zero-Based</option>
+                    <option value="50-30-20">50/30/20</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="currency">Currency</label>
+                <select id="currency" name="currency">
+                    <option value="usd">US Dollar - USD</option>
+                    <option value="gbp">UK Pound Sterling - GBP</option>
+                    <option value="eur">Euro - EUR</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="number-format">Number Format</label>
+                <input id="number-format" name="number-format" type="text" placeholder="123,456.78">
+            </div>
+            <div class="form-group">
+                <label for="date-format">Date Format</label>
+                <input id="date-format" name="date-format" type="text" placeholder="12/30/2024">
+            </div>
+            <div class="form-group submit-btn">
+                <button type="button" class="btn btn-primary" onclick="createBudget()">Create Budget</button>
+                <button type="button" class="btn btn-secondary" onclick="closeCreateBudgetForm()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function showCreateBudgetForm() {
+        document.getElementById('create-budget-form').style.display = 'flex';
+    }
+
+    function closeCreateBudgetForm() {
+        document.getElementById('create-budget-form').style.display = 'none';
+    }
+
+    function createBudget() {
+        // Function to handle creating a budget
+        alert('Budget Created!');
+    }
+     // Ensure modal is closed when the document is loaded
+     document.addEventListener('DOMContentLoaded', function () {
+        closeCreateBudgetForm();
+    });
+</script>
+{% endblock %}
+    
+

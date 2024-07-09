@@ -1,30 +1,8 @@
+{% extends 'financeapp/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CapitalCompass</title>
-    <link rel="stylesheet" href="{% static 'styles/HomeStyles.css' %}">
-    <link rel="stylesheet" href="{% static 'styles/authentications.css' %}">
-  </head>
-  <body>
-    <header>
-      <div class="logo">CapitalCompass</div>
-      <nav>
-          <ul class="nav-left">
-            <li><a href="{% url 'financeapp:index' %}">Home</a></li>
-            <li><a href="{% url 'financeapp:about' %}">About us</a></li>
-              <li><a href="#">Share us</a></li>
-              <li><a href="#">Reviews</a></li>
-              <li><a href="#">Contact us</a></li>
-            </ul>
-            <ul class="nav-right">
-              <li class="auth"><a href="{% url 'auth_login' %}">Login</a></li> 
-              <li class="auth"><a href="{% url 'registration_register' %}">Sign up</a></li> 
-          </ul>
-      </nav>
-  </header>
+{% block title_block %} Login {% endblock %}
+
+{% block body_block%}
 
   <div class="container">
     <div class="form-login-container">
@@ -34,7 +12,7 @@
       </div>
       <form method="post" action="{% url 'auth_login' %}">
         {% csrf_token %}
-        <input type="hidden" name="next" value="{% url 'financeapp:index' %}"> <!-- Redirect to index after login -->
+        <input type="hidden" name="next" value="{% url 'financeapp:budget' %}"> <!-- Redirect to budget after login -->
         <div class="form-group">
           <label for="username">Username</label>
           <input id="username" name="username" placeholder="Enter username" type="text">
@@ -49,5 +27,4 @@
       </form>
     </div>
   </div>
-</body>
-</html>
+{% endblock%}
