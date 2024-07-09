@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CapitalCompass</title>
+    <link rel="stylesheet" href="{% static 'styles/HomeStyles.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">CapitalCompass</div>
+        <nav>
+            <ul class="nav-left">
+                <li><a href="{% url 'financeapp:index' %}">Home</a></li>
+                <li><a href="{% url 'financeapp:about' %}">About us</a></li>
+                <li><a href="#">Share us</a></li>
+                <li><a href="#">Reviews</a></li>
+                <li><a href="#">Contact us</a></li>
+              </ul>
+              <ul class="nav-right">
+                <li class="auth"><a href="{% url 'auth_login' %}">Login</a></li> 
+                <li class="auth"><a href="{% url 'registration_register' %}">Sign up</a></li> 
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Take control of your Finances with CapitalCompass</h1>
+            <p>Track your spending, track savings, and set financial goals</p>
+            <button onclick="getStarted()">Get Started Now</button>
+            <button onclick="learnMore()">Learn More</button>
+        </div>
+        <div class="hero-image">
+            <img src="photo.jpg" alt="Financial Management">
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature">
+            <h2>Budget Tracking</h2>
+            <p>Your Blueprint to Financial Success</p>
+            <button>Learn More</button>
+        </div>
+        <div class="feature">
+            <h2>Expense Tracking</h2>
+            <p>Know where every pound is spent</p>
+            <button>Learn More</button>
+        </div>
+        <div class="feature">
+            <h2>Data Visualisation</h2>
+            <p>See Your Finances Clearly</p>
+            <button>Learn More</button>
+        </div>
+        <div class="feature">
+            <h2>Financial Insights</h2>
+            <p>Make Informed Decisions</p>
+            <button>Learn More</button>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <h2>Join people Who've Transformed Their Finances</h2>
+        <p>Your financial health simplified</p>
+        <div class="testimonial">Testimony 1</div>
+        <div class="testimonial">Testimony 2</div>
+        <div class="testimonial">Testimony 3</div>
+    </section>
+
+    <section class="how-it-works">
+        <h2>How it works</h2>
+        <ol>
+            <li>Sign Up and Link Accounts</li>
+            <li>Set Your Budget</li>
+            <li>Track and Analyse Spending</li>
+        </ol>
+        <button>Sign up here</button>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <a href="#">About</a>
+            <a href="#">Features</a>
+            <a href="#">Contact us anytime</a>
+            <div class="social-media-icons">[Social Media Icons]</div>
+            <div class="contact-info">
+                <p>Contact: email@example.com</p>
+                <p>Phone: (123) 456-7890</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'scripts.js' %}"></script>
+</body>
+</html>

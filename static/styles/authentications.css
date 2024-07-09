@@ -1,0 +1,81 @@
+/* Container for the form */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Form container styling */
+.form-container {
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-login-container{
+  width: 100%;
+  max-width: 700px;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  position: absolute; /* Change this line */
+  top: 100px; /* Adjust this value based on the height of your header */
+  left: 50%;
+  transform: translateX(-50%);
+  
+}
+.login-header, .signup-header{
+  text-align: center;
+
+}
+
+/* Form group styling */
+.form-group {
+  margin-bottom: 15px;
+}
+
+/* Label styling */
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+/* Input field styling */
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Help text styling */
+.helptext {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.9em;
+  color: #777;
+}
+
+/* Submit button styling */
+.submit-btn {
+  text-align: center;
+}
+
+.submit-btn button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.submit-btn button:hover {
+  background-color: #0056b3;
+}

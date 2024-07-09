@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CapitalCompass</title>
+    <link rel="stylesheet" href="{% static 'styles/HomeStyles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/authentications.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">CapitalCompass</div>
+        <nav>
+            <ul class="nav-left">
+                <li><a href="{% url 'financeapp:index' %}">Home</a></li>
+                <li><a href="{% url 'financeapp:about' %}">About us</a></li>
+                <li><a href="#">Share us</a></li>
+                <li><a href="#">Reviews</a></li>
+                <li><a href="#">Contact us</a></li>
+            </ul>
+            <ul class="nav-right">
+                <li class="auth"><a href="{% url 'auth_login' %}">Login</a></li>
+                <li class="auth"><a href="{% url 'registration_register' %}">Sign up</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="signup-header">
+                <h2>Register Here</h2>
+                <p>Already have an account? <a href="{% url 'auth_login' %}">Login here</a></p>
+            </div>
+            <form method="post" action="{% url 'registration_register' %}">
+                {% csrf_token %}
+                {% if form.errors %}
+                    <div class="form-errors">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="form-group">
+                    <label for="id_username">Username</label>
+                    <input id="id_username" maxlength="30" name="username" placeholder="Enter username" type="text" required />
+                    <span class="helptext">Required. 30 characters or fewer. Letters, digits and @/./+/-?_ only.</span>
+                </div>
+                <div class="form-group">
+                    <label for="id_email">Email</label>
+                    <input id="id_email" name="email" placeholder="Enter email" type="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_password1">Password</label>
+                    <input id="id_password1" name="password1" placeholder="Enter password" type="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_password2">Confirm Password</label>
+                    <input id="id_password2" name="password2" placeholder="Enter password" type="password" required>
+                    <span class="helptext">Enter the same password as before, for verification.</span>
+                </div>
+                <div class="form-group submit-btn">
+                    <button type="submit">Create Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
