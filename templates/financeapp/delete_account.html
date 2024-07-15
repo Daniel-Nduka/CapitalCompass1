@@ -1,0 +1,19 @@
+{% extends 'financeapp/loggedin_base.html' %}
+{% load static %}
+{% block title_block %} Delete Account - CapitalCompass {% endblock %}
+
+{% block body_block %}
+<main>
+    <section class="delete-account">
+        <h1>Delete Account</h1>
+        <p>Are you sure you want to delete the account "{{ account.account_name }}"?</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group submit-btn">
+                <button type="submit" class="btn btn-danger">Delete</button>
+                <button onclick="location.href='{% url 'financeapp:accounts' %}'" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </section>
+</main>
+{% endblock %}

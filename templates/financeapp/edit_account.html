@@ -1,0 +1,19 @@
+{% extends 'financeapp/loggedin_base.html' %}
+{% load static %}
+{% block title_block %} Edit Account - CapitalCompass {% endblock %}
+
+{% block body_block %}
+<main>
+    <section class="edit-account">
+        <h1>Edit Account</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="form-group submit-btn">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="button" onclick="location.href='{% url 'financeapp:accounts' %}'" class="btn btn-secondary">Cancel</button>
+            </div>
+        </form>
+    </section>
+</main>
+{% endblock %}

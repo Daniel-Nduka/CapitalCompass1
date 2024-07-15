@@ -134,7 +134,7 @@ REGISTRATION_OPEN = True
 REGISTRATION_AUTO_LOGIN = True
 
 # The URL that Django redirects users to after logging in.
-LOGIN_REDIRECT_URL = 'financeapp:index'
+LOGIN_REDIRECT_URL = 'financeapp:budget'
 
 # The page users are directed to if they are not logged in.
 LOGIN_URL = 'auth_login'

@@ -22,8 +22,7 @@
             <ul class="nav-right">
               {% if user.is_authenticated %} 
               <li class="auth"><a href="{% url 'auth_login' %}">Login</a></li>
-              <li><a href="{% url 'auth_logout' %}?next={% url 'financeapp:index' %}">Sign out</a></li>
-              <li class="auth"><a href="{% url 'registration_register' %}">Sign up</a></li>
+              <li class="auth"><a href="{% url 'financeapp:logout_and_signup' %}">Sign up</a></li> 
               {% else %} 
                 <li class="auth"><a href="{% url 'auth_login' %}">Login</a></li>
                 <li class="auth"><a href="{% url 'registration_register' %}">Sign up</a></li>
