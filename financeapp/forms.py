@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import UserProfile, Account
+from .models import UserProfile, Account, Budget
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
@@ -20,3 +20,7 @@ class AccountForm(forms.ModelForm):
         model = Account
         fields = ['account_name', 'account_type', 'balance']
         
+class BudgetForm(forms.ModelForm):
+    class Meta:
+        model = Budget
+        fields = ['budget_name', 'budget_type', 'currency_type']

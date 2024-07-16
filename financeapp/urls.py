@@ -4,7 +4,8 @@ app_name = 'financeapp'
 urlpatterns = [
     path('', views.index, name='index'),
     path('about/', views.about, name='about'),
-    path('budget/', views.budget, name='budget'),
+    path('create-budget/', views.create_budget, name='create_budget'),
+    path('budgets/', views.budget_list, name='budget_list'),
     path('profile/', views.profile, name='profile'),
     path('transactions/', views.transactions, name='transactions'),
     path('accounts/', views.account_list, name='accounts'),
@@ -12,4 +13,5 @@ urlpatterns = [
     path('accounts/delete/<int:account_id>/', views.delete_account, name='delete_account'),
     path('accounts/edit/<int:account_id>/', views.edit_account, name='edit_account'),
     path('logout-and-signup/', views.logout_and_signup, name='logout_and_signup'),
+    
 ]

@@ -1,0 +1,33 @@
+{% extends 'financeapp/loggedin_base.html' %}
+{% load static %}
+{% block title_block %} Budget List - CapitalCompass {% endblock %}
+
+{% block head_block %} 
+<link rel="stylesheet" href="{% static 'styles/budget_list.css' %}">
+{% endblock %}
+
+{% block body_block %}
+<main>
+  <section class="budgets-overview">
+      <h1>Your Budgets</h1>
+      <div class="budget-cards-container">
+          {% for budget in budgets %}
+              <div class="budget-card">
+                  <div class="budgets-thumbnails">
+                    <img class ="budget-photos"src="{% static 'images/image1.webp' %}" alt="Budget Icon">
+                  </div>
+                  <div class="budget-details">
+                      <h3>{{ budget.budget_name }}</h3>
+                      <p>Last used: {{ budget.updated_at|date:"F j, Y, g:i a" }}</p>
+                  </div>
+              </div>
+          {% endfor %}
+          <div class="budget-card create-new">
+              <div class="budget-icon">
+                  <button class="btn btn-primary" onclick="location.href='{% url 'financeapp:create_budget' %}'">Create New Budget</button>
+              </div>
+          </div>
+      </div>
+  </section>
+</main>
+{% endblock %}

@@ -8,7 +8,8 @@
    <link rel="stylesheet" href="{% static 'styles/application.css' %}"> 
     <link rel="stylesheet" href="{% static 'styles/profile.css' %}">
    <link rel="stylesheet" href="{% static 'styles/transactions.css' %}">
-    
+   {% block head_block %} {% endblock %}
+   
 </head>
 <body>
     <div class="sidebar">
@@ -16,7 +17,7 @@
         <nav>
             <ul class="nav-top">
                 <li><a href="{% url 'financeapp:accounts' %}">Accounts</a></li>
-                <li><a href="{% url 'financeapp:budget' %}">Budgets</a></li>
+                <li><a href="{% url 'financeapp:create_budget' %}">Budgets</a></li>
                 <li><a href="{% url 'financeapp:transactions' %}">Transactions</a></li>
                 <li><a href="#">Financial Analysis</a></li>
             </ul>

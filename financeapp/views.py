@@ -6,8 +6,8 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 
-from .models import UserProfile, Account
-from .forms import UserForm, UserProfileForm, AccountForm
+from .models import UserProfile, Account, Budget
+from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm
 
 from django.contrib.auth import logout
 
@@ -23,8 +23,6 @@ def index(request):
 def about(request):
     return render(request, 'financeapp/about.html')
 
-def budget(request):
-    return render(request, 'financeapp/budget.html')
 
 @login_required
 def account_list(request):
@@ -88,9 +86,6 @@ def edit_account(request, account_id):
     else:
         form = AccountForm(instance=account)
     return render(request, 'financeapp/edit_account.html', {'form': form})
-    
-    
-    return render(request, 'financeapp/delete_account.html', context)
 
 
 def transactions(request):
@@ -125,4 +120,25 @@ def profile(request):
         'user_profile': user_profile,
     }
     return render(request, 'financeapp/profile.html', context)
+
+#Create budget
+def create_budget(request):
+    if request.method == 'POST':
+        form = BudgetForm(request.POST)
+        if form.is_valid():
+            budget = form.save(commit=False)
+            budget.user = request.user
+            budget.save()
+            return redirect('financeapp:budget_list')
+    else:
+        form = BudgetForm()
+    return render(request, 'financeapp/budget.html', {'form': form})
+
+#Budget List
+def budget_list(request):
+   budgets = request.user.budgets.all()
+   context = {
+       'budgets': budgets
+   }
+   return render(request, 'financeapp/budget_list.html', context)
 
