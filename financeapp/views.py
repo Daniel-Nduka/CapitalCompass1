@@ -6,8 +6,8 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 
-from .models import UserProfile, Account, Budget
-from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm
+from .models import UserProfile, Account, Budget, ZeroBasedCategory, Expense
+from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm, ZeroBudgetForm, ExpenseForm
 
 from django.contrib.auth import logout
 
@@ -135,10 +135,154 @@ def create_budget(request):
     return render(request, 'financeapp/budget.html', {'form': form})
 
 #Budget List
+@login_required
 def budget_list(request):
    budgets = request.user.budgets.all()
    context = {
        'budgets': budgets
    }
    return render(request, 'financeapp/budget_list.html', context)
+'''
+@login_required
+def add_zero_based(request):
+    if request.method == 'POST':
+        form = ZeroBudgetForm(request.POST)
+        if form.is_valid():
+            zero_budget = form.save(commit=False)
+            zero_budget.user = request.user
+            zero_budget.save()
+            return redirect('financeapp:zero_based_budget_detail')
+    else:
+        form = ZeroBudgetForm()
+    return render(request, 'financeapp/zero_based_budget_detail.html', {'form': form})
+'''
+@login_required
+def zero_based_page(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
+    categories = ZeroBasedCategory.objects.filter(budget=budget)
 
+    category_form = ZeroBudgetForm()
+    expense_form = ExpenseForm()
+
+    if request.method == 'POST':
+        if 'add_category' in request.POST:
+            category_form = ZeroBudgetForm(request.POST)
+            if category_form.is_valid():
+                category = category_form.save(commit=False)
+                category.budget = budget
+                category.save()
+                return redirect('financeapp:zero_based_page', budget_id=budget.id)
+        elif 'edit_category' in request.POST:
+            category_id = request.POST.get('category_id')
+            category = get_object_or_404(ZeroBasedCategory, id=category_id, budget=budget)
+            category_form = ZeroBudgetForm(request.POST, instance=category)
+            if category_form.is_valid():
+                category_form.save()
+                return redirect('financeapp:zero_based_page', budget_id=budget.id)
+        elif 'add_expense' in request.POST:
+            expense_form = ExpenseForm(request.POST)
+            if expense_form.is_valid():
+                expense = expense_form.save(commit=False)
+                expense.category = get_object_or_404(ZeroBasedCategory, id=request.POST.get('category_id'))
+                expense.save()
+                return redirect('financeapp:zero_based_page', budget_id=budget.id)
+        elif 'edit_expense' in request.POST:
+            expense_id = request.POST.get('expense_id')
+            expense = get_object_or_404(Expense, id=expense_id)
+            expense_form = ExpenseForm(request.POST, instance=expense)
+            if expense_form.is_valid():
+                expense = expense_form.save(commit=False)
+                expense.category = get_object_or_404(ZeroBasedCategory, id=request.POST.get('category_id'))
+                expense.save()
+                return redirect('financeapp:zero_based_page', budget_id=budget.id)
+    context = {
+        'budget': budget,
+        'categories': categories,
+        'category_form': category_form,
+        'expense_form': expense_form,
+    }
+    return render(request, 'financeapp/zero_based_budget_detail.html', context)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+@login_required
+def edit_zero_based(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
+    categories = ZeroBasedCategory.objects.filter(budget=budget) 
+    accounts = request.user.accounts.all()
+
+    total_balance = sum(account.balance for account in accounts if account.account_type != 'CREDIT')
+    total_debt = sum(account.balance for account in accounts if account.account_type == 'CREDIT')
+    total_money = total_balance - total_debt
+    
+    budgeted_money = sum(category.assigned_amount for category in categories)
+    available_money = total_money - budgeted_money
+
+    if request.method == 'POST':
+        if 'category_name' in request.POST:
+            category_name = request.POST['category_name']
+            category_assigned = request.POST['category_assigned']
+            if category_name and category_assigned:
+                ZeroBasedCategory.objects.create(
+                    budget=budget,
+                    name=category_name,
+                    assigned_amount=category_assigned
+                )
+                return redirect('financeapp:edit_zero_based', budget_id=budget.id)
+        elif 'expense_description' in request.POST:
+            expense_description = request.POST['expense_description']
+            expense_assigned = request.POST['expense_assigned']
+            expense_activity = request.POST['expense_activity']
+            category_id = request.POST['category_id']
+            if expense_description and expense_assigned and category_id:
+                category = get_object_or_404(ZeroBasedCategory, id=category_id)
+                Expense.objects.create(
+                    category=category,
+                    description=expense_description,
+                    assigned_amount=expense_assigned,
+                    activity=expense_activity
+                )
+                return redirect('financeapp:edit_zero_based', budget_id=budget.id)
+
+    context = {
+        'budget': budget,
+        'categories': categories,
+        'total_money': total_money,
+        'budgeted_money': budgeted_money,
+        'available_money': available_money,
+    }
+    return render(request, 'financeapp/zero_based_budget_detail.html', context)
+'''

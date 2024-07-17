@@ -53,7 +53,39 @@ class Budget(models.Model):
 
     def __str__(self):
         return f"{self.budget_name} ({self.get_budget_type_display()}) - {self.user.username}"
+    
+    
+class ZeroBasedCategory(models.Model):
+    budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='zero_based_categories')
+    name = models.CharField(max_length=100)
+    assigned_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    def __str__(self):
+        return self.name
+    @property
+    def activity (self):
+        total_activity = 0
+        for expense in self.expenses.all():
+            total_activity += expense.spent
+        return total_activity
+    @property
+    def available(self):
+        return self.assigned_amount - self.activity
+    
+class Expense(models.Model):
+    category = models.ForeignKey(ZeroBasedCategory, on_delete=models.CASCADE, related_name='expenses')  
+    description = models.CharField(max_length=255, blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
+    
+    assigned_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
+    def __str__(self):
+        return f"{self.assigned_amount} - {self.description}"
+    @property   
+    def available(self):
+        return self.assigned_amount - self.spent
+            
+   
 #inherit from Budget
 """
 class ZeroBasedBudget(Budget):
@@ -79,6 +111,7 @@ class FiftyThirtyTwentyCategory(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     """
+    
 
     
     

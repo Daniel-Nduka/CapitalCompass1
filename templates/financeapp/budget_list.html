@@ -12,15 +12,19 @@
       <h1>Your Budgets</h1>
       <div class="budget-cards-container">
           {% for budget in budgets %}
-              <div class="budget-card">
+              {% if budget.budget_type == 'zero_based' %}
+                  <a href="{% url 'financeapp:zero_based_page' budget.id %}" class="budget-card">
+              {% else %}
+                  <a href="#" class="budget-card"> <!-- Update with the correct URL for other budget types -->
+              {% endif %}
                   <div class="budgets-thumbnails">
-                    <img class ="budget-photos"src="{% static 'images/image1.webp' %}" alt="Budget Icon">
+                      <img class="budget-photos" src="{% static 'images/image1.webp' %}" alt="Budget Icon">
                   </div>
                   <div class="budget-details">
                       <h3>{{ budget.budget_name }}</h3>
                       <p>Last used: {{ budget.updated_at|date:"F j, Y, g:i a" }}</p>
                   </div>
-              </div>
+              </a>
           {% endfor %}
           <div class="budget-card create-new">
               <div class="budget-icon">

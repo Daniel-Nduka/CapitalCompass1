@@ -1,0 +1,180 @@
+{% extends 'financeapp/loggedin_base.html' %}
+{% load static %}
+{% block title_block %} Zero-Based Budget - CapitalCompass {% endblock %}
+
+{% block body_block %}
+<main>
+    <section class="zero-based-budget-overview">
+        <h1>{{ budget.budget_name }} Zero-Based Budget</h1>
+    </section>
+    <section class="budget-details">
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Assigned</th>
+                    <th>Activity</th>
+                    <th>Available</th>
+                    <th>Action</th>
+                    <th>Action</th>
+                    
+                </tr>
+            </thead>
+            <button onclick="showAddCategoryForm()">+ Add Category</button>
+            <tbody id="category-table">
+                {% for category in categories %}
+                <tr class="category-row">
+                    <td>{{ category.name }} (+)</td>
+                    <td><input type="number" value="{{ category.assigned_amount }}" class="assigned" readonly></td>
+                    <td><input type="number" value="{{ category.activity }}" class="activity" readonly></td>
+                    <td><input type="number" value="{{ category.available }}" class="available" readonly></td>
+                    <td><button onclick="showEditCategoryForm('{{ category.id }}', '{{ category.name }}', '{{ category.assigned_amount }}')">Edit Category</button></td>
+                    <td><button onclick="showAddExpenseForm({{ category.id }})">+ Add Expense</button></td>
+                </tr>
+                {% for expense in category.expenses.all %}
+                <tr class="expense-row">
+                    <td class="expense">{{ expense.description }}</td>
+                    <td><input type="number" value="{{ expense.assigned_amount }}" class="assigned" readonly></td>
+                    <td><input type="number" value="{{ expense.spent }}" class="activity" readonly></td>
+                    <td><input type="number" value="{{ expense.available }}" class="available" readonly></td>
+                    <td><button onclick="showEditExpenseForm({{ category.id }})">Edit Expense</button></td>
+                    <td></td>
+                </tr>
+                {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</main>
+
+<!-- Add Category Modal -->
+<div id="add-category-form" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeAddCategoryForm()">&times;</span>
+        <h2>New Category</h2>
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ category_form.as_p }}
+            <div class="form-group submit-btn">
+                <button type="submit" name="add_category" class="btn btn-primary">Add Category</button>
+                <button type="button" class="btn btn-secondary" onclick="closeAddCategoryForm()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div id="edit-category-form" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeEditCategoryForm()">&times;</span>
+        <h2>Edit Category</h2>
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="category_id" id="edit-category-id">
+            <div class="form-group">
+                <label for="edit-category-name">Category Name:</label>
+                <input type="text" name="name" id="edit-category-name" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-category-assigned-amount">Assigned Amount:</label>
+                <input type="number" name="assigned_amount" id="edit-category-assigned-amount" required>
+            </div>
+            <div class="form-group submit-btn">
+                <button type="submit" name="edit_category" class="btn btn-primary">Edit Category</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEditCategoryForm()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<!-- Add Expense Modal -->
+<div id="add-expense-form" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeAddExpenseForm()">&times;</span>
+        <h2>New Expense</h2>
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ expense_form.as_p }}
+            <input type="hidden" name="category_id" id="expense-category-id">
+            <div class="form-group submit-btn">
+                <button type="submit" name="add_expense" class="btn btn-primary">Add Expense</button>
+                <button type="button" class="btn btn-secondary" onclick="closeAddExpenseForm()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- edit expense Modal-->
+
+<!-- Edit Expense Modal -->
+<div id="edit-expense-form" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeEditExpenseForm()">&times;</span>
+        <h2>Edit Expense</h2>
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ expense_form.as_p }}
+            <input type="hidden" name="expense_id" id="edit-expense-id">
+            <input type="hidden" name="category_id" id="edit-expense-category-id">
+            <div class="form-group submit-btn">
+                <td><button onclick="showEditExpenseForm('{{ expense.id }}', '{{ category.id }}', '{{ expense.description }}', '{{ expense.assigned_amount }}', '{{ expense.spent }}')">Edit Expense</button></td>
+                <button type="button" class="btn btn-secondary" onclick="closeEditExpenseForm()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script> 
+    /* add category */
+    function showAddCategoryForm() {
+        document.getElementById('add-category-form').style.display = 'flex';
+    }
+    function closeAddCategoryForm() {
+        document.getElementById('add-category-form').style.display = 'none';
+    }
+
+
+
+    function showEditCategoryForm(categoryId, categoryName, assignedAmount) {
+        document.getElementById('edit-category-form').style.display = 'flex';
+        document.getElementById('edit-category-id').value = categoryId;
+        
+        document.getElementById('edit-category-name').value = categoryName;
+        document.getElementById('edit-category-assigned-amount').value = assignedAmount;
+    }
+
+    function closeEditCategoryForm() {
+        document.getElementById('edit-category-form').style.display = 'none';
+    }
+
+    /* add expense form */
+    function showAddExpenseForm(categoryId) {
+        document.getElementById('expense-category-id').value = categoryId;
+        document.getElementById('add-expense-form').style.display = 'flex';
+    }
+
+    function closeAddExpenseForm() {
+        document.getElementById('add-expense-form').style.display = 'none';
+    }
+
+    function showEditExpenseForm(expenseId, categoryId, expenseDescription, assignedAmount, spentAmount) {
+        document.getElementById('edit-expense-id').value = expenseId;
+        document.getElementById('edit-expense-category-id').value = categoryId;
+        // Assuming you have fields for description, assigned amount, and spent amount
+        document.getElementById('edit-expense-description').value = expenseDescription;
+        document.getElementById('edit-expense-assigned').value = assignedAmount;
+        document.getElementById('edit-expense-spent').value = spentAmount;
+        document.getElementById('edit-expense-form').style.display = 'flex';
+    }
+    
+    function closeEditExpenseForm() {
+        document.getElementById('edit-expense-form').style.display = 'none';
+    }
+    
+
+   
+</script>
+{% endblock %}
