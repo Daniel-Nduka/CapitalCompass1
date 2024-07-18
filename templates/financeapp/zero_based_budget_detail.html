@@ -37,7 +37,8 @@
                     <td><input type="number" value="{{ expense.assigned_amount }}" class="assigned" readonly></td>
                     <td><input type="number" value="{{ expense.spent }}" class="activity" readonly></td>
                     <td><input type="number" value="{{ expense.available }}" class="available" readonly></td>
-                    <td><button onclick="showEditExpenseForm({{ category.id }})">Edit Expense</button></td>
+                    <td><button onclick="showEditExpenseForm('{{ expense.id }}', '{{ category.id }}', '{{ expense.description }}', '{{ expense.assigned_amount }}', '{{ expense.spent }}')">Edit Expense</button></td>
+
                     <td></td>
                 </tr>
                 {% endfor %}
@@ -52,7 +53,7 @@
     <div class="modal-content">
         <span class="close-button" onclick="closeAddCategoryForm()">&times;</span>
         <h2>New Category</h2>
-        <form method="post" action="">
+        <form method="post" action="{% url 'financeapp:add_category' budget.id %}">
             {% csrf_token %}
             {{ category_form.as_p }}
             <div class="form-group submit-btn">
@@ -68,7 +69,7 @@
     <div class="modal-content">
         <span class="close-button" onclick="closeEditCategoryForm()">&times;</span>
         <h2>Edit Category</h2>
-        <form method="post" action="">
+        <form method="post" action="{% url 'financeapp:edit_category' budget.id  %}" >
             {% csrf_token %}
             <input type="hidden" name="category_id" id="edit-category-id">
             <div class="form-group">
@@ -94,7 +95,7 @@
     <div class="modal-content">
         <span class="close-button" onclick="closeAddExpenseForm()">&times;</span>
         <h2>New Expense</h2>
-        <form method="post" action="">
+        <form method="post" action="{% url 'financeapp:add_expense' budget.id %}">
             {% csrf_token %}
             {{ expense_form.as_p }}
             <input type="hidden" name="category_id" id="expense-category-id">
@@ -106,25 +107,35 @@
     </div>
 </div>
 
-<!-- edit expense Modal-->
-
 <!-- Edit Expense Modal -->
 <div id="edit-expense-form" class="modal">
     <div class="modal-content">
         <span class="close-button" onclick="closeEditExpenseForm()">&times;</span>
         <h2>Edit Expense</h2>
-        <form method="post" action="">
+        <form method="post" action="{% url 'financeapp:edit_expense' budget.id %}">
             {% csrf_token %}
-            {{ expense_form.as_p }}
             <input type="hidden" name="expense_id" id="edit-expense-id">
             <input type="hidden" name="category_id" id="edit-expense-category-id">
+            <div class="form-group">
+                <label for="edit-expense-description">Expense Description:</label>
+                <input type="text" name="description" id="edit-expense-description" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-expense-assigned">Assigned Amount:</label>
+                <input type="number" name="assigned_amount" id="edit-expense-assigned" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-expense-spent">Spent Amount:</label>
+                <input type="number" name="spent" id="edit-expense-spent" required>
+            </div>
             <div class="form-group submit-btn">
-                <td><button onclick="showEditExpenseForm('{{ expense.id }}', '{{ category.id }}', '{{ expense.description }}', '{{ expense.assigned_amount }}', '{{ expense.spent }}')">Edit Expense</button></td>
+                <button type="submit" name="edit_expense" class="btn btn-primary">Edit Expense</button>
                 <button type="button" class="btn btn-secondary" onclick="closeEditExpenseForm()">Cancel</button>
             </div>
         </form>
     </div>
 </div>
+
 
 
 <script> 
@@ -137,7 +148,7 @@
     }
 
 
-
+    /* edit category */
     function showEditCategoryForm(categoryId, categoryName, assignedAmount) {
         document.getElementById('edit-category-form').style.display = 'flex';
         document.getElementById('edit-category-id').value = categoryId;
@@ -160,10 +171,12 @@
         document.getElementById('add-expense-form').style.display = 'none';
     }
 
+    /* edit expense form */
     function showEditExpenseForm(expenseId, categoryId, expenseDescription, assignedAmount, spentAmount) {
         document.getElementById('edit-expense-id').value = expenseId;
         document.getElementById('edit-expense-category-id').value = categoryId;
-        // Assuming you have fields for description, assigned amount, and spent amount
+       
+        
         document.getElementById('edit-expense-description').value = expenseDescription;
         document.getElementById('edit-expense-assigned').value = assignedAmount;
         document.getElementById('edit-expense-spent').value = spentAmount;

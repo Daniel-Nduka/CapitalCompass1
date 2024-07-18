@@ -142,22 +142,102 @@ def budget_list(request):
        'budgets': budgets
    }
    return render(request, 'financeapp/budget_list.html', context)
-'''
+
 @login_required
-def add_zero_based(request):
+def zero_based_page(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
+    categories = ZeroBasedCategory.objects.filter(budget=budget)
+    
+    category_form = ZeroBudgetForm()
+    expense_form = ExpenseForm()
+    
+    context = {
+        'budget': budget,
+        'categories': categories,
+        'category_form': category_form,
+        'expense_form': expense_form,
+    }
+    return render(request, 'financeapp/zero_based_budget_detail.html', context)
+@login_required
+def add_zero_based_category(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
     if request.method == 'POST':
         form = ZeroBudgetForm(request.POST)
         if form.is_valid():
-            zero_budget = form.save(commit=False)
-            zero_budget.user = request.user
-            zero_budget.save()
-            return redirect('financeapp:zero_based_budget_detail')
-    else:
-        form = ZeroBudgetForm()
-    return render(request, 'financeapp/zero_based_budget_detail.html', {'form': form})
+            category = form.save(commit=False)
+            category.budget = budget
+            category.save()
+            return redirect('financeapp:zero_based_page', budget_id=budget.id)
+    return redirect('financeapp:zero_based_page', budget_id=budget.id)
+
+@login_required
+def edit_zero_based_category(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
+    category_id = request.POST.get('category_id')
+    category = get_object_or_404(ZeroBasedCategory, id=category_id, budget=budget)
+    if request.method == 'POST':
+        category_form = ZeroBudgetForm(request.POST, instance=category)
+        if category_form.is_valid():
+            category_form.save()
+            return redirect('financeapp:zero_based_page', budget_id=budget.id)
+    return redirect ('financeapp:zero_based_page', budget_id=budget.id)
+
+@login_required
+def add_zero_based_expense(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
+    if request.method == 'POST':
+        expense_form = ExpenseForm(request.POST)
+        if expense_form.is_valid():
+            expense = expense_form.save(commit=False)
+            expense.category = get_object_or_404(ZeroBasedCategory, id=request.POST.get('category_id'))
+            expense.save()
+            return redirect('financeapp:zero_based_page', budget_id=budget.id)
+    return redirect('financeapp:zero_based_page', budget_id=budget.id)
+
+@login_required
+def edit_zero_based_expense(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
+    category_id = request.POST.get('category_id')
+    category = get_object_or_404(ZeroBasedCategory, id=category_id, budget=budget)
+    expense_id = request.POST.get('expense_id')
+    expense = get_object_or_404(Expense, id=expense_id, category=category)
+    if request.method == 'POST':
+        expense_form = ExpenseForm(request.POST, instance=expense)
+        if expense_form.is_valid():
+            expense_form.save()
+            return redirect('financeapp:zero_based_page', budget_id=budget.id)
+    return redirect('financeapp:zero_based_page', budget_id=budget.id)
+            
+            
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 '''
 @login_required
 def zero_based_page(request, budget_id):
+    
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
     categories = ZeroBasedCategory.objects.filter(budget=budget)
 
@@ -205,39 +285,6 @@ def zero_based_page(request, budget_id):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
 @login_required
 def edit_zero_based(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')

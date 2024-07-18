@@ -20,5 +20,10 @@ urlpatterns = [
     #path('budgets/zero_based/<int:budget_id>/add_category/', views.add_zero_based, name='add_category'),
    # path('budgets/zero_based/<int:category_id>/add_expense/', views.add_expense, name='add_expense'),  # Updated URL pattern
     path('budgets/zero_based/<int:budget_id>/', views.zero_based_page, name='zero_based_page'),
+    path('budgets/zero_based/<int:budget_id>/add_category/', views.add_zero_based_category, name='add_category'),
+    path('budgets/zero_based/<int:budget_id>/edit_category/', views.edit_zero_based_category, name='edit_category'),
+    path('budgets/zero_based/<int:budget_id>/add_expense/', views.add_zero_based_expense, name='add_expense'),
+    path('budgets/zero_based/<int:budget_id>/edit_expense/', views.edit_zero_based_expense, name='edit_expense'),
+
     
 ]
