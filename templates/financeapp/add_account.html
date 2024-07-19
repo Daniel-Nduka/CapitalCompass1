@@ -6,12 +6,12 @@
 <main>
     <section class="create-account">
         <h1>Add New Account</h1>
-        <form method="post">
+        <form method="post" action="{% url 'financeapp:add_account' %}">
             {% csrf_token %}
             {{ form.as_p }}
             <div class="form-group submit-btn">
                 <button type="submit" class="btn btn-primary">Add Account</button>
-                <button onclick="location.href='{% url 'financeapp:accounts' %}'" class="btn btn-secondary">Cancel</a>
+                <button onclick="location.href='{% url 'financeapp:account_list' %}'" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </section>

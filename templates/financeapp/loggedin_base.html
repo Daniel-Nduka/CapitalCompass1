@@ -13,13 +13,20 @@
 </head>
 <body>
     <div class="sidebar">
-        <div class="logo">CapitalCompass</div>
+        <div class="logo">
+            {% if request.selected_budget %}
+                {{ request.selected_budget.budget_name }} - CapitalCompass
+            {% else %}
+                CapitalCompass
+            {% endif %}
+        </div>
         <nav>
             <ul class="nav-top">
-                <li><a href="{% url 'financeapp:accounts' %}">Accounts</a></li>
-                <li><a href="{% url 'financeapp:create_budget' %}">Budgets</a></li>
+                
+                <li><a href="{% url 'financeapp:budget_list' %}">Budgets</a></li>
                 <li><a href="{% url 'financeapp:transactions' %}">Transactions</a></li>
                 <li><a href="#">Financial Analysis</a></li>
+                <li><a href="{% url 'financeapp:account_list'%}">Accounts</a></li> 
             </ul>
             <ul class="nav-bottom">
                 <li><a href="contactus.html">Contact us </a></li>

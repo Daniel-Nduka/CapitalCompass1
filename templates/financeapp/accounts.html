@@ -13,18 +13,23 @@
         </div>
 
         <button class="btn btn-primary" onclick="location.href='{% url 'financeapp:add_account' %}'"> Add Account </button>
-        
-      
+
         <ul>
             {% for account in accounts %}
                 <li>
-                  {{ account.account_name }}: Current Balance: £{{ account.balance }} 
-                  <button class="btn btn-info" onclick="location.href">View Transactions</button> 
-                  <button class="btn btn-warning" onclick="location.href='{% url 'financeapp:edit_account' account.id %}'">Edit Account</button>
-                  <button class="btn btn-danger" onclick="location.href='{% url 'financeapp:delete_account' account.id %}'">Delete</button>
-                </li> 
+                    {{ account.account_name }}: Current Balance: £{{ account.balance }}
+                    <form method="get" action="{% url 'financeapp:edit_account' account.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-warning">Edit Account</button>
+                    </form>
+                    <form method="get" action="{% url 'financeapp:delete_account' account.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </li>
             {% endfor %}
         </ul>
     </section>
 </main>
 {% endblock %}
+
