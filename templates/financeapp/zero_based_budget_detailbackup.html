@@ -17,45 +17,27 @@
             {% for category in categories %}
             <div class="category-card">
                 <div class="category-header">
-                    <span class="category-name"><span class="name-category">{{ category.name }}</span><span class="budget"> Budget</span></span>
-                    <span class="category-assigned"><span class="assigned-category">£{{ category.assigned_amount }}</span><span class="assigned"> Total Money Assigned </span></span>
-                    <span class="category-activity"><span class="activity-category">£{{ category.activity }}</span><span class="activity"> Money Spent</span></span>
+                    <span class="category-name">{{ category.name }}</span>
+                    <span class="category-assigned">£{{ category.assigned_amount }}</span>
+                    <button class="action-button" onclick="showEditCategoryForm('{{ category.id }}', '{{ category.name }}', '{{ category.assigned_amount }}')">Edit Category</button>
+                    <button class="action-button" onclick="showAddExpenseForm({{ category.id }})">+ Add Expense</button>
                 </div>
                 <div class="expenses-list">
                     {% for expense in category.expenses.all %}
                     <div class="expense-item">
-                        <span class="expense-description">
-                            <span class="description-expense">{{ expense.description }}</span>
-                            <span class="expense"> Expense </span>
-                        </span>
-                        <span class="expense-assigned">
-                            <span class="assigned-expense">£{{ expense.assigned_amount }}</span>
-                            <span class="cost"> Cost </span>
-                        </span>
-                        <span class="expense-spent">
-                            <span class="spent-container">
-                                <span class="spent-paid-container">
-                                    <span class="spent-expense">£{{ expense.spent }}</span>
-                                    <span class="paid"> Paid </span>
-                                </span>
-                                    <span class="edit-icon" onclick="showEditExpenseForm('{{ expense.id }}', '{{ category.id }}', '{{ expense.description }}', '{{ expense.assigned_amount }}', '{{ expense.spent }}')">
-                                        &#9998; <!-- Pencil icon -->
-                                    </span>
-                            </span>
-                        </span>
+                        <span class="expense-description">{{ expense.description }}</span>
+                        <span class="expense-assigned">£{{ expense.assigned_amount }}</span>
+                        <span class="expense-spent">£{{ expense.spent }}</span>
+                        <span class="expense-available">£{{ expense.available }}</span>
+                        <button class="action-button" onclick="showEditExpenseForm('{{ expense.id }}', '{{ category.id }}', '{{ expense.description }}', '{{ expense.assigned_amount }}', '{{ expense.spent }}')">Edit Expense</button>
                     </div>
-                    
                     {% endfor %}
-                </div>
-                <div class="category-actions">
-                    <button class="action-button" onclick="showEditCategoryForm('{{ category.id }}', '{{ category.name }}', '{{ category.assigned_amount }}')">Edit Category</button>
-                    <button class="action-button" onclick="showAddExpenseForm({{ category.id }})">+ Add Expense</button>
                 </div>
             </div>
             {% endfor %}
         </div>
     </section>
-   
+</main>
 
 <!-- Add Category Modal -->
 <div id="add-category-form" class="modal">
@@ -78,7 +60,7 @@
     <div class="modal-content">
         <span class="close-button" onclick="closeEditCategoryForm()">&times;</span>
         <h2>Edit Category</h2>
-        <form method="post" action="{% url 'financeapp:edit_category' budget.id %}">
+        <form method="post" action="{% url 'financeapp:edit_category' budget.id  %}" >
             {% csrf_token %}
             <input type="hidden" name="category_id" id="edit-category-id">
             <div class="form-group">
@@ -128,11 +110,11 @@
                 <input type="text" name="description" id="edit-expense-description" required>
             </div>
             <div class="form-group">
-                <label for="edit-expense-assigned">Cost:</label>
+                <label for="edit-expense-assigned">Assigned Amount:</label>
                 <input type="number" name="assigned_amount" id="edit-expense-assigned" required>
             </div>
             <div class="form-group">
-                <label for="edit-expense-spent">Paid:</label>
+                <label for="edit-expense-spent">Spent Amount:</label>
                 <input type="number" name="spent" id="edit-expense-spent" required>
             </div>
             <div class="form-group submit-btn">
@@ -186,14 +168,6 @@
     
     function closeEditExpenseForm() {
         document.getElementById('edit-expense-form').style.display = 'none';
-    }
-
-    // Ensure modals are hidden by default on page load
-    window.onload = function() {
-        closeAddCategoryForm();
-        closeEditCategoryForm();
-        closeAddExpenseForm();
-        closeEditExpenseForm();
     }
 </script>
 {% endblock %}

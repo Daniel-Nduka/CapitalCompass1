@@ -1,0 +1,361 @@
+/* Ensure html and body take up full height and width */
+html, body {
+    height: 100%;
+    width: 70%;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    padding-left: 200px; /* Your custom padding */
+}
+
+/* Main container styling */
+main {
+    padding: 20px;
+}
+
+/* Section header styling */
+.zero-based-budget-overview h1 {
+    margin-bottom: 20px;
+    text-align: center; /* Center the header text */
+    font-size: 40px; /* Your custom font size */
+}
+
+/* Add Category button styling */
+.add-category-button {
+    display: block; /* Make the button a block-level element */
+    margin: 0 auto 20px auto; /* Center horizontally with a bottom margin */
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px; /* Your custom margin */
+}
+
+.add-category-button:hover {
+    background-color: #0056b3;
+}
+
+/* Categories container styling */
+.categories-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Category card styling */
+.category-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Category header styling */
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.category-name {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.category-assigned, .category-available {
+    font-size: 1.2em;
+    color: #007bff;
+}
+
+/* Action buttons styling */
+.action-button {
+    background-color: transparent;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+}
+
+.action-button:hover {
+    text-decoration: underline;
+}
+
+/* Expenses list styling */
+.expenses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Flex container for expense item */
+.expense-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+/* Expense spent container to position icon inline */
+.expense-spent {
+  display: flex;
+
+}
+.spent-container {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Adjust gap as needed */
+}
+.spent-paid-container {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: flex-start; /* Align items to the start of the flex container */
+}
+
+.spent-expense {
+  margin-right: 5px; /* Space between amount and icon */
+}
+
+.edit-icon {
+  cursor: pointer;
+  color: #007bff;
+  font-size: 1.2em; /* Adjust icon size */
+}
+
+.edit-icon:hover {
+  color: #0056b3;
+}
+
+
+.expense-description {
+    font-weight: 0.5;
+}
+
+.expense-assigned,
+.expense-spent,
+.expense-available {
+    color: #333;
+}
+
+.submit-btn {
+    text-align: center;
+}
+
+.submit-btn button {
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn .btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.submit-btn .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.submit-btn .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.submit-btn .btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Modal container */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+/* Modal content */
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/* Close button */
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Form group */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* Submit buttons */
+.form-group.submit-btn {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-group.submit-btn button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.form-group.submit-btn .btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.form-group.submit-btn .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+
+.add-category-button {
+  display: block; /* Make the button a block-level element */
+  margin: 0 auto 20px auto; /* Center horizontally with a bottom margin */
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px; /* Your custom margin */
+}
+.category-name {
+  position: relative;
+  display: flex;
+  flex-direction: column; /* To stack the budget below the category name */
+  align-items: flex-start; /* Align items to the start of the flex container */
+}
+.name-category, .assigned-category, .activity-category {
+  font-size: 1.4em;
+}
+
+.category-assigned, .category-available, .category-activity{
+  font-size: 1.2em;
+  color: #007bff;
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: flex-start;
+  font-weight: bold;
+}
+
+.expense-description, .expense-assigned, .expense-spent{
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: flex-start;
+
+}
+
+.category-name .budget, .category-assigned .assigned, .category-activity .activity, .expense-description .expense, .expense-assigned .cost, .expense-spent .paid {
+  display: inline-block;
+  padding: 5px; /* Adjust padding for the box */
+  border-radius: 10px; 
+  background-color: white; /* Background color */
+  margin-top: 2px; /* Space between category name and budget logo */
+}
+
+.budget {
+  color: red;
+  border: 1px solid red; /* Border to create the box effect */
+  font-size: 0.8em; /* Smaller font size */
+}
+
+.assigned {
+  color: purple;
+  border: 1px solid purple; /* Border to create the box effect */
+  font-size: 0.8em; /* Smaller font size */
+}
+
+.activity{
+  color: green;
+  border: 1px solid green; /* Border to create the box effect */
+  font-size: 0.8em; /* Smaller font size */
+}
+.description-expense, .assigned-expense, .spent-expense {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+
+.assigned-expense, .spent-expense {
+  font-weight: 0.5;
+  font-size: 1.2em;
+}
+.expense, .cost, .paid{
+  font-size: 0.8em; /* Smaller font size */
+  font-weight: 0.5;
+}
+.expense{
+  color: blue;
+  border: 1px solid blue; /* Border to create the box effect */
+}
+
+.cost{
+  color: red;
+  border: 1px solid red; /* Border to create the box effect */
+}
+
+.paid{
+  color: green;
+  border: 1px solid green; /* Border to create the box effect */
+
+}
+.category-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center; /* Align buttons to the right */
+  margin-top: 10px; /* Add space between expenses and buttons */
+}
+

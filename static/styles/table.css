@@ -1,0 +1,48 @@
+/* Ensure html and body take up full height and width */
+
+
+/* Ensure main and section containers take up full height and width */
+main {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+/* Make the table take up full width and height */
+table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 18px;
+    text-align: left;
+    border: none; /* Remove table border */
+}
+
+.category-row, .assigned-header, .available-header, .activity-header, .action-header{
+    background-color: #f0ebec; /* Burgundy color */
+    
+    font-weight: bold;
+    border: none;
+   
+}
+
+.category-row{
+    padding-right: 100px;
+}
+.assigned, .available, .activity, .action{
+  background-color: white;
+  border: none;
+
+  
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    border: none; /* Remove cell borders */
+}
+
+
