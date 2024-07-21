@@ -172,6 +172,18 @@ def zero_based_page(request, budget_id):
     request.session['selected_budget_id'] = budget.id
     categories = ZeroBasedCategory.objects.filter(budget=budget)
     
+    total_balance = 0
+    budgeted_money = sum(category.assigned_amount for category in categories) 
+    accounts = budget.accounts.all()
+    
+    for account in accounts:
+        if account.account_type != 'CREDIT':
+            total_balance+= account.balance
+        else:
+            total_balance -= account.balance
+    money_available = total_balance - budgeted_money
+             
+    
     category_form = ZeroBudgetForm()
     expense_form = ExpenseForm()
     
@@ -180,6 +192,7 @@ def zero_based_page(request, budget_id):
         'categories': categories,
         'category_form': category_form,
         'expense_form': expense_form,
+        'money_available': money_available,
     }
     return render(request, 'financeapp/zero_based_budget_detail.html', context)
 

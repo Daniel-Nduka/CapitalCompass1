@@ -10,9 +10,16 @@
 <main>
     <section class="zero-based-budget-overview">
         <h1>{{ budget.budget_name }} Zero-Based Budget</h1>
+        <div class="{% if money_available >= 0 %}money-positive{% else %}money-negative{% endif %}">
+            {% if money_available >= 0 %}
+                Available Money: £{{ money_available }} 
+            {% else %}
+                Warning: Negative Balance of £{{ money_available }} <button class="add-money" onclick="location.href='{% url 'financeapp:add_account' %}'"> Add Money </button>
+            {% endif %}
+        </div>
     </section>
-    <section class="budget-details">
-        <button class="add-category-button" onclick="showAddCategoryForm()">+ Add Category</button>
+
+    <section class="budget-details">  
         <div class="categories-container">
             {% for category in categories %}
             <div class="category-card">
@@ -54,6 +61,7 @@
             </div>
             {% endfor %}
         </div>
+        <button class="add-category-button" onclick="showAddCategoryForm()">+ Add Category</button>
     </section>
    
 
