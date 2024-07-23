@@ -288,6 +288,17 @@ def edit_zero_based_category(request, budget_id):
     return redirect ('financeapp:zero_based_page', budget_id=budget.id)
 
 @login_required
+def delete_category(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
+    category_id = request.POST.get('category_id')
+    category = get_object_or_404(ZeroBasedCategory, id=category_id, budget=budget)
+    
+    if request.method == 'POST':
+        category.delete()
+        return redirect('financeapp:zero_based_page', budget_id=budget.id)
+    return redirect('financeapp:zero_based_page', budget_id=budget.id)
+
+@login_required
 def add_zero_based_expense(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
     if request.method == 'POST':
@@ -299,23 +310,7 @@ def add_zero_based_expense(request, budget_id):
             return redirect('financeapp:zero_based_page', budget_id=budget.id)
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
 
-'''
-@login_required
-def edit_zero_based_expense(request, budget_id):
-    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
-    category_id = request.POST.get('category_id')
-    category = get_object_or_404(ZeroBasedCategory, id=category_id, budget=budget)
-    expense_id = request.POST.get('expense_id')
-    expense = get_object_or_404(Expense, id=expense_id, category=category)
-    if request.method == 'POST':
-        form = ExpenseForm(request.POST, instance=expense)
-        if form.is_valid():
-            # Manually update the is_recurring field
-            expense.is_recurring = 'is_recurring' in request.POST
-            form.save()
-            return redirect('financeapp:zero_based_page', budget_id=budget.id)
-    return redirect('financeapp:zero_based_page', budget_id=budget.id)
-'''
+
 @login_required
 def edit_zero_based_expense(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
@@ -341,4 +336,22 @@ def edit_zero_based_expense(request, budget_id):
     
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
 
-            
+
+@login_required
+def delete_expense(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
+    category_id = request.POST.get('category_id')
+    expense_id = request.POST.get('expense_id')
+    print(f"Budget ID: {budget_id}")
+    print(f"Category ID: {category_id}")
+    print(f"Expense ID: {expense_id}")
+
+    if category_id and expense_id:
+        category = get_object_or_404(ZeroBasedCategory, id=category_id, budget=budget)
+        expense = get_object_or_404(Expense, id=expense_id, category=category)
+    
+        if request.method == 'POST':
+            expense.delete()
+            return redirect('financeapp:zero_based_page', budget_id=budget.id)
+    
+    return redirect('financeapp:zero_based_page', budget_id=budget.id)

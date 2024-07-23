@@ -2,7 +2,7 @@
 {% load static %}
 {% block title_block %} Budget List - CapitalCompass {% endblock %}
 
-{% block head_block %} 
+{% block head_block %}
 <link rel="stylesheet" href="{% static 'styles/budget_list.css' %}">
 {% endblock %}
 
@@ -22,11 +22,11 @@
                   </div>
                   <div class="budget-actions">
                       {% if budget.budget_type == 'zero_based' %}
-                          <a href="{% url 'financeapp:zero_based_page' budget.id %}" class="btn btn-primary">View</a>
+                          <button onclick="location.href='{% url 'financeapp:zero_based_page' budget.id %}'" class="btn btn-primary">View</button>
                       {% else %}
-                          <a href="#" class="btn btn-primary">View</a> <!-- Update with the correct URL for other budget types -->
+                          <button onclick="location.href='#'" class="btn btn-primary">View</button> <!-- Update with the correct URL for other budget types -->
                       {% endif %}
-                      <a href="{% url 'financeapp:delete_budget' budget.id %}" class="btn btn-danger">Delete</a>
+                      <button onclick="location.href='{% url 'financeapp:delete_budget' budget.id %}'" class="btn btn-danger">Delete</button>
                   </div>
               </div>
           {% endfor %}

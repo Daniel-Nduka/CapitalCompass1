@@ -53,7 +53,7 @@ main {
   display: flex;
   flex-direction: column;
 }
-.add-money {
+.add-money-negative {
   display: inline-block;
   margin-left: 10px; /* Space between text and button */
   padding: 5px 10px;
@@ -63,7 +63,20 @@ main {
   border-radius: 5px; /* Rounded corners */
   cursor: pointer; /* Pointer cursor on hover */
   font-weight: bold; /* Bold text */
-  font-size: 0.9em; /* Adjust font size */
+  font-size: 0.75em; /* Adjust font size */
+}
+
+.add-money-positive {
+  display: inline-block;
+  margin-left: 10px; /* Space between text and button */
+  padding: 5px 10px;
+  background-color: green; /* Red background */
+  color: white; /* White text */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-weight: bold; /* Bold text */
+  font-size: 0.75em; /* Adjust font size */
 }
 
 .add-money:hover {
