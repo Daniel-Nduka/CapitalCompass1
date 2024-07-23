@@ -36,36 +36,7 @@
         <form method="post" action="{% url 'financeapp:create_budget' %}">
             {% csrf_token %}
             {{ form.as_p }}
-            <!--
-            <div class="form-group">
-                <label for="budget-name">Budget Name</label>
-                <input id="budget-name" name="budget-name" type="text" placeholder="Enter budget name">
-            </div>
-            <div class="form-group">
-                <label for="budgettype">Select Budget Type</label>
-                <select id="budget-type" name="showBudgetForm()">
-                    <option value="zero-based">Zero-Based</option>
-                    <option value="50-30-20">50/30/20</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="currency">Currency</label>
-                <select id="currency" name="currency">
-                    <option value="usd">US Dollar - USD</option>
-                    <option value="gbp">UK Pound Sterling - GBP</option>
-                    <option value="eur">Euro - EUR</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="number-format">Number Format</label>
-                <input id="number-format" name="number-format" type="text" placeholder="123,456.78">
-            </div>
-            <div class="form-group">
-                <label for="date-format">Date Format</label>
-                <input id="date-format" name="date-format" type="text" placeholder="12/30/2024">
-            </div>
-        -->
+          
             <div class="form-group submit-btn">
                 <button type="submit" class="btn btn-primary" onclick="createBudget()">Create Budget</button>
                 <button type="button" class="btn btn-secondary" onclick="closeCreateBudgetForm()">Cancel</button>

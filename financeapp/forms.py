@@ -26,11 +26,13 @@ class BudgetForm(forms.ModelForm):
         fields = ['budget_name', 'budget_type', 'currency_type']
         
 class ZeroBudgetForm(forms.ModelForm):
+    is_recurring = forms.BooleanField(required=False, label='Recurring')
     class Meta:
         model = ZeroBasedCategory
-        fields = ['name', 'assigned_amount']
+        fields = ['name', 'assigned_amount', 'is_recurring']
 
 class ExpenseForm(forms.ModelForm):
+    is_recurring = forms.BooleanField(required=False, label='Recurring')
     class Meta:
         model = Expense
-        fields = ['description', 'assigned_amount', 'spent']
+        fields = ['description', 'assigned_amount', 'spent', 'is_recurring']

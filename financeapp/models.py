@@ -2,6 +2,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+import datetime
+
 # Create your models here.
 
 class UserProfile(models.Model):
@@ -53,6 +55,7 @@ class Account(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    
     def __str__(self):
        return f"{self.account_name} ({self.get_account_type_display()}) - {self.budget.budget_name}"
 
@@ -62,6 +65,8 @@ class ZeroBasedCategory(models.Model):
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='zero_based_categories')
     name = models.CharField(max_length=100)
     assigned_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    month = models.DateField(default=datetime.date.today)
+    is_recurring = models.BooleanField(default=False)  # New field to indicate if the category is recurring
     def __str__(self):
         return self.name
     @property
@@ -78,6 +83,7 @@ class Expense(models.Model):
     category = models.ForeignKey(ZeroBasedCategory, on_delete=models.CASCADE, related_name='expenses')  
     description = models.CharField(max_length=255, blank=True, null=True)
     date = models.DateField(auto_now_add=True)
+    is_recurring = models.BooleanField(default=False)  # New field to indicate if the expense is recurring
     
     assigned_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -87,6 +93,16 @@ class Expense(models.Model):
     @property   
     def available(self):
         return self.assigned_amount - self.spent
+
+''' 
+class Transactions(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions')
+    description = models.CharField(max_length=255, blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    def __str__(self):
+        return f"{self.amount} - {self.description}"
+        '''
             
    
 #inherit from Budget

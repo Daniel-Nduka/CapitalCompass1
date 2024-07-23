@@ -2,6 +2,7 @@
 
 from django.shortcuts import get_object_or_404
 from .models import Budget
+from django.shortcuts import render
 
 class SelectedBudgetMiddleware:
     def __init__(self, get_response):

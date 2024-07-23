@@ -27,9 +27,13 @@ urlpatterns = [
     
     path('create-budget/', views.create_budget, name='create_budget'),
     path('budgets/', views.budget_list, name='budget_list'),
+    path('budgets/delete/<int:budget_id>/', views.delete_budget, name='delete_budget'),
     
     
-    path('budgets/zero_based/<int:budget_id>/', views.zero_based_page, name='zero_based_page'),
+    path('budgets/zero_based/<int:budget_id>/', views.zero_based_page, name='zero_based_page'), 
+    path('budgets/zero-based/<int:budget_id>/<int:year>/<int:month>/', views.zero_based_page, name='zero_based_page_with_date'),
+    
+    
     path('budgets/zero_based/<int:budget_id>/add_category/', views.add_zero_based_category, name='add_category'),
     path('budgets/zero_based/<int:budget_id>/edit_category/', views.edit_zero_based_category, name='edit_category'),
     path('budgets/zero_based/<int:budget_id>/add_expense/', views.add_zero_based_expense, name='add_expense'),

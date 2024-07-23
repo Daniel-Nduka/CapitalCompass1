@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.http import JsonResponse
+import datetime
 
 from .models import UserProfile, Budget, ZeroBasedCategory, Expense, Account
 from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm, ZeroBudgetForm, ExpenseForm
@@ -163,38 +164,103 @@ def budget_list(request):
        'budgets': budgets
    }
    return render(request, 'financeapp/budget_list.html', context)
+@login_required
 
+def delete_budget(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user)
+   
+    if request.method == 'POST':
+        #ensure the selected budget is removed from the session
+        if request.session.get('selected_budget_id') == budget_id:
+            del request.session['selected_budget_id']
+        budget.delete()
+        messages.success(request, 'Budget deleted successfully.')
+        return redirect('financeapp:budget_list')
+    context = {
+        'budget': budget
+    }
+    return render(request, 'financeapp/delete_budget.html', context)
+
+@login_required
+# Helper Function to copy recurring categories and expenses from the previous budget
+def copy_recurring_items(budget, selected_date):
+    last_month = selected_date - datetime.timedelta(days=1)
+    last_month_categories = ZeroBasedCategory.objects.filter(budget=budget, month__year=last_month.year, month__month=last_month.month, is_recurring=True)
+
+    for category in last_month_categories:
+        new_category, created = ZeroBasedCategory.objects.get_or_create(
+            budget=budget,
+            name=category.name,
+            month=selected_date,
+            defaults={'assigned_amount': category.assigned_amount, 'is_recurring': category.is_recurring}
+        )
+
+        if created:
+            for expense in category.expenses.filter(is_recurring=True):
+                Expense.objects.create(
+                    category=new_category,
+                    description=expense.description,
+                    assigned_amount=expense.assigned_amount,
+                    spent=0,  # reset spent for new month
+                    is_recurring=expense.is_recurring
+                )
 #Zero based budget page. It displays the categories and expenses associated with the budget.
 #when a user selects a budget, it stores the budget in the session.
+
 @login_required
-def zero_based_page(request, budget_id):
+def zero_based_page(request, budget_id, year=None, month=None):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
     request.session['selected_budget_id'] = budget.id
-    categories = ZeroBasedCategory.objects.filter(budget=budget)
-    
+
+    if not year or not month:
+        today = datetime.date.today()
+        year, month = today.year, today.month
+
+    selected_date = datetime.date(year, month, 1)
+
+    # Copy recurring items if necessary
+    copy_recurring_items(budget, selected_date)
+
+    previous_month_date = selected_date.replace(day=1) - datetime.timedelta(days=1)
+    next_month_date = selected_date.replace(day=28) + datetime.timedelta(days=4)
+    previous_month = previous_month_date.month
+    previous_year = previous_month_date.year
+    next_month = next_month_date.replace(day=1).month
+    next_year = next_month_date.replace(day=1).year
+
+    categories = ZeroBasedCategory.objects.filter(budget=budget, month__year=year, month__month=month)
+
     total_balance = 0
-    budgeted_money = sum(category.assigned_amount for category in categories) 
+    budgeted_money = sum(category.assigned_amount for category in categories)
     accounts = budget.accounts.all()
-    
+
     for account in accounts:
         if account.account_type != 'CREDIT':
-            total_balance+= account.balance
+            total_balance += account.balance
         else:
             total_balance -= account.balance
+
     money_available = total_balance - budgeted_money
-             
-    
+
     category_form = ZeroBudgetForm()
     expense_form = ExpenseForm()
-    
+
     context = {
         'budget': budget,
         'categories': categories,
         'category_form': category_form,
         'expense_form': expense_form,
         'money_available': money_available,
+        'selected_date': selected_date,
+        'year': year,
+        'month': month,
+        'previous_month': previous_month,
+        'previous_year': previous_year,
+        'next_month': next_month,
+        'next_year': next_year,
     }
     return render(request, 'financeapp/zero_based_budget_detail.html', context)
+
 
 #Add zero based category. It allows users to add a category to the zero based budget.
 @login_required
@@ -233,6 +299,7 @@ def add_zero_based_expense(request, budget_id):
             return redirect('financeapp:zero_based_page', budget_id=budget.id)
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
 
+'''
 @login_required
 def edit_zero_based_expense(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
@@ -241,64 +308,37 @@ def edit_zero_based_expense(request, budget_id):
     expense_id = request.POST.get('expense_id')
     expense = get_object_or_404(Expense, id=expense_id, category=category)
     if request.method == 'POST':
-        expense_form = ExpenseForm(request.POST, instance=expense)
-        if expense_form.is_valid():
-            expense_form.save()
+        form = ExpenseForm(request.POST, instance=expense)
+        if form.is_valid():
+            # Manually update the is_recurring field
+            expense.is_recurring = 'is_recurring' in request.POST
+            form.save()
             return redirect('financeapp:zero_based_page', budget_id=budget.id)
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
-            
-            
-
-
-
-
 '''
 @login_required
-def edit_zero_based(request, budget_id):
+def edit_zero_based_expense(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
-    categories = ZeroBasedCategory.objects.filter(budget=budget) 
-    accounts = request.user.accounts.all()
-
-    total_balance = sum(account.balance for account in accounts if account.account_type != 'CREDIT')
-    total_debt = sum(account.balance for account in accounts if account.account_type == 'CREDIT')
-    total_money = total_balance - total_debt
+    category_id = request.POST.get('category_id')
+    category = get_object_or_404(ZeroBasedCategory, id=category_id, budget=budget)
+    expense_id = request.POST.get('expense_id')
+    expense = get_object_or_404(Expense, id=expense_id, category=category)
     
-    budgeted_money = sum(category.assigned_amount for category in categories)
-    available_money = total_money - budgeted_money
-
     if request.method == 'POST':
-        if 'category_name' in request.POST:
-            category_name = request.POST['category_name']
-            category_assigned = request.POST['category_assigned']
-            if category_name and category_assigned:
-                ZeroBasedCategory.objects.create(
-                    budget=budget,
-                    name=category_name,
-                    assigned_amount=category_assigned
-                )
-                return redirect('financeapp:edit_zero_based', budget_id=budget.id)
-        elif 'expense_description' in request.POST:
-            expense_description = request.POST['expense_description']
-            expense_assigned = request.POST['expense_assigned']
-            expense_activity = request.POST['expense_activity']
-            category_id = request.POST['category_id']
-            if expense_description and expense_assigned and category_id:
-                category = get_object_or_404(ZeroBasedCategory, id=category_id)
-                Expense.objects.create(
-                    category=category,
-                    description=expense_description,
-                    assigned_amount=expense_assigned,
-                    activity=expense_activity
-                )
-                return redirect('financeapp:edit_zero_based', budget_id=budget.id)
-
-    context = {
-        'budget': budget,
-        'categories': categories,
-        'total_money': total_money,
-        'budgeted_money': budgeted_money,
-        'available_money': available_money,
-    }
-    return render(request, 'financeapp/zero_based_budget_detail.html', context)
+        form = ExpenseForm(request.POST, instance=expense)
+        if form.is_valid():
+            expense = form.save(commit=False)
+            # Ensure is_recurring is explicitly updated
+            is_recurring_value = 'is_recurring' in request.POST
+            expense.is_recurring = is_recurring_value
+            expense.save()
+            print(f"Updated is_recurring: {is_recurring_value}")  # Debugging line
+            return redirect('financeapp:zero_based_page', budget_id=budget.id)
+        else:
+            print("Form is invalid", form.errors)  # Debugging line
+    else:
+        print("Request method is not POST")  # Debugging line
     
-'''
+    return redirect('financeapp:zero_based_page', budget_id=budget.id)
+
+            

@@ -30,7 +30,7 @@ main {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px; /* Your custom margin */
+  margin-top: 50px; /* Your custom margin */
 }
 
 .add-category-button:hover {
@@ -70,6 +70,28 @@ main {
   background-color: #d32f2f; /* Darker red on hover */
 }
 
+.month-year-display{
+  font-size: 30px;
+}
+.month-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.month-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
 
 .money-positive {
   display: flex;
@@ -86,6 +108,7 @@ main {
   font-size: 1.2em; /* Adjust font size */
   text-align: center;
 }
+
 
 .money-negative {
   display: flex;
@@ -287,6 +310,16 @@ color: #0056b3;
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
+}
+.form-group input[type="checkbox"] {
+  display: inline-block;
+  width: auto;
+  margin-right: 10px;
+}
+.form-group .checkbox-label {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
 }
 
 /* Submit buttons */

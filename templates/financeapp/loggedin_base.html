@@ -5,11 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title_block %}{% endblock %}</title>
-   <link rel="stylesheet" href="{% static 'styles/application.css' %}"> 
+    <link rel="stylesheet" href="{% static 'styles/application.css' %}">
     <link rel="stylesheet" href="{% static 'styles/profile.css' %}">
-   <link rel="stylesheet" href="{% static 'styles/transactions.css' %}">
-   {% block head_block %} {% endblock %}
-   
+    <link rel="stylesheet" href="{% static 'styles/transactions.css' %}">
+    {% block head_block %}{% endblock %}
 </head>
 <body>
     <div class="sidebar">
@@ -22,19 +21,23 @@
         </div>
         <nav>
             <ul class="nav-top">
-                
-                <li><a href="{% url 'financeapp:budget_list' %}">Budgets</a></li>
+                {% if request.selected_budget %}
+                    <li><a href="{% url 'financeapp:zero_based_page' request.selected_budget.id %}">{{ request.selected_budget.budget_name }} Budget </a></li>
+                {% else %}
+                    <li><a href="{% url 'financeapp:create_budget' %}">Create Budget</a></li>
+                {% endif %}
                 <li><a href="{% url 'financeapp:transactions' %}">Transactions</a></li>
                 <li><a href="#">Financial Analysis</a></li>
-                <li><a href="{% url 'financeapp:account_list'%}">Accounts</a></li> 
+                <li><a href="{% url 'financeapp:account_list' %}">Accounts</a></li>
             </ul>
             <ul class="nav-bottom">
-                <li><a href="contactus.html">Contact us </a></li>
-                <li><a href="{% url 'financeapp:profile' %}">Profile </a></li>
+                <li><a href="{% url 'financeapp:budget_list' %}">Your Budgets</a></li>
+                <li><a href="contactus.html">Contact us</a></li>
+                <li><a href="{% url 'financeapp:profile' %}">Profile</a></li>
                 <li><a href="{% url 'auth_logout' %}?next={% url 'financeapp:index' %}">Log out</a></li>
             </ul>
         </nav>
     </div>
-        {% block body_block %}{% endblock %}   
+    {% block body_block %}{% endblock %}
 </body>
 </html>
