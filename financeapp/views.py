@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 import datetime
 
-from .models import UserProfile, Budget, ZeroBasedCategory, Expense, Account
-from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm, ZeroBudgetForm, ExpenseForm
+from .models import UserProfile, Budget, ZeroBasedCategory, Expense, Account, FiftyThirtyTwentyCategory, FiftyThirtyTwentyBudget
+from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm, ZeroBudgetForm, ExpenseForm, Fifty_Twenty_ThirtyForm
 
 from django.contrib.auth import logout
 
@@ -355,3 +355,151 @@ def delete_expense(request, budget_id):
             return redirect('financeapp:zero_based_page', budget_id=budget.id)
     
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
+#implementation of the 50/30/20 budget
+
+@login_required
+def copy_recurring_items_fifty_thirty_twenty(budget, selected_date):
+    last_month = selected_date - datetime.timedelta(days=1)
+    
+    # Attempt to get the last month's budget
+    try:
+        last_month_budget = FiftyThirtyTwentyBudget.objects.get(budget=budget, month__year=last_month.year, month__month=last_month.month)
+    except FiftyThirtyTwentyBudget.DoesNotExist:
+        # If last month's budget does not exist, exit the function
+        return
+
+    # Get the recurring categories from the last month's budget
+    last_month_categories = FiftyThirtyTwentyCategory.objects.filter(budget=last_month_budget, is_recurring=True)
+
+    for category in last_month_categories:
+        # Create a new category for the current month if it doesn't already exist
+        new_category, created = FiftyThirtyTwentyCategory.objects.get_or_create(
+            budget=FiftyThirtyTwentyBudget.objects.get(budget=budget, month=selected_date),  # Ensure correct budget
+            name=category.name,
+            defaults={'assigned_amount': category.assigned_amount, 'is_recurring': category.is_recurring}
+        )
+
+        if created:
+            for expense in category.expenses.filter(is_recurring=True):
+                Expense.objects.create(
+                    fifty_30_twenty_category=new_category,
+                    description=expense.description,
+                    assigned_amount=expense.assigned_amount,
+                    spent=0,  # reset spent for new month
+                    is_recurring=expense.is_recurring
+                )
+
+                
+@login_required
+def fifty_thirty_twenty_page(request, budget_id, year=None, month=None):
+    base_budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='fifty_thirty_twenty')
+    request.session['selected_budget_id'] = base_budget.id
+
+    if not year or not month:
+        today = datetime.date.today()
+        year, month = today.year, today.month
+
+    selected_date = datetime.date(year, month, 1)
+
+    # Copy recurring items if necessary
+    copy_recurring_items_fifty_thirty_twenty(base_budget, selected_date)
+    fifty_thirty_twenty_budget, created = FiftyThirtyTwentyBudget.objects.get_or_create(
+        budget=base_budget, month=selected_date
+    )
+
+    previous_month_date = selected_date.replace(day=1) - datetime.timedelta(days=1)
+    next_month_date = selected_date.replace(day=28) + datetime.timedelta(days=4)
+    previous_month = previous_month_date.month
+    previous_year = previous_month_date.year
+    next_month = next_month_date.replace(day=1).month
+    next_year = next_month_date.replace(day=1).year
+
+    categories = FiftyThirtyTwentyCategory.objects.filter(budget=fifty_thirty_twenty_budget, month__year=year, month__month=month)
+
+    total_balance = 0
+    budgeted_money = sum(category.assigned_amount for category in categories)
+    accounts = base_budget.accounts.all()
+
+    for account in accounts:
+        if account.account_type != 'CREDIT':
+            total_balance += account.balance
+        else:
+            total_balance -= account.balance
+
+    money_available = total_balance - budgeted_money
+
+    category_form = Fifty_Twenty_ThirtyForm()
+    expense_form = ExpenseForm()
+
+    context = {
+        'budget': base_budget,
+        'categories': categories,
+        'category_form': category_form,
+        'expense_form': expense_form,
+        'money_available': money_available,
+        'selected_date': selected_date,
+        'year': year,
+        'month': month,
+        'previous_month': previous_month,
+        'previous_year': previous_year,
+        'next_month': next_month,
+        'next_year': next_year,
+    }
+    return render(request, 'financeapp/fifty_thirty_twenty_budget_detail.html', context)
+
+@login_required
+def add_fifty_thirty_twenty_expense(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='fifty_thirty_twenty')
+    if request.method == 'POST':
+        expense_form = ExpenseForm(request.POST)
+        if expense_form.is_valid():
+            expense = expense_form.save(commit=False)
+            #expense.category = None  # Explicitly set category to None
+            expense.fifty_30_twenty_category = get_object_or_404(FiftyThirtyTwentyCategory, id=request.POST.get('category_id'))
+            expense.save()
+            return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
+    return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
+
+
+@login_required
+def edit_fifty_thirty_twenty_expense(request, budget_id):
+    base_budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='fifty_thirty_twenty')
+    fifty_thirty_twenty_budget, created = FiftyThirtyTwentyBudget.objects.get_or_create(budget=base_budget)
+    category_id = request.POST.get('category_id')
+    category = get_object_or_404(FiftyThirtyTwentyCategory, id=category_id, budget=fifty_thirty_twenty_budget)
+    expense_id = request.POST.get('expense_id')
+    expense = get_object_or_404(Expense, id=expense_id,  fifty_30_twenty_category=category )
+    
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST, instance=expense)
+        if form.is_valid():
+            expense = form.save(commit=False)
+            # Ensure is_recurring is explicitly updated
+            is_recurring_value = 'is_recurring' in request.POST
+            expense.is_recurring = is_recurring_value
+            expense.save()
+            print(f"Updated is_recurring: {is_recurring_value}")  # Debugging line
+            return redirect('financeapp:fifty_thirty_twenty_page', budget_id=base_budget.id)
+        else:
+            print("Form is invalid", form.errors)  # Debugging line
+    else:
+        print("Request method is not POST")  # Debugging line
+    
+    return redirect('financeapp:fifty_thirty_twenty_page', budget_id=base_budget.id)
+
+@login_required
+def delete_50_expense(request, budget_id):
+    base_budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='fifty_thirty_twenty')
+    fifty_thirty_twenty_budget, created = FiftyThirtyTwentyBudget.objects.get_or_create(budget=base_budget)
+    category_id = request.POST.get('category_id')
+    expense_id = request.POST.get('expense_id')
+    print(f"Budget ID: {budget_id}")
+    print(f"Category ID: {category_id}")
+    print(f"Expense ID: {expense_id}")
+
+    if category_id and expense_id:
+        category = get_object_or_404(FiftyThirtyTwentyCategory, id=category_id, budget=fifty_thirty_twenty_budget)
+        expense = get_object_or_404(Expense, id=expense_id, fifty_30_twenty_category=category)
+        if request.method == 'POST':
+            expense.delete()
+            return redirect('financeapp:fifty_thirty_twenty_page', budget_id=base_budget.id)
