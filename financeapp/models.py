@@ -1,6 +1,9 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 import datetime
 
@@ -62,7 +65,7 @@ class Account(models.Model):
 class BaseCategory(models.Model):
     assigned_amount = models.DecimalField(max_digits=10, decimal_places=2)
     month = models.DateField(default=datetime.date.today)
-    is_recurring = models.BooleanField(default=False)
+   # is_recurring = models.BooleanField(default=False)
     
     class Meta:
         abstract = True
@@ -87,27 +90,7 @@ class BaseCategory(models.Model):
         super().save(*args, **kwargs)
 
  #50.30.20 Models implementation
-class FiftyThirtyTwentyBudget(models.Model):
-    budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='fifty_thirty_twenty_budgets')
-    month = models.DateField(default=datetime.date.today)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"50/30/20 Budget for {self.budget.budget_name} - {self.month.strftime('%B %Y')}"
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        # Create the three categories if they don't exist
-        if not self.categories.exists():
-            categories = ['Needs', 'Wants', 'Savings']
-            for name in categories:
-                FiftyThirtyTwentyCategory.objects.create(
-                    budget=self,
-                    name=name,
-                    assigned_amount=0.0
-                )
-
+# 50/30/20 Category Model
 class FiftyThirtyTwentyCategory(BaseCategory):
     CATEGORY_CHOICES = [
         ('Needs', 'Needs'),
@@ -115,11 +98,29 @@ class FiftyThirtyTwentyCategory(BaseCategory):
         ('Savings', 'Savings'),
     ]
 
-    budget = models.ForeignKey(FiftyThirtyTwentyBudget, on_delete=models.CASCADE, related_name='categories')
+    budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='fifty_thirty_twenty_categories')
     name = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    is_recurring = models.BooleanField(default=True)  # New field to indicate if category is occuring
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name} - {self.budget.budget.budget_name}"
+        return f"{self.name} - {self.budget.budget_name} ({self.month.strftime('%B %Y')})"
+
+    class Meta:
+        unique_together = ('budget', 'name', 'month')
+
+@receiver(post_save, sender=Budget)
+def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
+    if created and instance.budget_type == 'fifty_thirty_twenty':
+        categories = ['Needs', 'Wants', 'Savings']
+        for name in categories:
+            FiftyThirtyTwentyCategory.objects.create(
+                budget=instance,
+                name=name,
+                assigned_amount=0.0,
+                month=instance.month
+            )
 
  
  
@@ -127,6 +128,7 @@ class FiftyThirtyTwentyCategory(BaseCategory):
 class ZeroBasedCategory(BaseCategory):
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='zero_based_categories')
     name = models.CharField(max_length=100) 
+    is_recurring = models.BooleanField(default=False)
     def __str__(self):
         return self.name
 
@@ -164,7 +166,30 @@ class Expense(models.Model):
     
     
     
+    '''
+class FiftyThirtyTwentyBudget(models.Model):
+    budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='fifty_thirty_twenty_budgets')
+    month = models.DateField(default=datetime.date.today)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"50/30/20 Budget for {self.budget.budget_name} - {self.month.strftime('%B %Y')}"
     
+    class Meta:
+        unique_together = ('budget', 'month')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Create the three categories if they don't exist
+        if not self.categories.exists():
+            categories = ['Needs', 'Wants', 'Savings']
+            for name in categories:
+                FiftyThirtyTwentyCategory.objects.create(
+                    budget=self,
+                    name=name,
+                    assigned_amount=0.0
+                )'''
     
     
     

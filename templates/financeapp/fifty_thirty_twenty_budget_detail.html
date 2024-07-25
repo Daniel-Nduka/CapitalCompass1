@@ -60,6 +60,7 @@
                 <div class="category-actions">
                     <button class="action-button" onclick="showAddExpenseForm({{ category.id }}, this.getAttribute('data-is-recurring'))" data-is-recurring="{{ category.is_recurring|yesno:'true,false' }}">+ Add Expense</button>
 
+
                 </div>
             </div>
             {% endfor %}
