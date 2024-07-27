@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from decimal import Decimal
 
 import datetime
 
@@ -48,7 +49,7 @@ class Account(models.Model):
     ACCOUNT_TYPES = [
        ('CHECKING', 'checking'),
        ('SAVINGS', 'savings'),
-       ('CREDIT', 'credit'), 
+      # ('CREDIT', 'credit'), 
        ('CASH', 'cash'),
     ]
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='accounts')
@@ -81,13 +82,14 @@ class BaseCategory(models.Model):
         return self.assigned_amount - self.activity
 
     @property
-    def assigned_amount_total(self):
+    def expenses_assigned_amount_total(self):
         return sum(expense.assigned_amount for expense in self.expenses.all())
-
+    '''
     def save(self, *args, **kwargs):
         if self.assigned_amount_total > self.assigned_amount:
             self.assigned_amount = self.assigned_amount_total
         super().save(*args, **kwargs)
+    '''
 
  #50.30.20 Models implementation
 # 50/30/20 Category Model
@@ -101,6 +103,7 @@ class FiftyThirtyTwentyCategory(BaseCategory):
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='fifty_thirty_twenty_categories')
     name = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     is_recurring = models.BooleanField(default=True)  # New field to indicate if category is occuring
+    is_user_modified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -109,6 +112,17 @@ class FiftyThirtyTwentyCategory(BaseCategory):
 
     class Meta:
         unique_together = ('budget', 'name', 'month')
+    def save(self, *args, **kwargs):
+        if not self.is_user_modified:
+            total_balance = sum(account.balance for account in self.budget.accounts.all())
+            total_balance_float = float(total_balance)  # Convert Decimal to float
+            if self.name == 'Needs':
+                self.assigned_amount = Decimal(0.5 * total_balance_float)
+            elif self.name == 'Wants':
+                self.assigned_amount = Decimal(0.3 * total_balance_float)
+            else:
+                self.assigned_amount = Decimal(0.2 * total_balance_float)
+        super().save(*args, **kwargs)
 
 @receiver(post_save, sender=Budget)
 def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
@@ -121,7 +135,28 @@ def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
                 assigned_amount=0.0,
                 month=instance.month
             )
-
+'''
+@receiver(post_save, sender=Budget)
+def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
+    if created and instance.budget_type == 'fifty_thirty_twenty':
+        
+        total_balance = sum(account.balance for account in instance.accounts.all())
+        
+        
+        categories = ['Needs', 'Wants', 'Savings']
+        for name in categories:
+            FiftyThirtyTwentyCategory.objects.create(
+                budget=instance,
+                name=name,
+                if name == 'Needs':
+                    assigned_amount=0.5 * total_balance
+                elif name == 'Wants':
+                    assigned_amount=0.3 * total_balance
+                else:
+                    assigned_amount=0.2 * total_balance
+                month=instance.month
+            )
+'''
  
  
 #Zero Based Models implementation      

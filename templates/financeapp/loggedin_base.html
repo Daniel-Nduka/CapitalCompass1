@@ -9,30 +9,24 @@
     <link rel="stylesheet" href="{% static 'styles/profile.css' %}">
     <link rel="stylesheet" href="{% static 'styles/transactions.css' %}">
     {% block head_block %}{% endblock %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
     <div class="sidebar">
-        <div class="logo">
-            {% if request.selected_budget %}
-                {{ request.selected_budget.budget_name }} - CapitalCompass
-            {% else %}
-                CapitalCompass
-            {% endif %}
+        <div id="dynamic-sidebar-content">
+            <!-- Default content or loading spinner -->
+            <div class="logo">
+                   CapitalCompass    
+            </div>
+        
+            <nav>
+                <ul class="nav-top">
+                    <li><a href="{% url 'financeapp:create_budget' %}">Create Budget</a></li>
+                </ul>
+            </nav>
+        
         </div>
         <nav>
-            <ul class="nav-top">
-         
-                {% if request.selected_budget.budget_type == 'zero_based' %}
-                    <li><a href="{% url 'financeapp:zero_based_page' request.selected_budget.id %}">{{ request.selected_budget.budget_name }} Budget </a></li>
-                {% elif request.selected_budget.budget_type == 'fifty_thirty_twenty' %}
-                    <li><a href="{% url 'financeapp:fifty_thirty_twenty_page' request.selected_budget.id %}">{{ request.selected_budget.budget_name }} Budget </a></li>
-                {% else %}
-                    <li><a href="{% url 'financeapp:create_budget' %}">Create Budget</a></li>
-                {% endif %}
-                <li><a href="{% url 'financeapp:transactions' %}">Transactions</a></li>
-                <li><a href="#">Financial Analysis</a></li>
-                <li><a href="{% url 'financeapp:account_list' %}">Accounts</a></li>
-            </ul>
             <ul class="nav-bottom">
                 <li><a href="{% url 'financeapp:budget_list' %}">Your Budgets</a></li>
                 <li><a href="contactus.html">Contact us</a></li>
@@ -42,5 +36,40 @@
         </nav>
     </div>
     {% block body_block %}{% endblock %}
+    
+    <script>
+        function loadSidebarContent(budgetId) {
+            $.ajax({
+                url: '{% url "financeapp:load_sidebar_content" 0 %}'.replace('0', budgetId),
+                type: 'GET',
+                success: function(response) {
+                    if (response.sidebar_content) {
+                        $('#dynamic-sidebar-content').html(response.sidebar_content);
+                    } else {
+                        console.error('Failed to load sidebar content');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        function loadSelectedBudgetSidebar() {
+            var selectedBudgetId = {{ request.session.selected_budget_id|default:"null" }};
+            if (selectedBudgetId) {
+                loadSidebarContent(selectedBudgetId);
+            }
+        }
+
+        $(document).ready(function() {
+            loadSelectedBudgetSidebar();
+            
+            $('.open-budget').click(function() {
+                var budgetId = $(this).data('budget-id');
+                loadSidebarContent(budgetId);
+            });
+        });
+    </script>
 </body>
 </html>

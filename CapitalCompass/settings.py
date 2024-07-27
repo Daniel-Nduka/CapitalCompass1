@@ -142,7 +142,7 @@ LOGIN_REDIRECT_URL = 'financeapp:budget'
 # The page users are directed to if they are not logged in.
 LOGIN_URL = 'auth_login'
 
-SIMPLE_BACKEND_REDIRECT_URL = '/budget/'
+SIMPLE_BACKEND_REDIRECT_URL = '/create-budget/'
 
 
 

@@ -11,6 +11,7 @@
             </div>
             <form method="post" action="{% url 'registration_register' %}">
                 {% csrf_token %}
+                <input type="hidden" name="next" value="{% url 'financeapp:create_budget' %}">
                 <div class="form-group">
                     <label for="id_username">Username</label>
                     <input id="id_username" maxlength="30" name="username" placeholder="Enter username" type="text" required />

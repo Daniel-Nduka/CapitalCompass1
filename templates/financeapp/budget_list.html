@@ -19,12 +19,13 @@
                   <div class="budget-details">
                       <h3>{{ budget.budget_name }}</h3>
                       <p>Last used: {{ budget.updated_at|date:"F j, Y, g:i a" }}</p>
+                      <p>Budget Type: {{ budget.budget_type }}</p>
                   </div>
                   <div class="budget-actions">
                       {% if budget.budget_type == 'zero_based' %}
-                          <button onclick="location.href='{% url 'financeapp:zero_based_page' budget.id %}'" class="btn btn-primary">View</button>
+                          <button data-budget-id="{{ budget.id }}" class="btn btn-primary open-budget"  >Open</button>
                       {% else %}
-                            <button onclick="location.href='{% url 'financeapp:fifty_thirty_twenty_page' budget.id %}'" class="btn btn-primary">View</button> <!-- Update with the correct URL for other budget types -->
+                          <button data-budget-id="{{ budget.id }}" class="btn btn-primary open-budget">Open</button>
                       {% endif %}
                       <button onclick="location.href='{% url 'financeapp:delete_budget' budget.id %}'" class="btn btn-danger">Delete</button>
                   </div>

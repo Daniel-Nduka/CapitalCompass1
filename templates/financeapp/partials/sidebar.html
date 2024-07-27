@@ -1,0 +1,31 @@
+<div class="sidebar" id="sidebar">
+  <div class="logo">
+      {% if request.selected_budget %}
+          {{ request.selected_budget.budget_name }} - CapitalCompass
+      {% else %}
+          CapitalCompass
+      {% endif %}
+  </div>
+  <nav>
+      <ul class="nav-top">
+          {% if request.selected_budget %}
+              {% if request.selected_budget.budget_type == 'zero_based' %}
+                  <li><a href="{% url 'financeapp:zero_based_page' request.selected_budget.id %}">{{ request.selected_budget.budget_name }} Budget </a></li>
+              {% elif request.selected_budget.budget_type == 'fifty_thirty_twenty' %}
+                  <li><a href="{% url 'financeapp:fifty_thirty_twenty_page' request.selected_budget.id %}">{{ request.selected_budget.budget_name }} Budget </a></li>
+              {% endif %}
+              <li><a href="{% url 'financeapp:transactions' %}">Transactions</a></li>
+              <li><a href="#">Financial Analysis</a></li>
+              <li><a href="{% url 'financeapp:account_list' %}">Accounts</a></li>
+          {% else %}
+              <li><a href="{% url 'financeapp:create_budget' %}">Create Budget</a></li>
+          {% endif %}
+      </ul>
+      <ul class="nav-bottom">
+          <li><a href="{% url 'financeapp:budget_list' %}">Your Budgets</a></li>
+          <li><a href="contactus.html">Contact us</a></li>
+          <li><a href="{% url 'financeapp:profile' %}">Profile</a></li>
+          <li><a href="{% url 'auth_logout' %}?next={% url 'financeapp:index' %}">Log out</a></li>
+      </ul>
+  </nav>
+</div>

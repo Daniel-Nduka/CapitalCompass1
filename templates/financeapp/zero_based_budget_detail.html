@@ -30,7 +30,11 @@
             <div class="category-card">
                 <div class="category-header">
                     <span class="category-name"><span class="name-category">{{ category.name }}</span><span class="budget"> Budget</span></span>
-                    <span class="category-assigned"><span class="assigned-category">£{{ category.assigned_amount }}</span><span class="assigned"> Total Money Assigned </span></span>
+                    <span class="category-assigned" data-assigned-amount="{{ category.assigned_amount }}" data-expenses-assigned-amount-total="{{ category.expenses_assigned_amount_total }}">
+                        <span class="assigned-category">£{{ category.assigned_amount }}</span>
+                        <span class="assigned"> Total Money Assigned </span>
+                        <span class="warning-message">Alert: Expenses Exceed Budget!</span>
+                    </span>
                     <span class="category-activity"><span class="activity-category">£{{ category.activity }}</span><span class="activity"> Money Spent</span></span>
                 </div>
                 <div class="expenses-list">
@@ -61,87 +65,102 @@
                 <div class="category-actions">
                     <button class="action-button" onclick="showEditCategoryForm('{{ category.id }}', '{{ category.name }}', '{{ category.assigned_amount }}', this.getAttribute('data-is-recurring'))" data-is-recurring="{{ category.is_recurring|yesno:'true,false' }}">Edit Category</button>
                     <button class="action-button" onclick="showAddExpenseForm({{ category.id }}, this.getAttribute('data-is-recurring'))" data-is-recurring="{{ category.is_recurring|yesno:'true,false' }}">+ Add Expense</button>
-
                 </div>
             </div>
             {% endfor %}
         </div>
-        <button class="add-category-button" onclick="showAddCategoryForm()">+ Add Category</button>
+        <div class="add-category-button-container">
+            <button class="add-category-button" onclick="showAddCategoryForm()">Create new category</button>
+        </div>
     </section>
 
-<!-- Add Category Modal -->
-<div id="add-category-form" class="modal">
-    <div class="modal-content">
-        <span class="close-button" onclick="closeAddCategoryForm()">&times;</span>
-        <h2>New Category</h2>
-        <form method="post" action="{% url 'financeapp:add_category' budget.id %}">
-            {% csrf_token %}
-            {{ category_form.as_p }}
-            <div class="form-group submit-btn">
-                <button type="submit" name="add_category" class="btn btn-primary">Add Category</button>
-                <button type="button" class="btn btn-secondary" onclick="closeAddCategoryForm()">Cancel</button>
-            </div>
-        </form>
+    <!-- Add Category Modal -->
+    <div id="add-category-form" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeAddCategoryForm()">&times;</span>
+            <h2>New Category</h2>
+            <form method="post" action="{% url 'financeapp:add_zero_category' budget.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_name">Category Name:</label>
+                    <input type="text" name="name" id="id_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_assigned_amount">Assigned Amount:</label>
+                    <input type="number" name="assigned_amount" id="id_assigned_amount" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_is_recurring">Recurring:</label>
+                    <input type="checkbox" name="is_recurring" id="id_is_recurring">
+                </div>
+                <div class="form-group submit-btn">
+                    <button type="submit" name="add_category" class="btn btn-primary">Add Category</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddCategoryForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- Edit Category Modal -->
-<div id="edit-category-form" class="modal">
-    <div class="modal-content">
-        <span class="close-button" onclick="closeEditCategoryForm()">&times;</span>
-        <h2>Edit Category</h2>
-        <form method="post" action="{% url 'financeapp:edit_category' budget.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="category_id" id="edit-category-id">
-            <div class="form-group">
-                <label for="edit-category-name">Category Name:</label>
-                <input type="text" name="name" id="edit-category-name" required>
-            </div>
-            <div class="form-group">
-                <label for="edit-category-assigned-amount">Assigned Amount:</label>
-                <input type="number" name="assigned_amount" id="edit-category-assigned-amount" required>
-            </div>
-            <div class="form-group">
-                <label for="edit-category-is_recurring">Recurring:</label>
-                <input type="checkbox" name="is_recurring" id="edit-category-is_recurring">
-            </div>
-            <div class="form-group submit-btn">
-                <button type="submit" name="edit_category" class="btn btn-primary">Edit Category</button>
-                <button type="button" class="btn btn-secondary" onclick="closeEditCategoryForm()">Cancel</button>
-            </div>
-        </form>
-        <form method="post" action="{% url 'financeapp:delete_category' budget.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="category_id" id="delete-category-id">
-            <div class="form-group submit-btn">
-                <button type="submit" name="delete_category" class="btn btn-danger">Delete Category</button>
-            </div>
-        </form>
+    <!-- Edit Category Modal -->
+    <div id="edit-category-form" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeEditCategoryForm()">&times;</span>
+            <h2>Edit Category</h2>
+            <form method="post" action="{% url 'financeapp:edit_zero_category' budget.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="category_id" id="edit-category-id">
+                <div class="form-group">
+                    <label for="edit-category-name">Category Name:</label>
+                    <input type="text" name="name" id="edit-category-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-category-assigned-amount">Assigned Amount:</label>
+                    <input type="number" name="assigned_amount" id="edit-category-assigned-amount" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-category-is_recurring">Recurring:</label>
+                    <input type="checkbox" name="is_recurring" id="edit-category-is_recurring">
+                </div>
+                <div class="form-group submit-btn">
+                    <button type="submit" name="edit_category" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditCategoryForm()">Cancel</button>
+                </div>
+            </form>
+            <form method="post" action="{% url 'financeapp:delete_zero_category' budget.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="category_id" id="delete-category-id">
+                <div class="form-group submit-btn">
+                    <button type="submit" name="delete_category" class="btn btn-danger">Delete Category</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- Add Expense Modal -->
-<!-- Add Expense Modal -->
+    <!-- Add Expense Modal -->
+   <!-- Add Expense Modal -->
 <div id="add-expense-form" class="modal">
     <div class="modal-content">
         <span class="close-button" onclick="closeAddExpenseForm()">&times;</span>
         <h2>New Expense</h2>
-        <form method="post" action="{% url 'financeapp:add_expense' budget.id %}">
+        <form method="post" action="{% url 'financeapp:add_zero_expense' budget.id %}">
             {% csrf_token %}
-            {{ expense_form.non_field_errors }}
             <div class="form-group">
-                {{ expense_form.description.label_tag }} {{ expense_form.description }}
+                <label for="id_description">Expense Description:</label>
+                <input type="text" name="description" id="id_description" required>
             </div>
             <div class="form-group">
-                {{ expense_form.assigned_amount.label_tag }} {{ expense_form.assigned_amount }}
+                <label for="id_assigned_amount">Cost:</label>
+                <input type="number" name="assigned_amount" id="id_assigned_amount" required>
             </div>
             <div class="form-group">
-                {{ expense_form.spent.label_tag }} {{ expense_form.spent }}
+                <label for="id_spent">Paid:</label>
+                <input type="number" name="spent" id="id_spent" required>
             </div>
             <input type="hidden" name="category_id" id="expense-category-id">
             <div id="add-expense-recurring-container" style="display: none;">
                 <div class="form-group">
-                    {{ expense_form.is_recurring.label_tag }} {{ expense_form.is_recurring }}
+                    <label for="id_is_recurring">Recurring:</label>
+                    <input type="checkbox" name="is_recurring" id="id_is_recurring">
                 </div>
             </div>
             <div class="form-group submit-btn">
@@ -153,130 +172,138 @@
 </div>
 
 
-
-<!-- Edit Expense Modal -->
-<div id="edit-expense-form" class="modal">
-    <div class="modal-content">
-        <span class="close-button" onclick="closeEditExpenseForm()">&times;</span>
-        <h2>Edit Expense</h2>
-        <form method="post" action="{% url 'financeapp:edit_expense' budget.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="expense_id" id="edit-expense-id">
-            <input type="hidden" name="category_id" id="edit-expense-category-id">
-            <input type="hidden" id="edit-is-category-recurring" name="is_category_recurring">
-            <div class="form-group">
-                <label for="edit-expense-description">Expense Description:</label>
-                <input type="text" name="description" id="edit-expense-description" required>
-            </div>
-            <div class="form-group">
-                <label for="edit-expense-assigned">Cost:</label>
-                <input type="number" name="assigned_amount" id="edit-expense-assigned" required>
-            </div>
-            <div class="form-group">
-                <label for="edit-expense-spent">Paid:</label>
-                <input type="number" name="spent" id="edit-expense-spent" required>
-            </div>
-            <div id="edit-expense-recurring-container" style="display: none;">
+    <!-- Edit Expense Modal -->
+    <div id="edit-expense-form" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeEditExpenseForm()">&times;</span>
+            <h2>Edit Expense</h2>
+            <form method="post" action="{% url 'financeapp:edit_zero_expense' budget.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="expense_id" id="edit-expense-id">
+                <input type="hidden" name="category_id" id="edit-expense-category-id">
+                <input type="hidden" id="edit-is-category-recurring" name="is_category_recurring">
                 <div class="form-group">
-                    <label for="edit-is_recurring_expense">Recurring:</label>
-                    <input type="checkbox" name="is_recurring" id="edit-is_recurring_expense">
+                    <label for="edit-expense-description">Expense Description:</label>
+                    <input type="text" name="description" id="edit-expense-description" required>
                 </div>
-            </div>
-            <div class="form-group submit-btn">
-                <button type="submit" name="edit_expense" class="btn btn-primary">Edit Expense</button>
-                <button type="button" class="btn btn-secondary" onclick="closeEditExpenseForm()">Cancel</button>
-            </div>
-        </form>
-        <form method="post" action="{% url 'financeapp:delete_expense' budget.id %}">
-            {% csrf_token %}
-            <input type="hidden" name="expense_id" id="delete-expense-id">
-            <input type="hidden" name="category_id" id="delete-expense-category-id">
-            <div class="form-group submit-btn">
-                <button type="submit" name="delete_expense" class="btn btn-danger">Delete Expense</button>
-            </div>
-        </form>
-        
+                <div class="form-group">
+                    <label for="edit-expense-assigned">Cost:</label>
+                    <input type="number" name="assigned_amount" id="edit-expense-assigned" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-expense-spent">Paid:</label>
+                    <input type="number" name="spent" id="edit-expense-spent" required>
+                </div>
+                <div class="form-group submit-btn">
+                    <button type="submit" name="edit_expense" class="btn btn-primary">Edit Expense</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditExpenseForm()">Cancel</button>
+                </div>
+            </form>
+            <form method="post" action="{% url 'financeapp:delete_zero_expense' budget.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="expense_id" id="delete-expense-id">
+                <input type="hidden" name="category_id" id="delete-expense-category-id">
+                <div class="form-group submit-btn">
+                    <button type="submit" name="delete_expense" class="btn btn-danger">Delete Expense</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-
-<script>
-    /* add category */
-    function showAddCategoryForm() {
-        document.getElementById('add-category-form').style.display = 'flex';
-    }
-    function closeAddCategoryForm() {
-        document.getElementById('add-category-form').style.display = 'none';
-    }
-
-    /* edit category */
-    function showEditCategoryForm(categoryId, categoryName, assignedAmount, isRecurring) {
-        document.getElementById('edit-category-form').style.display = 'flex';
-        document.getElementById('edit-category-id').value = categoryId;
-        document.getElementById('edit-category-name').value = categoryName;
-        document.getElementById('edit-category-assigned-amount').value = assignedAmount;
-        document.getElementById('edit-category-is_recurring').checked = (isRecurring === 'true');
-        document.getElementById('delete-category-id').value = categoryId; // Populate delete category ID
-    }
-
-    function closeEditCategoryForm() {
-        document.getElementById('edit-category-form').style.display = 'none';
-    }
-
-    /* add expense form */
-    function showAddExpenseForm(categoryId, isCategoryRecurring) {
-        console.log("Showing Add Expense Form for Category ID:", categoryId, "Is Category Recurring:", isCategoryRecurring);
-        document.getElementById('expense-category-id').value = categoryId;
-        document.getElementById('add-expense-form').style.display = 'flex';
-        
-        var recurringContainer = document.getElementById('add-expense-recurring-container');
-        if (isCategoryRecurring === 'true') {
-            recurringContainer.style.display = 'block';
-            console.log("Displaying Recurring Option for Add Expense");
-        } else {
-            recurringContainer.style.display = 'none';
-            console.log("Hiding Recurring Option for Add Expense");
+    <script>
+        /* add category */
+        function showAddCategoryForm() {
+            document.getElementById('add-category-form').style.display = 'flex';
         }
-    }
-
-    function closeAddExpenseForm() {
-        document.getElementById('add-expense-form').style.display = 'none';
-    }
-
-
-    function showEditExpenseForm(expenseId, categoryId, expenseDescription, assignedAmount, spentAmount, isCategoryRecurring, isRecurring) {
-        console.log("Showing Edit Expense Form for Expense ID:", expenseId, "Category ID:", categoryId, "Is Category Recurring:", isCategoryRecurring);
-        document.getElementById('edit-expense-id').value = expenseId;
-        document.getElementById('edit-expense-category-id').value = categoryId;
-        document.getElementById('edit-expense-description').value = expenseDescription;
-        document.getElementById('edit-expense-assigned').value = assignedAmount;
-        document.getElementById('edit-expense-spent').value = spentAmount;
-        document.getElementById('edit-is-category-recurring').value = isCategoryRecurring;
-        document.getElementById('edit-expense-form').style.display = 'flex';
-        document.getElementById('delete-expense-category-id').value = categoryId; // Ensure category ID is set
-        document.getElementById('delete-expense-id').value = expenseId; // Populate delete expense ID
-       
-        var recurringContainer = document.getElementById('edit-expense-recurring-container');
-        if (isCategoryRecurring === 'true') {
-            document.getElementById('edit-is_recurring_expense').checked = (isRecurring === 'true');
-            recurringContainer.style.display = 'block';
-            console.log("Displaying Recurring Option for Edit Expense");
-        } else {
-            recurringContainer.style.display = 'none';
-            console.log("Hiding Recurring Option for Edit Expense");
+        function closeAddCategoryForm() {
+            document.getElementById('add-category-form').style.display = 'none';
         }
-    }
 
-    function closeEditExpenseForm() {
-        document.getElementById('edit-expense-form').style.display = 'none';
-    }
+        /* edit category */
+        function showEditCategoryForm(categoryId, categoryName, assignedAmount, isRecurring) {
+            document.getElementById('edit-category-form').style.display = 'flex';
+            document.getElementById('edit-category-id').value = categoryId;
+            document.getElementById('edit-category-name').value = categoryName;
+            document.getElementById('edit-category-assigned-amount').value = assignedAmount;
+            document.getElementById('edit-category-is_recurring').checked = (isRecurring === 'true');
+            document.getElementById('delete-category-id').value = categoryId; // Populate delete category ID
+        }
 
-    // Ensure modals are hidden by default on page load
-    window.onload = function() {
-        closeAddCategoryForm();
-        closeEditCategoryForm();
-        closeAddExpenseForm();
-        closeEditExpenseForm();
-    }
-</script>
+        function closeEditCategoryForm() {
+            document.getElementById('edit-category-form').style.display = 'none';
+        }
+
+        /* add expense form */
+        function showAddExpenseForm(categoryId, isCategoryRecurring) {
+            console.log("Showing Add Expense Form for Category ID:", categoryId, "Is Category Recurring:", isCategoryRecurring);
+            document.getElementById('expense-category-id').value = categoryId;
+            document.getElementById('add-expense-form').style.display = 'flex';
+            
+            var recurringContainer = document.getElementById('add-expense-recurring-container');
+            if (isCategoryRecurring === 'true') {
+                recurringContainer.style.display = 'block';
+                console.log("Displaying Recurring Option for Add Expense");
+            } else {
+                recurringContainer.style.display = 'none';
+                console.log("Hiding Recurring Option for Add Expense");
+            }
+        }
+
+        function closeAddExpenseForm() {
+            document.getElementById('add-expense-form').style.display = 'none';
+        }
+
+        function showEditExpenseForm(expenseId, categoryId, expenseDescription, assignedAmount, spentAmount, isCategoryRecurring, isRecurring) {
+            console.log("Showing Edit Expense Form for Expense ID:", expenseId, "Category ID:", categoryId, "Is Category Recurring:", isCategoryRecurring);
+            document.getElementById('edit-expense-id').value = expenseId;
+            document.getElementById('edit-expense-category-id').value = categoryId;
+            document.getElementById('edit-expense-description').value = expenseDescription;
+            document.getElementById('edit-expense-assigned').value = assignedAmount;
+            document.getElementById('edit-expense-spent').value = spentAmount;
+            document.getElementById('edit-is-category-recurring').value = isCategoryRecurring;
+            document.getElementById('edit-expense-form').style.display = 'flex';
+            document.getElementById('delete-expense-category-id').value = categoryId; // Ensure category ID is set
+            document.getElementById('delete-expense-id').value = expenseId; // Populate delete expense ID
+           
+            var recurringContainer = document.getElementById('edit-expense-recurring-container');
+            if (isCategoryRecurring === 'true') {
+                document.getElementById('edit-is_recurring_expense').checked = (isRecurring === 'true');
+                recurringContainer.style.display = 'block';
+                console.log("Displaying Recurring Option for Edit Expense");
+            } else {
+                recurringContainer.style.display = 'none';
+                console.log("Hiding Recurring Option for Edit Expense");
+            }
+        }
+
+        function closeEditExpenseForm() {
+            document.getElementById('edit-expense-form').style.display = 'none';
+        }
+
+        // Function to update category assigned amount color based on total assigned expenses
+        function updateCategoryAssignedColor() {
+            const categories = document.querySelectorAll('.category-assigned');
+            categories.forEach(category => {
+                const assignedAmount = parseFloat(category.getAttribute('data-assigned-amount'));
+                const expensesAssignedAmountTotal = parseFloat(category.getAttribute('data-expenses-assigned-amount-total'));
+                console.log("Assigned Amount:", assignedAmount, "Expenses Assigned Amount Total:", expensesAssignedAmountTotal);
+                if (expensesAssignedAmountTotal > assignedAmount) {
+                    category.style.color = 'red';
+                    category.querySelector('.warning-message').style.display = 'inline';
+                } else {
+                    category.style.color = ''; // Reset to default if not exceeded
+                    category.querySelector('.warning-message').style.display = 'none';
+                }
+            });
+        }
+
+        // Run the update function on page load
+        window.onload = function() {
+            closeAddCategoryForm();
+            closeEditCategoryForm();
+            closeAddExpenseForm();
+            closeEditExpenseForm();
+            updateCategoryAssignedColor(); // Check and update category assigned amount colors
+        }
+    </script>
 {% endblock %}

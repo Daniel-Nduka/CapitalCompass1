@@ -1,0 +1,27 @@
+<!-- sidebar_dynamic_content.html -->
+{% if budget %}
+    <div class="logo">
+        {{ budget.budget_name }} - CapitalCompass
+    </div>
+    <nav>
+        <ul class="nav-top">
+            {% if budget.budget_type == 'zero_based' %}
+                <li><a href="{% url 'financeapp:zero_based_page' budget.id %}">{{ budget.budget_name }} Budget </a></li>
+            {% elif budget.budget_type == 'fifty_thirty_twenty' %}
+                <li><a href="{% url 'financeapp:fifty_thirty_twenty_page' budget.id %}">{{ budget.budget_name }} Budget </a></li>
+            {% endif %}
+            <li><a href="{% url 'financeapp:transactions' %}">Transactions</a></li>
+            <li><a href="#">Financial Analysis</a></li>
+            <li><a href="{% url 'financeapp:account_list' %}">Accounts</a></li>
+        </ul>
+    </nav>
+{% else %}
+    <div class="logo">
+        CapitalCompass
+    </div>
+    <nav>
+        <ul class="nav-top">
+            <li><a href="{% url 'financeapp:create_budget' %}">Create Budget</a></li>
+        </ul>
+    </nav>
+{% endif %}

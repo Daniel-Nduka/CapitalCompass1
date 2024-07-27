@@ -13,7 +13,8 @@ urlpatterns = [
 
   
      
-    
+    #path for account.intro
+   
     path('accounts/', views.account_list, name='account_list'),
     path('accounts/add/', views.add_account, name='add_account'),
     path('accounts/edit/<int:account_id>/', views.edit_account, name='edit_account'),
@@ -32,13 +33,13 @@ urlpatterns = [
     #path for zero_based budget
     path('budgets/zero_based/<int:budget_id>/', views.zero_based_page, name='zero_based_page'), 
     path('budgets/zero-based/<int:budget_id>/<int:year>/<int:month>/', views.zero_based_page, name='zero_based_page_with_date'),
-    path('budgets/zero_based/<int:budget_id>/add_category/', views.add_zero_based_category, name='add_category'),
-    path('budgets/zero_based/<int:budget_id>/edit_category/', views.edit_zero_based_category, name='edit_category'),
-    path('budgets/zero_based/<int:budget_id>/add_expense/', views.add_zero_based_expense, name='add_expense'),
-    path('budgets/zero_based/<int:budget_id>/edit_expense/', views.edit_zero_based_expense, name='edit_expense'),
+    path('budgets/zero_based/<int:budget_id>/add_category/', views.add_zero_based_category, name='add_zero_category'),
+    path('budgets/zero_based/<int:budget_id>/edit_category/', views.edit_zero_based_category, name='edit_zero_category'),
+    path('budgets/zero_based/<int:budget_id>/add_expense/', views.add_zero_based_expense, name='add_zero_expense'),
+    path('budgets/zero_based/<int:budget_id>/edit_expense/', views.edit_zero_based_expense, name='edit_zero_expense'),
     
-    path('budgets/zero_based/<int:budget_id>/delete_category/', views.delete_category, name='delete_category'),
-    path('budgets/zero_based/<int:budget_id>/delete_expense/', views.delete_expense, name='delete_expense'),
+    path('budgets/zero_based/<int:budget_id>/delete_category/', views.delete_category, name='delete_zero_category'),
+    path('budgets/zero_based/<int:budget_id>/delete_expense/', views.delete_expense, name='delete_zero_expense'),
 
     #path for 50.30.20 budget
     path('budgets/fifty_thirty_twenty/<int:budget_id>/', views.fifty_thirty_twenty_page, name='fifty_thirty_twenty_page'),
@@ -46,4 +47,6 @@ urlpatterns = [
     path('budgets/fifty_thirty_twenty/<int:budget_id>/add_expense/', views.add_fifty_thirty_twenty_expense, name='add_fifty_thirty_twenty_expense'),
     path('budgets/fifty_thirty_twenty/<int:budget_id>/edit_expense/', views.edit_fifty_thirty_twenty_expense, name='edit_fifty_thirty_twenty_expense'),
     path('budgets/fifty_thirty_twenty/<int:budget_id>/delete_50_expense/', views.delete_50_expense, name='delete_expense'),
+    path('budgets/fifty_thirty_twenty/<int:budget_id>/delete_30_expense/', views.edit_fifty_thirty_twenty_category, name='edit_category'),
+    path('load-sidebar-content/<int:budget_id>/', views.load_sidebar_content, name='load_sidebar_content'),
 ]

@@ -4,8 +4,9 @@ from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.http import JsonResponse
 import datetime
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 from .models import UserProfile, Budget, ZeroBasedCategory, Expense, Account, FiftyThirtyTwentyCategory #FiftyThirtyTwentyBudget
 from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm, ZeroBudgetForm, ExpenseForm, Fifty_Twenty_ThirtyForm
@@ -38,23 +39,24 @@ def select_budget(request, budget_id):
 
 #This is the account list page. When a user selects a budget, it displays the accounts associated with that budget.
 #if there is no budget selected, it redirects the user to the budget list page.
+
 @login_required
 def account_list(request):
     budget = request.selected_budget
     if not budget:
-        return redirect('financeapp:budget_list')
+        return redirect('financeapp:account_intro')
 
     accounts = Account.objects.filter(budget=budget)
-    total_balance = sum(account.balance for account in accounts if account.account_type != 'CREDIT')
-    total_debt = sum(account.balance for account in accounts if account.account_type == 'CREDIT')
-    net_balance = total_balance - total_debt
+    total_balance = sum(account.balance for account in accounts)
+    #total_debt = sum(account.balance for account in accounts if account.account_type == 'CREDIT')
+   # net_balance = total_balance - total_debt
     
     context = {
         'budget': budget,
         'accounts': accounts,
         'total_balance': total_balance,
-        'total_debt': total_debt,
-        'net_balance': net_balance,
+      #  'total_debt': total_debt,
+      #  'net_balance': net_balance,
     }
     return render(request, 'financeapp/accounts.html', context)
 
@@ -80,9 +82,7 @@ def delete_account(request, account_id):
     budget = request.selected_budget
     if not budget:
         return redirect('financeapp:budget_list')
-
-    account = get_object_or_404(Account, id=account_id, budget=budget)
-    
+    account = get_object_or_404(Account, id=account_id, budget=budget)  
     if request.method == 'POST':
         account.delete()
         return redirect('financeapp:account_list')
@@ -238,10 +238,7 @@ def zero_based_page(request, budget_id, year=None, month=None):
     accounts = budget.accounts.all()
 
     for account in accounts:
-        if account.account_type != 'CREDIT':
-            total_balance += account.balance
-        else:
-            total_balance -= account.balance
+        total_balance += account.balance
 
     money_available = total_balance - budgeted_money
 
@@ -416,11 +413,8 @@ def fifty_thirty_twenty_page(request, budget_id, year=None, month=None):
     accounts = base_budget.accounts.all()
 
     for account in accounts:
-        if account.account_type != 'CREDIT':
-            total_balance += account.balance
-        else:
-            total_balance -= account.balance
-
+        total_balance += account.balance
+       
     money_available = total_balance - budgeted_money
 
     category_form = Fifty_Twenty_ThirtyForm()
@@ -441,6 +435,18 @@ def fifty_thirty_twenty_page(request, budget_id, year=None, month=None):
         'next_year': next_year,
     }
     return render(request, 'financeapp/fifty_thirty_twenty_budget_detail.html', context)
+
+@login_required
+def edit_fifty_thirty_twenty_category(request, budget_id):
+    base_budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='fifty_thirty_twenty')
+    category_id = request.POST.get('category_id')
+    category = get_object_or_404(FiftyThirtyTwentyCategory, id=category_id, budget=base_budget)
+    if request.method == 'POST':
+        category_form = Fifty_Twenty_ThirtyForm(request.POST, instance=category)
+        if category_form.is_valid():
+            category_form.save()
+            return redirect('financeapp:fifty_thirty_twenty_page', budget_id=base_budget.id)
+    return redirect('financeapp:fifty_thirty_twenty_page', budget_id=base_budget.id)
 
 @login_required
 def add_fifty_thirty_twenty_expense(request, budget_id):
@@ -510,42 +516,17 @@ def delete_50_expense(request, budget_id):
 
     return redirect('financeapp:fifty_thirty_twenty_page', budget_id=base_budget.id)
 
-'''
 @login_required
-def copy_recurring_items_fifty_thirty_twenty(budget, selected_date):
-    # Ensure the current month's budget exists
-   # current_budget, _ = FiftyThirtyTwentyBudget.objects.get_or_create(budget=budget, month=selected_date)
-    
-    last_month = selected_date.replace(day=1) - datetime.timedelta(days=1)
-    
-    # Get last month's budget if it exists
-    try:
-        last_month_budget = FiftyThirtyTwentyBudget.objects.get(budget=budget, month__year=last_month.year, month__month=last_month.month)
-    except FiftyThirtyTwentyBudget.DoesNotExist:
-        return  # Exit if last month's budget does not exist
+def load_sidebar_content(request, budget_id):
+    if request.is_ajax():
+        budget = get_object_or_404(Budget, id=budget_id, user=request.user)
+        request.session['selected_budget_id'] = budget_id  # Set selected budget in session
+        sidebar_content = render_to_string('financeapp/sidebar_dynamic_content.html', {'budget': budget}, request=request)
+        return JsonResponse({'sidebar_content': sidebar_content})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
-    # Get the recurring categories from last month's budget
-    last_month_categories = FiftyThirtyTwentyCategory.objects.filter(budget=last_month_budget, is_recurring=True)
-
-    for category in last_month_categories:
-        # Create the new category for the current month
-        new_category, created = FiftyThirtyTwentyCategory.objects.get_or_create(
-            budget=current_budget,
-            name=category.name,
-            defaults={
-                'assigned_amount': category.assigned_amount,
-                'is_recurring': category.is_recurring
-            }
-        )
-
-        # Copy recurring expenses to the new/existing category
-        for expense in category.expenses.filter(is_recurring=True):
-            Expense.objects.get_or_create(
-                fifty_30_twenty_category=new_category,
-                description=expense.description,
-                defaults={
-                    'assigned_amount': expense.assigned_amount,
-                    'spent': 0,  # reset spent for new month
-                    'is_recurring': expense.is_recurring
-                }
-    '''
+@login_required
+def some_view(request):
+    budget_id = request.session.get('selected_budget_id')
+    # Other view logic
+    return render(request, 'your_template.html', {'selected_budget_id': budget_id})

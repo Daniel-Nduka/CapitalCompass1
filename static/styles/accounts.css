@@ -1,0 +1,68 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+/* Main container styling */
+main {
+  padding: 20px;
+  max-width: 800px; /* Define a max-width for your main content */
+  width: 100%; /* Ensure it doesn't exceed the parent width */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Section header styling */
+.accounts-overview h1 {
+  margin-bottom: 20px;
+  text-align: center; /* Center the header text */
+  font-size: 40px; /* Your custom font size */
+}
+
+/* Balance id styling */
+#summary {
+  font-size: 20px; /* Your custom font size */
+  text-align: center;
+}
+
+.add-button-class {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.account-list ul {
+  list-style-type: none; /* Remove bullet points */
+  padding: 0;
+}
+
+.account-box {
+  background-color: #f9f9f9; /* Light grey background */
+  border: 1px solid #ddd; /* Light grey border */
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px; /* Rounded corners */
+  display: flex;
+  flex-direction: column; /* Stack details and actions vertically */
+}
+
+.account-details {
+  font-size: 18px; /* Custom font size */
+  margin-bottom: 10px; /* Space between details and actions */
+}
+
+.account-actions {
+  display: flex;
+  justify-content: space-between; /* Space between buttons */
+}
+
+.account-actions form {
+  display: inline; /* Keep forms inline */
+}
+
+.account-actions button {
+  margin-left: 10px; /* Space between buttons */
+}

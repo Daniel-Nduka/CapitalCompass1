@@ -1,6 +1,9 @@
 {% extends 'financeapp/loggedin_base.html' %}
 {% load static %}
 {% block title_block %} Accounts - CapitalCompass {% endblock %}
+{% block head_block %}
+<link rel="stylesheet" href="{% static 'styles/accounts.css' %}">
+{% endblock %}
 
 {% block body_block %}
 <main>
@@ -8,28 +11,33 @@
         <h1>Accounts Overview</h1>
         <div id="summary">
             <p>Total Balance: £<span id="total-balance">{{ total_balance }}</span></p>
-            <p>Total Debt: £<span id="total-debt">{{ total_debt }}</span></p>
-            <p>Net Balance: £<span id="net-balance">{{ net_balance }}</span></p>
+            <!-- <p>Total Debt: £<span id="total-debt">{{ total_debt }}</span></p>
+            <p>Net Balance: £<span id="net-balance">{{ net_balance }}</span></p> -->
         </div>
-
-        <button class="btn btn-primary" onclick="location.href='{% url 'financeapp:add_account' %}'"> Add Account </button>
-
-        <ul>
-            {% for account in accounts %}
-                <li>
-                    {{ account.account_name }}: Current Balance: £{{ account.balance }}
-                    <form method="get" action="{% url 'financeapp:edit_account' account.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-warning">Edit Account</button>
-                    </form>
-                    <form method="get" action="{% url 'financeapp:delete_account' account.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
+        <div class="add-button-class">
+             <button class="btn btn-primary" onclick="location.href='{% url 'financeapp:add_account' %}'"> Add Account </button>
+        </div>
+        <div class="account-list">
+            <ul>
+                {% for account in accounts %}
+                <li class="account-box">
+                    <div class="account-details">
+                        {{ account.account_name }}: Current Balance: £{{ account.balance }}
+                    </div>
+                    <div class="account-actions">
+                        <form method="get" action="{% url 'financeapp:edit_account' account.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-warning">Edit Account</button>
+                        </form>
+                        <form method="get" action="{% url 'financeapp:delete_account' account.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
                 </li>
-            {% endfor %}
-        </ul>
+                {% endfor %}
+            </ul>
+        </div>
     </section>
 </main>
 {% endblock %}
-
