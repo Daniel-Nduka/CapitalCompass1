@@ -43,6 +43,20 @@ class Budget(models.Model):
 
     def __str__(self):
         return f"{self.budget_name} ({self.get_budget_type_display()}) - {self.user.username}"
+    
+    def update_fifty_thirty_twenty_categories(self):
+        if self.budget_type == 'fifty_thirty_twenty':
+            total_balance = sum(account.balance for account in self.accounts.all())
+            total_balance_float = float(total_balance)  # Convert Decimal to float
+            for category in self.fifty_thirty_twenty_categories.all():
+                if category.name == 'Needs':
+                    category.assigned_amount = Decimal(0.5 * total_balance_float)
+                elif category.name == 'Wants':
+                    category.assigned_amount = Decimal(0.3 * total_balance_float)
+                else:
+                    category.assigned_amount = Decimal(0.2 * total_balance_float)
+                category.save()
+            
 
 
 class Account(models.Model):
@@ -62,6 +76,11 @@ class Account(models.Model):
     
     def __str__(self):
        return f"{self.account_name} ({self.get_account_type_display()}) - {self.budget.budget_name}"
+   
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Update the budget's categories if necessary
+        self.budget.update_fifty_thirty_twenty_categories()
 #Base Category
 class BaseCategory(models.Model):
     assigned_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -103,7 +122,7 @@ class FiftyThirtyTwentyCategory(BaseCategory):
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='fifty_thirty_twenty_categories')
     name = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     is_recurring = models.BooleanField(default=True)  # New field to indicate if category is occuring
-    is_user_modified = models.BooleanField(default=False)
+  #  is_user_modified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -112,6 +131,7 @@ class FiftyThirtyTwentyCategory(BaseCategory):
 
     class Meta:
         unique_together = ('budget', 'name', 'month')
+    '''
     def save(self, *args, **kwargs):
         if not self.is_user_modified:
             total_balance = sum(account.balance for account in self.budget.accounts.all())
@@ -123,7 +143,7 @@ class FiftyThirtyTwentyCategory(BaseCategory):
             else:
                 self.assigned_amount = Decimal(0.2 * total_balance_float)
         super().save(*args, **kwargs)
-
+'''
 @receiver(post_save, sender=Budget)
 def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
     if created and instance.budget_type == 'fifty_thirty_twenty':
@@ -193,48 +213,32 @@ class Expense(models.Model):
 
    
            
+class Transaction(models.Model):
+    account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions')
+    expense = models.ForeignKey(Expense, on_delete=models.CASCADE, related_name='transactions', null=True, blank=True)
+    date = models.DateField(default=timezone.now)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    payee = models.CharField(max_length=255, blank=True, null=True)
+    inflow = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    outflow = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
-        
-
-
-    
-    
-    
-    
-    '''
-class FiftyThirtyTwentyBudget(models.Model):
-    budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='fifty_thirty_twenty_budgets')
-    month = models.DateField(default=datetime.date.today)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
     def __str__(self):
-        return f"50/30/20 Budget for {self.budget.budget_name} - {self.month.strftime('%B %Y')}"
-    
-    class Meta:
-        unique_together = ('budget', 'month')
+        return f"{self.date} - {self.description} ({self.inflow} / {self.outflow})"
 
     def save(self, *args, **kwargs):
+        # Update the account balance based on the transaction
+        if self.inflow > 0:
+            self.account.balance += Decimal(self.inflow)
+        if self.outflow > 0:
+            self.account.balance -= Decimal(self.outflow)
+        
+        self.account.save()
+
+        # If this is an outflow, update the linked expense
+        if self.outflow > 0 and self.expense:
+            self.expense.spent += Decimal(self.outflow)
+            self.expense.save()
+
         super().save(*args, **kwargs)
-        # Create the three categories if they don't exist
-        if not self.categories.exists():
-            categories = ['Needs', 'Wants', 'Savings']
-            for name in categories:
-                FiftyThirtyTwentyCategory.objects.create(
-                    budget=self,
-                    name=name,
-                    assigned_amount=0.0
-                )'''
     
-    
-    
-    
-    
-    
-    
-   
-    
-    
-    
-    
-    
+        

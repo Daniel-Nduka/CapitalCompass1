@@ -8,8 +8,8 @@ import datetime
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
-from .models import UserProfile, Budget, ZeroBasedCategory, Expense, Account, FiftyThirtyTwentyCategory #FiftyThirtyTwentyBudget
-from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm, ZeroBudgetForm, ExpenseForm, Fifty_Twenty_ThirtyForm
+from .models import UserProfile, Budget, ZeroBasedCategory, Expense, Account, FiftyThirtyTwentyCategory, Transaction
+from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm, ZeroBudgetForm, ExpenseForm, Fifty_Twenty_ThirtyForm, TransactionForm
 
 from django.contrib.auth import logout
 import logging
@@ -109,11 +109,11 @@ def edit_account(request, account_id):
     return render(request, 'financeapp/edit_account.html', {'form': form})
 
 
-
+'''
 
 def transactions(request):
     return render(request, 'financeapp/transactions.html')
-
+'''
 #This is the profile page. It allows users to update their profile information.
 @login_required
 def profile(request):
@@ -517,11 +517,17 @@ def delete_50_expense(request, budget_id):
     return redirect('financeapp:fifty_thirty_twenty_page', budget_id=base_budget.id)
 
 @login_required
-def load_sidebar_content(request, budget_id):
+def load_sidebar_content_with_budget(request, budget_id):
     if request.is_ajax():
         budget = get_object_or_404(Budget, id=budget_id, user=request.user)
         request.session['selected_budget_id'] = budget_id  # Set selected budget in session
         sidebar_content = render_to_string('financeapp/sidebar_dynamic_content.html', {'budget': budget}, request=request)
+        return JsonResponse({'sidebar_content': sidebar_content})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def load_sidebar_content_without_budget(request):
+    if request.is_ajax():
+        sidebar_content = render_to_string('financeapp/sidebar_dynamic_content.html', {'budget': None}, request=request)
         return JsonResponse({'sidebar_content': sidebar_content})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
@@ -530,3 +536,67 @@ def some_view(request):
     budget_id = request.session.get('selected_budget_id')
     # Other view logic
     return render(request, 'your_template.html', {'selected_budget_id': budget_id})
+
+@login_required
+def transaction_list(request):
+    budget = request.session.get('selected_budget_id')
+    if not budget:
+        return redirect('financeapp:budget_list')
+
+
+    transactions = Transaction.objects.filter(account__budget_id=budget)
+    accounts = Account.objects.filter(budget_id=budget)
+    categories = ZeroBasedCategory.objects.filter(budget_id=budget).prefetch_related('expenses')
+    context = {
+        'transactions': transactions,
+        'accounts': accounts,
+        'categories': categories,
+        'today': datetime.date.today()
+    }
+    return render(request, 'financeapp/transactions.html', context)
+
+@login_required
+def transaction_list(request):
+    budget = request.session.get('selected_budget_id')
+    if not budget:
+        return redirect('financeapp:budget_list')
+
+    transactions = Transaction.objects.filter(account__budget_id=budget)
+    accounts = Account.objects.filter(budget_id=budget)
+    categories = ZeroBasedCategory.objects.filter(budget_id=budget).prefetch_related('expenses')
+    context = {
+        'transactions': transactions,
+        'accounts': accounts,
+        'categories': categories,
+        'today': datetime.date.today()
+    }
+    return render(request, 'financeapp/transactions.html', context)
+
+@login_required
+def add_transaction(request):
+    budget = request.session.get('selected_budget_id')
+    if not budget:
+        return redirect('financeapp:budget_list')
+
+    if request.method == 'POST':
+        form = TransactionForm(request.POST)
+        if form.is_valid():
+            transaction = form.save(commit=False)
+            transaction.account = form.cleaned_data['account']
+            transaction.save()
+            messages.success(request, 'Transaction added successfully.')
+            return redirect('financeapp:transactions')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+
+    transactions = Transaction.objects.filter(account__budget_id=budget)
+    accounts = Account.objects.filter(budget_id=budget)
+    categories = ZeroBasedCategory.objects.filter(budget_id=budget).prefetch_related('expenses')
+    context = {
+        'transactions': transactions,
+        'accounts': accounts,
+        'categories': categories,
+        'today': datetime.date.today(),
+        'form': form if request.method == 'POST' else TransactionForm()
+    }
+    return render(request, 'financeapp/transactions.html', context)

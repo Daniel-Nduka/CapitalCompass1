@@ -7,7 +7,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('about/', views.about, name='about'),
     path('profile/', views.profile, name='profile'),
-    path('transactions/', views.transactions, name='transactions'),
+    #path('transactions/', views.transactions, name='transactions'),
     
     path('select_budget/<int:budget_id>/', views.select_budget, name='select_budget'),
 
@@ -48,5 +48,10 @@ urlpatterns = [
     path('budgets/fifty_thirty_twenty/<int:budget_id>/edit_expense/', views.edit_fifty_thirty_twenty_expense, name='edit_fifty_thirty_twenty_expense'),
     path('budgets/fifty_thirty_twenty/<int:budget_id>/delete_50_expense/', views.delete_50_expense, name='delete_expense'),
     path('budgets/fifty_thirty_twenty/<int:budget_id>/delete_30_expense/', views.edit_fifty_thirty_twenty_category, name='edit_category'),
-    path('load-sidebar-content/<int:budget_id>/', views.load_sidebar_content, name='load_sidebar_content'),
+    
+    path('load-sidebar-content/<int:budget_id>/', views.load_sidebar_content_with_budget, name='load_sidebar_content_with_budget'),
+    path('load-sidebar-content/', views.load_sidebar_content_without_budget, name='load_sidebar_content_without_budget'),
+    
+    path('transactions/', views.transaction_list, name='transactions'),
+    path('transactions/add/', views.add_transaction, name='add_transaction'),
 ]

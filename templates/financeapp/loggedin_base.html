@@ -7,7 +7,7 @@
     <title>{% block title_block %}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'styles/application.css' %}">
     <link rel="stylesheet" href="{% static 'styles/profile.css' %}">
-    <link rel="stylesheet" href="{% static 'styles/transactions.css' %}">
+
     {% block head_block %}{% endblock %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
@@ -15,16 +15,7 @@
     <div class="sidebar">
         <div id="dynamic-sidebar-content">
             <!-- Default content or loading spinner -->
-            <div class="logo">
-                   CapitalCompass    
-            </div>
-        
-            <nav>
-                <ul class="nav-top">
-                    <li><a href="{% url 'financeapp:create_budget' %}">Create Budget</a></li>
-                </ul>
-            </nav>
-        
+    
         </div>
         <nav>
             <ul class="nav-bottom">
@@ -39,8 +30,9 @@
     
     <script>
         function loadSidebarContent(budgetId) {
+            var url = budgetId ? '{% url "financeapp:load_sidebar_content_with_budget" 0 %}'.replace('0', budgetId) : '{% url "financeapp:load_sidebar_content_without_budget" %}';
             $.ajax({
-                url: '{% url "financeapp:load_sidebar_content" 0 %}'.replace('0', budgetId),
+                url: url,
                 type: 'GET',
                 success: function(response) {
                     if (response.sidebar_content) {
@@ -54,14 +46,12 @@
                 }
             });
         }
-
+    
         function loadSelectedBudgetSidebar() {
             var selectedBudgetId = {{ request.session.selected_budget_id|default:"null" }};
-            if (selectedBudgetId) {
-                loadSidebarContent(selectedBudgetId);
-            }
+            loadSidebarContent(selectedBudgetId);
         }
-
+    
         $(document).ready(function() {
             loadSelectedBudgetSidebar();
             
@@ -71,5 +61,6 @@
             });
         });
     </script>
+    
 </body>
 </html>
