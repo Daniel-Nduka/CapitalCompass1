@@ -4,6 +4,7 @@
 
 {% block head_block %}
     <link rel="stylesheet" href="{% static 'styles/transactions.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 {% endblock %}
 
 {% block body_block %}
@@ -11,9 +12,11 @@
     <section class="transaction-details">
         <h1>Transactions</h1>
      
-       <div class="add-transaction-class">
-        <button class="btn btn-primary" onclick="showTransactionForm()">Add Transaction</button>    
-     </div>
+        <div class="add-transaction-class">
+            <button class="btn btn-primary" onclick="showTransactionForm()">
+                <i class="fas fa-plus"></i> Add Transaction
+            </button>   
+        </div>
         <table>
             <thead>
                 <tr>
@@ -38,7 +41,9 @@
                     <td>{{ transaction.outflow }}</td>
                     <td>{{ transaction.inflow }}</td>
                     <td>
-                        <!-- Optional: Add edit and delete buttons if needed -->
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-pencil-alt"></i> Edit
+                        </button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -52,6 +57,10 @@
     <div class="modal-content">
         <span class="close-button" onclick="closeTransactionForm()">&times;</span>
         <h2>New Transaction</h2>
+        <div class="transaction-type-buttons" style="text-align: center;">
+            <button id="inflow-btn" class="btn btn-primary" onclick="showInflowForm()">Inflow</button>
+            <button id="outflow-btn" class="btn btn-secondary" onclick="showOutflowForm()">Outflow</button>
+        </div>
         <form id="transaction-form" method="post" action="{% url 'financeapp:add_transaction' %}">
             {% csrf_token %}
             <div class="form-group">
@@ -66,32 +75,38 @@
                 <label for="date">Date</label>
                 <input type="date" id="date" name="date" class="form-control" value="{{ today|date:'Y-m-d' }}">
             </div>
-            <div class="form-group">
-                <label for="description">Description</label>
-                <input type="text" id="description" name="description" class="form-control" placeholder="Enter description">
+            <div id="common-fields">
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" id="description" name="description" class="form-control" placeholder="Enter description">
+                </div>
+                <div class="form-group">
+                    <label for="payee">Payee</label>
+                    <input type="text" id="payee" name="payee" class="form-control" placeholder="Enter payee name">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="payee">Payee</label>
-                <input type="text" id="payee" name="payee" class="form-control" placeholder="Enter payee name">
-            </div>
-            <div class="form-group">
-                <label for="expense">Expense (Optional)</label>
-                <select id="expense" name="expense" class="form-control">
-                    <option value="">-- Select Expense --</option>
-                    {% for category in categories %}
-                        {% for expense in category.expenses.all %}
-                        <option value="{{ expense.id }}">{{ expense.description }} ({{ category.name }})</option>
+            <div id="outflow-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="expense">Expense</label>
+                    <select id="expense" name="expense" class="form-control">
+                        <option value="">-- Select Expense --</option>
+                        {% for category in categories %}
+                            {% for expense in category.expenses.all %}
+                            <option value="{{ expense.id }}">{{ expense.description }} ({{ category.name }})</option>
+                            {% endfor %}
                         {% endfor %}
-                    {% endfor %}
-                </select>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="outflow">Amount</label>
+                    <input type="number" id="outflow" name="outflow" class="form-control" placeholder="Enter outflow amount">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="outflow">Outflow</label>
-                <input type="number" id="outflow" name="outflow" class="form-control" placeholder="Enter outflow amount">
-
-            </div>
-            <div class="form-group">
-                <input type="number" id="inflow" name="inflow" class="form-control" placeholder="Enter inflow amount">
+            <div id="inflow-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="inflow">Amount</label>
+                    <input type="number" id="inflow" name="inflow" class="form-control" placeholder="Enter inflow amount">
+                </div>
             </div>
             <div class="form-group submit-btn">
                 <button type="submit" class="btn btn-primary">Add Transaction</button>
@@ -104,10 +119,29 @@
 <script>
     function showTransactionForm() {
         document.getElementById('transaction-form-modal').style.display = 'flex';
+        showInflowForm();  // Default to inflow form
     }
 
     function closeTransactionForm() {
         document.getElementById('transaction-form-modal').style.display = 'none';
+    }
+
+    function showInflowForm() {
+        document.getElementById('inflow-fields').style.display = 'block';
+        document.getElementById('outflow-fields').style.display = 'none';
+        document.getElementById('inflow-btn').classList.add('btn-primary');
+        document.getElementById('inflow-btn').classList.remove('btn-secondary');
+        document.getElementById('outflow-btn').classList.add('btn-secondary');
+        document.getElementById('outflow-btn').classList.remove('btn-primary');
+    }
+
+    function showOutflowForm() {
+        document.getElementById('outflow-fields').style.display = 'block';
+        document.getElementById('inflow-fields').style.display = 'none';
+        document.getElementById('outflow-btn').classList.add('btn-primary');
+        document.getElementById('outflow-btn').classList.remove('btn-secondary');
+        document.getElementById('inflow-btn').classList.add('btn-secondary');
+        document.getElementById('inflow-btn').classList.remove('btn-primary');
     }
 
     window.onload = function() {

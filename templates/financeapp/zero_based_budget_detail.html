@@ -10,13 +10,36 @@
 <main>
     <section class="zero-based-budget-overview">
         <h1>{{ budget.budget_name }} Zero-Based Budget</h1>
+        <div class="add-money-container">
+            <button class="add-money-button" onclick="location.href='{% url 'financeapp:account_list' %}'">Add Money</button>
+        </div>
+        <div class="budget-overview">
+            <div class="budget-amount">
+                <span class="budget-income-label">Total Income</span>
+                <span class="budget-income-value">£{{ total_balance }}</span>
+            </div>
+            <div class="budget-activity">
+                <span class="budget-activity-label">Total Budget</span>
+                <span class="budget-activity-value">£{{ budgeted_money }}</span>
+            </div>
+            <div class="budget-available {% if money_available < 0 %}negative-value{% else %}positive-value{% endif %}">
+                <span class="budget-available-label">Total Money Available</span>
+                <span class="budget-available-value">
+                    £{{ money_available }}
+                    {% if money_available < 0 %}
+                    <i class="fas fa-exclamation-circle warning-icon"></i>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+        <!--
         <div class="{% if money_available >= 0 %}money-positive{% else %}money-negative{% endif %}">
             {% if money_available >= 0 %}
-                Available Money: £{{ money_available }} <button class="add-money-positive" onclick="location.href='{% url 'financeapp:add_account' %}'"> Add Money </button>
+                Available Money: £{{ money_available }} <button class="add-money-positive" onclick="location.href='{% url 'financeapp:account_list' %}'"> Add Money </button>
             {% else %}
-                Warning: Negative Balance of £{{ money_available }} <button class="add-money-negative" onclick="location.href='{% url 'financeapp:add_account' %}'"> Add Money </button>
+                Warning: Negative Balance of £{{ money_available }} <button class="add-money-negative" onclick="location.href='{% url 'financeapp:account_list' %}'"> Add Money </button>
             {% endif %}
-        </div>
+        </div> -->
         <div class="month-navigation">
             <button class="month-button" onclick="location.href='{% url 'financeapp:zero_based_page_with_date' budget.id previous_year previous_month %}'">Previous Month</button>
             <span class="month-year-display">{{ selected_date|date:"F Y" }}</span>
@@ -27,7 +50,7 @@
     <section class="budget-details">  
         <div class="categories-container">
             {% for category in categories %}
-            <div class="category-card">
+            <div class="category-card {% if category.expenses_assigned_amount_total > category.assigned_amount %}over-budget{% endif %}">
                 <div class="category-header">
                     <span class="category-name"><span class="name-category">{{ category.name }}</span><span class="budget"> Budget</span></span>
                     <span class="category-assigned" data-assigned-amount="{{ category.assigned_amount }}" data-expenses-assigned-amount-total="{{ category.expenses_assigned_amount_total }}">
@@ -194,8 +217,12 @@
                     <label for="edit-expense-spent">Paid:</label>
                     <input type="number" name="spent" id="edit-expense-spent" required>
                 </div>
+                <div clss="form-group">
+                    <label for="edit-is_recurring_expense">Recurring:</label>
+                    <input type="checkbox" name="is_recurring" id="edit-is_recurring_expense">
+                </div>
                 <div class="form-group submit-btn">
-                    <button type="submit" name="edit_expense" class="btn btn-primary">Edit Expense</button>
+                    <button type="submit" name="edit_expense" class="btn btn-primary">Save Changes</button>
                     <button type="button" class="btn btn-secondary" onclick="closeEditExpenseForm()">Cancel</button>
                 </div>
             </form>

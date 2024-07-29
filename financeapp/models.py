@@ -70,8 +70,10 @@ class Account(models.Model):
     account_name = models.CharField(max_length=100)
     account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES)
     balance = models.DecimalField(max_digits=15, decimal_places=2)
+   # current_balance = models.DecimalField(max_digits=15, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    #recurring_income = models.BooleanField(default=False)
     
     
     def __str__(self):
@@ -131,19 +133,7 @@ class FiftyThirtyTwentyCategory(BaseCategory):
 
     class Meta:
         unique_together = ('budget', 'name', 'month')
-    '''
-    def save(self, *args, **kwargs):
-        if not self.is_user_modified:
-            total_balance = sum(account.balance for account in self.budget.accounts.all())
-            total_balance_float = float(total_balance)  # Convert Decimal to float
-            if self.name == 'Needs':
-                self.assigned_amount = Decimal(0.5 * total_balance_float)
-            elif self.name == 'Wants':
-                self.assigned_amount = Decimal(0.3 * total_balance_float)
-            else:
-                self.assigned_amount = Decimal(0.2 * total_balance_float)
-        super().save(*args, **kwargs)
-'''
+  
 @receiver(post_save, sender=Budget)
 def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
     if created and instance.budget_type == 'fifty_thirty_twenty':
@@ -155,28 +145,6 @@ def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
                 assigned_amount=0.0,
                 month=instance.month
             )
-'''
-@receiver(post_save, sender=Budget)
-def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
-    if created and instance.budget_type == 'fifty_thirty_twenty':
-        
-        total_balance = sum(account.balance for account in instance.accounts.all())
-        
-        
-        categories = ['Needs', 'Wants', 'Savings']
-        for name in categories:
-            FiftyThirtyTwentyCategory.objects.create(
-                budget=instance,
-                name=name,
-                if name == 'Needs':
-                    assigned_amount=0.5 * total_balance
-                elif name == 'Wants':
-                    assigned_amount=0.3 * total_balance
-                else:
-                    assigned_amount=0.2 * total_balance
-                month=instance.month
-            )
-'''
  
  
 #Zero Based Models implementation      
@@ -229,8 +197,10 @@ class Transaction(models.Model):
         # Update the account balance based on the transaction
         if self.inflow > 0:
             self.account.balance += Decimal(self.inflow)
+            self.outflow = 0
         if self.outflow > 0:
             self.account.balance -= Decimal(self.outflow)
+            self.inflow = 0
         
         self.account.save()
 

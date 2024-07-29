@@ -30,7 +30,7 @@ main {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px; /* Your custom margin */
+  margin-top: 50px; /* Your custom margin */
 }
 
 .add-category-button:hover {
@@ -54,6 +54,94 @@ main {
   flex-direction: column;
 }
 
+.add-money-negative {
+  display: inline-block;
+  margin-left: 10px; /* Space between text and button */
+  padding: 5px 10px;
+  background-color: #f44336; /* Red background */
+  color: white; /* White text */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-weight: bold; /* Bold text */
+  font-size: 0.75em; /* Adjust font size */
+} 
+
+.add-money-positive {
+  display: inline-block;
+  margin-left: 10px; /* Space between text and button */
+  padding: 5px 10px;
+  background-color: green; /* Red background */
+  color: white; /* White text */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-weight: bold; /* Bold text */
+  font-size: 0.75em; /* Adjust font size */
+}
+
+.add-money:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+}
+
+.month-year-display{
+  font-size: 30px;
+}
+.month-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.month-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.money-positive {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;
+  padding: 10px;
+  margin: 20px auto; /* Center the box and add vertical margins */
+  max-width: 300px; /* Set a maximum width for the box */
+  background-color: #e8f5e9; /* Light green background */
+  border: 2px solid #4caf50; /* Green border */
+  border-radius: 5px;
+  color: #4caf50; /* Green text */
+  font-weight: bold;
+  font-size: 1.2em; /* Adjust font size */
+  text-align: center;
+}
+
+
+.money-negative {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;
+  padding: 10px;
+  margin: 20px auto; /* Center the box and add vertical margins */
+  max-width: 300px; /* Set a maximum width for the box */
+  background-color: #ffebee; /* Light red background */
+  border: 2px solid #f44336; /* Red border */
+  border-radius: 5px;
+  color: #f44336; /* Red text */
+  font-weight: bold;
+  font-size: 1.2em; /* Adjust font size */
+  text-align: center;
+}
+
+
+
 /* Category header styling */
 .category-header {
   display: flex;
@@ -65,11 +153,14 @@ main {
 .category-name {
   font-weight: bold;
   font-size: 1.2em;
+  text-align: center;
+  
 }
 
-.category-assigned {
+.category-assigned, .category-available {
   font-size: 1.2em;
   color: #007bff;
+  text-align: center;
 }
 
 /* Action buttons styling */
@@ -78,33 +169,10 @@ main {
   border: none;
   color: #007bff;
   cursor: pointer;
-  text-align: left;
-  font-size: 16px;
-  padding: 10px;
-  border-radius: 5px;
-  width: 100%;
 }
 
 .action-button:hover {
-  background-color: #f1f1f1;
-}
-
-.action-button:focus {
-  outline: none;
-  background-color: #e1e1e1;
-}
-
-/* Special styling for the delete button */
-.action-button[style="color: red;"] {
-  color: red;
-}
-
-.action-button[style="color: red;"]:hover {
-  background-color: #f9dcdc;
-}
-
-.action-button[style="color: red;"]:focus {
-  background-color: #f8b5b5;
+  text-decoration: underline;
 }
 
 /* Expenses list styling */
@@ -114,24 +182,56 @@ main {
   gap: 10px;
 }
 
-/* Expense item styling */
+/* Flex container for expense item */
 .expense-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 10px;
+background-color: #f9f9f9;
+border-radius: 5px;
 }
 
+/* Expense spent container to position icon inline */
+.expense-spent {
+display: flex;
+
+}
+.spent-container {
+display: flex;
+align-items: center;
+gap: 5px; /* Adjust gap as needed */
+}
+.spent-paid-container {
+display: flex;
+flex-direction: column; /* Stack elements vertically */
+align-items: flex-start; /* Align items to the start of the flex container */
+}
+
+.spent-expense {
+margin-right: 5px; /* Space between amount and icon */
+}
+
+.edit-icon {
+cursor: pointer;
+color: #007bff;
+font-size: 1.2em; /* Adjust icon size */
+}
+
+.edit-icon:hover {
+color: #0056b3;
+}
+
+
 .expense-description {
-  font-weight: bold;
+  font-weight: 0.5;
 }
 
 .expense-assigned,
 .expense-spent,
 .expense-available {
   color: #333;
+  text-align: left; /* Align text to the left */
 }
 
 .submit-btn {
@@ -176,7 +276,7 @@ main {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  background-color: rgba(0, 0, 0, 0.5);
   justify-content: center;
   align-items: center;
   display: flex;
@@ -186,19 +286,17 @@ main {
 .modal-content {
   background-color: white;
   padding: 20px;
-  border-radius: 10px;
-  width: 300px; /* Adjusted width to match the example */
+  border-radius: 5px;
+  width: 400px;
   max-width: 90%;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 /* Close button */
 .close-button {
   color: #aaa;
+  float: right;
   font-size: 28px;
   font-weight: bold;
   position: absolute;
@@ -212,4 +310,220 @@ main {
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+/* Form group */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.form-group input[type="checkbox"] {
+  display: inline-block;
+  width: auto;
+  margin-right: 10px;
+}
+.form-group .checkbox-label {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+}
+
+/* Submit buttons
+.form-group.submit-btn {
+  display: flex;
+  justify-content: space-between;
+}
+
+.form-group.submit-btn button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.form-group.submit-btn .btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.form-group.submit-btn .btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+  */
+
+  /* Flex container for form buttons */
+.form-group.submit-btn {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px; /* Add spacing between buttons */
+}
+
+/* Flex container for delete form buttons */
+.submit-btn.delete-group {
+  justify-content: flex-end; /* Align delete button to the right */
+}
+
+/* Consistent button width */
+.submit-btn button {
+  flex: 1; /* Make buttons take equal space */
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+/* Button styles */
+.submit-btn .btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.submit-btn .btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.submit-btn .btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.submit-btn .btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.submit-btn .btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.submit-btn .btn-danger:hover {
+  background-color: #c82333;
+}
+
+
+
+.add-category-button {
+display: block; /* Make the button a block-level element */
+margin: 0 auto 20px auto; /* Center horizontally with a bottom margin */
+padding: 10px 20px;
+background-color: #007bff;
+color: white;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+margin-top: 20px; /* Your custom margin */
+margin-bottom: 20px;
+}
+.add-category-button-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 100px; /* Add margin at the bottom */
+}
+.category-name {
+position: relative;
+display: flex;
+flex-direction: column; /* To stack the budget below the category name */
+align-items: flex-start; /* Align items to the start of the flex container */
+}
+.name-category, .assigned-category, .activity-category {
+font-size: 1.4em;
+
+}
+
+.category-assigned, .category-available, .category-activity{
+font-size: 1.2em;
+color: black;
+display: flex;
+flex-direction: column; /* Stack elements vertically */
+align-items: flex-start;
+font-weight: bold;
+}
+
+.expense-description, .expense-assigned, .expense-spent{
+display: flex;
+flex-direction: column; /* Stack elements vertically */
+align-items: flex-start;
+
+}
+
+.category-name .budget, .category-assigned .assigned, .category-activity .activity, .expense-description .expense, .expense-assigned .cost, .expense-spent .paid {
+display: inline-block;
+padding: 5px; /* Adjust padding for the box */
+border-radius: 10px; 
+background-color: white; /* Background color */
+margin-top: 2px; /* Space between category name and budget logo */
+}
+
+.budget {
+color: red;
+border: 1px solid red; /* Border to create the box effect */
+font-size: 0.65em; /* Smaller font size */
+}
+
+.assigned {
+color: purple;
+border: 1px solid purple; /* Border to create the box effect */
+font-size: 0.65em; /* Smaller font size */
+}
+
+.activity{
+color: green;
+border: 1px solid green; /* Border to create the box effect */
+font-size: 0.65em; /* Smaller font size */
+}
+.description-expense, .assigned-expense, .spent-expense {
+font-weight: 0.5;
+font-size: 1.0em;
+}
+
+
+.assigned-expense, .spent-expense {
+font-weight: 0.5;
+font-size: 1.2em;
+}
+.expense, .cost, .paid{
+font-size: 0.8em; /* Smaller font size */
+font-weight: 0.5;
+}
+.expense{
+color: blue;
+border: 1px solid blue; /* Border to create the box effect */
+}
+
+.cost{
+color: red;
+border: 1px solid red; /* Border to create the box effect */
+}
+
+.paid{
+color: green;
+border: 1px solid green; /* Border to create the box effect */
+
+}
+.category-actions {
+display: flex;
+gap: 10px;
+justify-content: center; /* Align buttons to the right */
+margin-top: 10px;/* Add space between expenses and buttons */
+}
+
+.warning-message { /* Add custom warning message styling */
+  color: red; /* Red text color */
+  text-align: center; /* Center text */
+  font-size: 0.55em;
+  font-style: italic;
 }

@@ -3,13 +3,12 @@ html, body {
   height: 100%;
   width: 100%;
   display: flex;
-  justify-content: center; /* Center horizontally */
+  /* justify-content: center; /* Center horizontally */
 
 }
 
 /* Main container styling */
 main {
-  padding: 20px;
 
   width: 100%; /* Ensure it doesn't exceed the parent width */
   box-sizing: border-box; /* Include padding and border in the element's total width and height */
@@ -17,13 +16,13 @@ main {
 
 /* Section header styling */
 .transaction-details h1 {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   text-align: center; /* Center the header text */
-  font-size: 40px; /* Your custom font size */
+  font-size: 30px; /* Your custom font size */
 }
 
 .add-transaction-class {
-  margin-top: 20px;
+  margin-top: 10px;
   margin-bottom: 20px;
   display: flex;
   justify-content: center;

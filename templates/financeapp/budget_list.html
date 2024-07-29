@@ -22,13 +22,14 @@
                       <p>Budget Type: {{ budget.budget_type }}</p>
                   </div>
                   <div class="budget-actions">
-                      {% if budget.budget_type == 'zero_based' %}
-                          <button data-budget-id="{{ budget.id }}" class="btn btn-primary open-budget"  >Open</button>
-                      {% else %}
-                          <button data-budget-id="{{ budget.id }}" class="btn btn-primary open-budget">Open</button>
-                      {% endif %}
-                      <button onclick="location.href='{% url 'financeapp:delete_budget' budget.id %}'" class="btn btn-danger">Delete</button>
-                  </div>
+                    {% if budget.budget_type == 'zero_based' %}
+                        <button onclick="location.href='{% url 'financeapp:zero_based_page' budget.id %}'" class="btn btn-primary open-budget">Open</button>
+                    {% elif budget.budget_type == 'fifty_thirty_twenty' %}
+                        <button onclick="location.href='{% url 'financeapp:fifty_thirty_twenty_page' budget.id %}'" class="btn btn-primary open-budget">Open</button>
+                    {% endif %}
+                    <button onclick="location.href='{% url 'financeapp:delete_budget' budget.id %}'" class="btn btn-danger">Delete</button>
+                </div>
+                
               </div>
           {% endfor %}
           <div class="budget-card create-new">

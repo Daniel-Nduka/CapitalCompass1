@@ -2,38 +2,119 @@
 {% load static %}
 {% block title_block %} Register {% endblock %}
 
-{% block body_block%}
-    <div class="container">
-        <div class="form-container">
-            <div class="signup-header">
-                <h2>Register Here</h2>
-                <p>Already have an account? <a href="{% url 'auth_login' %}">Login here</a></p>
-            </div>
-            <form method="post" action="{% url 'registration_register' %}">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{% url 'financeapp:create_budget' %}">
-                <div class="form-group">
-                    <label for="id_username">Username</label>
-                    <input id="id_username" maxlength="30" name="username" placeholder="Enter username" type="text" required />
-                    <span class="helptext">Required. 30 characters or fewer. Letters, digits and @/./+/-?_ only.</span>
-                </div>
-                <div class="form-group">
-                    <label for="id_email">Email</label>
-                    <input id="id_email" name="email" placeholder="Enter email" type="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="id_password1">Password</label>
-                    <input id="id_password1" name="password1" placeholder="Enter password" type="password" required>
-                </div>
-                <div class="form-group">
-                    <label for="id_password2">Confirm Password</label>
-                    <input id="id_password2" name="password2" placeholder="Enter password" type="password" required>
-                    <span class="helptext">Enter the same password as before, for verification.</span>
-                </div>
-                <div class="form-group submit-btn">
-                    <button type="submit">Create Account</button>
-                </div>
-            </form>
+{% block body_block %}
+<div class="container">
+    <div class="form-container">
+        <div class="signup-header">
+            <h2>Register Here</h2>
+            <p>Already have an account? <a href="{% url 'auth_login' %}">Login here</a></p>
         </div>
+        <form method="post" action="{% url 'registration_register' %}" id="registrationForm">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{% url 'financeapp:create_budget' %}">
+
+            <div class="form-group">
+                <label for="id_username">Username</label>
+                <input id="id_username" maxlength="30" name="username" placeholder="Enter username" type="text" required value="{{ form.username.value|default:'' }}">
+                <span class="helptext">Required. 30 characters or fewer. Letters, digits and @/./+/-?_ only.</span>
+                <div class="error" id="usernameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_email">Email</label>
+                <input id="id_email" name="email" placeholder="Enter email" type="email" required value="{{ form.email.value|default:'' }}">
+                <div class="error" id="emailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password1">Password</label>
+                <input id="id_password1" name="password1" placeholder="Enter password" type="password" required>
+                <ul class="helptext">
+                    <li id="lengthRequirement">At least 8 characters long.</li>
+                    <li id="numericRequirement">Cannot be entirely numeric.</li>
+                </ul>
+                <div class="error" id="password1Error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password2">Confirm Password</label>
+                <input id="id_password2" name="password2" placeholder="Enter password" type="password" required>
+                <span class="helptext">Enter the same password as before, for verification.</span>
+                <div class="error" id="password2Error"></div>
+            </div>
+
+            <div class="form-group submit-btn">
+                <button type="submit">Create Account</button>
+            </div>
+        </form>
     </div>
+</div>
+
+<style>
+    .error-message {
+        color: red;
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var form = document.getElementById("registrationForm");
+    var username = document.getElementById("id_username");
+    var password1 = document.getElementById("id_password1");
+    var password2 = document.getElementById("id_password2");
+    var lengthRequirement = document.getElementById("lengthRequirement");
+    var numericRequirement = document.getElementById("numericRequirement");
+    var password1Error = document.getElementById("password1Error");
+    var password2Error = document.getElementById("password2Error");
+
+    password1.addEventListener("input", validatePassword);
+    password2.addEventListener("input", validatePasswordMatch);
+    form.addEventListener("submit", function(event) {
+        if (!validatePassword() || !validatePasswordMatch()) {
+            event.preventDefault();
+        }
+    });
+
+    function validatePassword() {
+        var valid = true;
+        password1Error.innerHTML = "";
+
+        // Check length requirement
+        if (password1.value.length < 8) {
+            lengthRequirement.style.color = "red";
+            valid = false;
+        } else {
+            lengthRequirement.style.color = "green";
+        }
+
+        // Check numeric requirement
+        if (/^\d+$/.test(password1.value)) {
+            numericRequirement.style.color = "red";
+            valid = false;
+        } else {
+            numericRequirement.style.color = "green";
+        }
+
+        // Check if password contains the username
+        if (password1.value.toLowerCase().includes(username.value.toLowerCase())) {
+            password1Error.innerHTML = "<span class='error-message'>Password cannot contain the username.</span>";
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    function validatePasswordMatch() {
+        var valid = true;
+        password2Error.innerHTML = "";
+
+        if (password1.value !== password2.value) {
+            password2Error.innerHTML = "<span class='error-message'>Passwords do not match.</span>";
+            valid = false;
+        }
+
+        return valid;
+    }
+});
+</script>
 {% endblock %}

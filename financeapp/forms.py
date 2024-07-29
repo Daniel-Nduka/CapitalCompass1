@@ -16,6 +16,7 @@ class UserProfileForm(forms.ModelForm):
 
 #Account form
 class AccountForm(forms.ModelForm):
+   # income_recurring = forms.BooleanField(required=False, label='Recurring')
     class Meta:
         model = Account
         fields = ['account_name', 'account_type', 'balance']
@@ -85,3 +86,17 @@ class TransactionForm(forms.ModelForm):
             'inflow': 'Enter the inflow amount',
             'outflow': 'Enter the outflow amount',
         }
+    def clean(self):
+        cleaned_data = super().clean()
+        inflow = cleaned_data.get("inflow")
+        outflow = cleaned_data.get("outflow")
+
+        # Check that at least one of inflow or outflow is provided
+        if not inflow and not outflow:
+            raise forms.ValidationError("Please provide either an inflow or an outflow.")
+
+        # Check that only one of inflow or outflow is provided
+        if inflow and outflow:
+            raise forms.ValidationError("Please provide either an inflow or an outflow, not both.")
+
+        return cleaned_data
