@@ -72,9 +72,7 @@ def add_account(request):
             account.budget = budget
             account.save()
             return redirect('financeapp:account_list')
-    else:
-        form = AccountForm()
-    return render(request, 'financeapp/add_account.html', {'form': form})
+    return redirect('financeapp:account_list')
 
 @login_required
 def delete_account(request, account_id):
@@ -92,7 +90,8 @@ def delete_account(request, account_id):
     return render(request, 'financeapp/delete_account.html', context)
 
 @login_required
-def edit_account(request, account_id):
+def edit_account(request):
+    account_id = request.POST.get('account_id')
     budget = request.selected_budget
     if not budget:
         return redirect('financeapp:budget_list')
@@ -103,9 +102,7 @@ def edit_account(request, account_id):
         if form.is_valid():
             form.save()
             return redirect('financeapp:account_list')
-    else:
-        form = AccountForm(instance=account)
-    return render(request, 'financeapp/edit_account.html', {'form': form})
+    return redirect('financeapp:account_list')
 
 
 '''
@@ -205,7 +202,15 @@ def copy_recurring_items(budget, selected_date):
                 spent=0,  # reset spent for new month
                 is_recurring=expense.is_recurring
                 )
-     # Copy available balance instead of total balance
+     # Update account balances
+    # Calculate and update account balances
+    
+    # Set new month's balance based on previous balance
+    '''
+    for account in budget.accounts.all():
+        account.balance = account.previous_balance  # Use the previous balance for the new month
+        account.save()
+   ''' 
     
 #Zero based budget page. It displays the categories and expenses associated with the budget.
 #when a user selects a budget, it stores the budget in the session.
@@ -220,8 +225,6 @@ def zero_based_page(request, budget_id, year=None, month=None):
         year, month = today.year, today.month
 
     selected_date = datetime.date(year, month, 1)
-
-    # Copy recurring items if necessary
     copy_recurring_items(budget, selected_date)
 
     previous_month_date = selected_date.replace(day=1) - datetime.timedelta(days=1)
@@ -241,6 +244,9 @@ def zero_based_page(request, budget_id, year=None, month=None):
         total_balance += account.balance
 
     money_available = total_balance - budgeted_money
+    
+        
+    copy_recurring_items(budget, selected_date)
 
     category_form = ZeroBudgetForm()
     expense_form = ExpenseForm()

@@ -1,6 +1,7 @@
 {% extends 'financeapp/loggedin_base.html' %}
 {% load static %}
 {% block title_block %} Accounts - CapitalCompass {% endblock %}
+
 {% block head_block %}
 <link rel="stylesheet" href="{% static 'styles/accounts.css' %}">
 {% endblock %}
@@ -11,11 +12,9 @@
         <h1>Accounts Overview</h1>
         <div id="summary">
             <p>Total Balance: £<span id="total-balance">{{ total_balance }}</span></p>
-            <!-- <p>Total Debt: £<span id="total-debt">{{ total_debt }}</span></p>
-            <p>Net Balance: £<span id="net-balance">{{ net_balance }}</span></p> -->
         </div>
         <div class="add-button-class">
-             <button class="btn btn-primary" onclick="location.href='{% url 'financeapp:add_account' %}'"> Add Account </button>
+             <button class="btn btn-primary" onclick="showAddAccountForm()"> Add Account </button>
         </div>
         <div class="account-list">
             <ul>
@@ -25,10 +24,7 @@
                         {{ account.account_name }}: Current Balance: £{{ account.balance }}
                     </div>
                     <div class="account-actions">
-                        <form method="get" action="{% url 'financeapp:edit_account' account.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-warning">Edit Account</button>
-                        </form>
+                        <button class="btn btn-primary" onclick="showEditAccountForm({{ account.id }}, '{{ account.account_name }}', {{ account.balance }}, '{{ account.account_type }}')">Edit</button>
                         <form method="get" action="{% url 'financeapp:delete_account' account.id %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger">Delete</button>
@@ -40,4 +36,98 @@
         </div>
     </section>
 </main>
+
+<!-- Add Account Modal -->
+<div id="add-account-form-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeAddAccountForm()">&times;</span>
+        <h2>New Account</h2>
+        <form method="post" action="{% url 'financeapp:add_account' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_account_name">Account Name:</label>
+                <input type="text" name="account_name" id="id_account_name" required>
+            </div>
+            <div class="form-group">
+                <label for="id_balance">Balance:</label>
+                <input type="number" name="balance" id="id_balance" required>
+            </div>
+            <div class="form-group">
+                <label for="id_account_type">Account Type:</label>
+                <select name="account_type" id="id_account_type">
+                    <option value="CHECKING">Checking</option>
+                    <option value="SAVINGS">Savings</option>
+                    <option value="CASH">Cash</option>
+                </select>
+            </div>
+            <div class="form-group submit-btn">
+                <button type="submit" name="add_account" class="btn btn-primary">Add Account</button>
+                <button type="button" class="btn btn-secondary" onclick="closeAddAccountForm()">Cancel</button>
+            </div>
+        </form>
+    </div>    
+</div>
+
+<!-- Edit Account Modal -->
+<div id="edit-account-form" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeEditAccountForm()">&times;</span>
+        <h2>Edit Account</h2>
+        <form method="post" action="{% url 'financeapp:edit_account' %}">
+            {% csrf_token %}
+            <input type="hidden" name="account_id" id="edit-account-id">
+            <div class="form-group">
+                <label for="edit-account-name">Account Name:</label>
+                <input type="text" name="account_name" id="edit-account-name" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-balance">Balance:</label>
+                <input type="number" name="balance" id="edit-balance" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-account-type">Account Type:</label>
+                <select name="account_type" id="edit-account-type">
+                    <option value="CHECKING">Checking</option>
+                    <option value="SAVINGS">Savings</option>
+                    <option value="CASH">Cash</option>
+                </select>
+            </div>
+            <div class="form-group submit-btn">
+                <button type="submit" name="edit_account" class="btn btn-primary">Save Changes</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEditAccountForm()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    /* add account */
+    function showAddAccountForm() {
+        document.getElementById('add-account-form-modal').style.display = 'flex';
+    }
+    function closeAddAccountForm() {
+        document.getElementById('add-account-form-modal').style.display = 'none';
+    }
+    function showEditAccountForm(accountId, accountName, balance, accountType) {
+        document.getElementById('edit-account-id').value = accountId;
+        document.getElementById('edit-account-name').value = accountName;
+        document.getElementById('edit-balance').value = balance;
+        document.getElementById('edit-account-type').value = accountType;
+    
+    
+        document.getElementById('edit-account-form').style.display = 'flex';
+    }
+    
+    function closeEditAccountForm() {
+        document.getElementById('edit-account-form').style.display = 'none';
+    }
+    
+
+    // Run the update function on page load
+    window.onload = function() {
+        closeAddAccountForm();
+        closeEditAccountForm();
+    }
+</script>
 {% endblock %}

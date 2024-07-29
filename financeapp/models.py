@@ -40,6 +40,7 @@ class Budget(models.Model):
     month = models.DateField(auto_now_add=True)  # Add month field
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    balance_initialized = models.BooleanField(default=False)  # Add this line
 
     def __str__(self):
         return f"{self.budget_name} ({self.get_budget_type_display()}) - {self.user.username}"
@@ -70,6 +71,7 @@ class Account(models.Model):
     account_name = models.CharField(max_length=100)
     account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES)
     balance = models.DecimalField(max_digits=15, decimal_places=2)
+    previous_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
    # current_balance = models.DecimalField(max_digits=15, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
