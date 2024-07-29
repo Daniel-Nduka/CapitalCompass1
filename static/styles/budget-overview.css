@@ -1,0 +1,74 @@
+/* General container for the entire page */
+main {
+    margin: 20px;
+}
+
+/* Styling for the main title of the page */
+.overview-title {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+/* Container for introductory text */
+.overview-intro, .budget-chart, .explanation-box, .navigation-buttons {
+    background-color: #f9f9f9; /* Light background */
+    border: 1px solid #ddd; /* Subtle border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+/* Style for buttons section */
+.action-buttons, .navigation-buttons {
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Standardize button appearance */
+.action-buttons button, .navigation-buttons button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 5px;
+}
+
+/* Style for section titles */
+.section-title {
+    text-align: center;
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+
+/* Specific styling for each explanation box */
+.explanation-box {
+    margin-bottom: 15px;
+}
+
+/* Styling for explanation box headings */
+.explanation-box h3 {
+    margin-top: 0;
+    font-size: 1.2em;
+    color: #333;
+}
+
+/* Styling for explanation box paragraphs */
+.explanation-box p {
+    margin: 0;
+    font-size: 1em;
+    color: #555;
+}
+.action-buttons {
+    text-align: center;
+    margin: 20px 0;
+    padding-bottom: 30px; /* Add padding at the bottom for extra space */
+}
+
+/* Button styling with additional margin for spacing */
+.action-buttons button {
+    margin: 10px 15px; /* Margin between buttons */
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 5px;
+}

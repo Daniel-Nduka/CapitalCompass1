@@ -7,6 +7,8 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('about/', views.about, name='about'),
     path('profile/', views.profile, name='profile'),
+    
+    path('overview/', views.overview, name='overview'),
     #path('transactions/', views.transactions, name='transactions'),
     
     path('select_budget/<int:budget_id>/', views.select_budget, name='select_budget'),

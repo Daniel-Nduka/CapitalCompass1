@@ -1,0 +1,73 @@
+.overview-section {
+  margin: 20px;
+}
+
+.overview-title {
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.overview-box, .feature-box, .getting-started-box, .support-box {
+  background-color: #f9f9f9; /* Light background */
+  border: 1px solid #ddd; /* Subtle border */
+  border-radius: 8px; /* Rounded corners */
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+.section-title {
+  font-size: 1.5em;
+  margin-bottom: 15px;
+}
+
+.feature-box ul, .getting-started-box p {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.feature-box ul li, .getting-started-box p {
+  margin-bottom: 10px;
+  font-size: 1em;
+}
+
+.feature-box ul li strong {
+  color: #333; /* Darker color for emphasis */
+}
+.budget-overview, .budget-explanations {
+  margin: 20px;
+}
+
+.overview-title, .section-title {
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.action-buttons {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.budget-chart, .explanation-box {
+  background-color: #f9f9f9; /* Light background */
+  border: 1px solid #ddd; /* Subtle border */
+  border-radius: 8px; /* Rounded corners */
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+.explanation-box h3 {
+  margin-top: 0;
+}
+
+.explanation-box p {
+  margin: 0;
+  padding: 0;
+  font-size: 1em;
+}
+
+

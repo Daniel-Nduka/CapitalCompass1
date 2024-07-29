@@ -19,6 +19,10 @@ logger = logging.getLogger(__name__)
 
 
 # Create your views here.
+
+#overview
+def overview(request):
+    return render(request, 'financeapp/overview.html')
 #This ensures when a user clicks sign up, if there is an authenticated user, it logs them out and redirects them to the sign up page.
 def logout_and_signup(request):
     logout(request)

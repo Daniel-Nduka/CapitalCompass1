@@ -1,0 +1,52 @@
+{% extends 'financeapp/loggedin_base.html' %}
+{% load static %}
+{% block title_block %} Overview - CapitalCompass {% endblock %}
+
+{% block head_block %}
+<link rel="stylesheet" href="{% static 'styles/overview.css' %}">
+{% endblock %}
+
+{% block body_block %}
+<main>
+    <section class="overview-section">
+        <h1 class="overview-title">Welcome to CapitalCompass</h1>
+        <div class="overview-box">
+            <p>CapitalCompass is your personal finance management tool designed to help you keep track of your accounts, manage your budgets, and gain better control over your finances. With a user-friendly interface and powerful features, you can easily manage all aspects of your financial life.</p>
+        </div>
+        
+        <div class="features-overview">
+            <h2 class="section-title">Key Features</h2>
+            <div class="feature-box">
+                <ul>
+                    <li><strong>Accounts Management:</strong> Easily manage all your financial accounts, including Checking, Savings, and Cash accounts. View balances, edit account details, and delete accounts as needed.</li>
+                    <li><strong>Budget Tracking:</strong> Create and monitor budgets to ensure you are staying on track with your financial goals. Allocate funds to different categories and track your spending.</li>
+                    <li><strong>Transaction Management:</strong> Record transactions, categorize expenses, and view transaction history for detailed insights into your spending habits.</li>
+                    <li><strong>Analytics and Reports:</strong> Gain insights into your financial health with detailed analytics and reports. Visualize your income, expenses, and savings to make informed financial decisions.</li>
+                    <li><strong>Security and Privacy:</strong> Your data is securely stored and protected, ensuring your financial information remains confidential.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="getting-started">
+          <h2 class="section-title">Getting Started</h2>
+          <div class="getting-started-box">
+              <p>To start using CapitalCompass, you can <a href="{% url 'financeapp:create_budget' %}">create a new budget</a>. You can choose between two types of budgets based on your needs:</p>
+              <ul>
+                  <li><strong>Fixed Budget:</strong> This is ideal for users with consistent income and expenses. You set fixed amounts for each category, and the app helps you track your spending against these limits.</li>
+                  <li><strong>Flexible Budget:</strong> Suitable for those with variable income or expenses, allowing for dynamic adjustments to your budget categories based on your financial situation.</li>
+              </ul>
+              <p>You can add your recurring accounts under the "Accounts" section. This includes setting up different types of accounts like Checking, Savings, and Cash accounts.</p>
+              <p>You can add inflow and outflow transactions using the "Transactions" section, helping you to manage and categorize your income and expenses.</p>
+              <p>For a deeper understanding of your finances, you can view financial analysis through detailed analytics and reports. These tools provide insights into your income, expenses, savings, and investments.</p>
+          </div>
+      </div>
+
+      <div class="support">
+          <h2 class="section-title">Support</h2>
+          <div class="support-box">
+              <p>If you have any questions or need assistance, our support team is here to help. Feel free to reach out via our <a href="#">support page</a>.</p>
+          </div>
+      </div>
+    </section>
+</main>
+{% endblock %}

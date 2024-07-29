@@ -12,7 +12,7 @@
       </div>
       <form method="post" action="{% url 'auth_login' %}">
         {% csrf_token %}
-        <input type="hidden" name="next" value="{% url 'financeapp:create_budget' %}"> <!-- Redirect to budget after login -->
+        <input type="hidden" name="next" value="{% url 'financeapp:overview' %}"> <!-- Redirect to budget after login -->
         <div class="form-group">
           <label for="username">Username</label>
           <input id="username" name="username" placeholder="Enter username" type="text">
