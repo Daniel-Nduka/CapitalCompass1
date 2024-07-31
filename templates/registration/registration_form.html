@@ -9,7 +9,7 @@
             <h2>Register Here</h2>
             <p>Already have an account? <a href="{% url 'auth_login' %}">Login here</a></p>
         </div>
-        <form method="post" action="{% url 'registration_register' %}" id="registrationForm">
+        <form method="post" action="." id="registrationForm">
             {% csrf_token %}
             <input type="hidden" name="next" value="{% url 'financeapp:create_budget' %}">
 

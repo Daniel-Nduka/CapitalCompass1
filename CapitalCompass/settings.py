@@ -145,6 +145,11 @@ LOGIN_URL = 'auth_login'
 
 SIMPLE_BACKEND_REDIRECT_URL = '/overview/'
 
+# Required settings
+'''
+ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window
+REGISTRATION_OPEN = True  # Allow registrations
+'''
 
 
 

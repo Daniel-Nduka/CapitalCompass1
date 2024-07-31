@@ -627,11 +627,6 @@ def load_sidebar_content_without_budget(request):
         return JsonResponse({'sidebar_content': sidebar_content})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-@login_required
-def some_view(request):
-    budget_id = request.session.get('selected_budget_id')
-    # Other view logic
-    return render(request, 'your_template.html', {'selected_budget_id': budget_id})
 
 @login_required
 def transaction_list(request):
@@ -639,32 +634,36 @@ def transaction_list(request):
     if not budget:
         return redirect('financeapp:budget_list')
 
+    budget = get_object_or_404(Budget, id=budget)
+    # Determine the default selected date, today for example
+    selected_date = request.POST.get('date', datetime.date.today())
+    
+    # Extract year and month from the selected date
+    if isinstance(selected_date, str):
+        selected_date = datetime.datetime.strptime(selected_date, '%Y-%m-%d').date()
+    year = selected_date.year
+    month = selected_date.month
 
+    # Filter expenses for the selected month
+    
+    if (budget.budget_type == 'zero_based'):
+        categories = ZeroBasedCategory.objects.filter(budget_id=budget,
+                                                  month__year=year, 
+                                                  month__month=month
+                                                  ).prefetch_related('expenses')
+    else:
+        categories = FiftyThirtyTwentyCategory.objects.filter(budget_id=budget,
+                                                  month__year=year, 
+                                                  month__month=month
+                                                  ).prefetch_related('expenses')
     transactions = Transaction.objects.filter(account__budget_id=budget)
     accounts = Account.objects.filter(budget_id=budget)
-    categories = ZeroBasedCategory.objects.filter(budget_id=budget).prefetch_related('expenses')
     context = {
         'transactions': transactions,
         'accounts': accounts,
         'categories': categories,
-        'today': datetime.date.today()
-    }
-    return render(request, 'financeapp/transactions.html', context)
-
-@login_required
-def transaction_list(request):
-    budget = request.session.get('selected_budget_id')
-    if not budget:
-        return redirect('financeapp:budget_list')
-
-    transactions = Transaction.objects.filter(account__budget_id=budget)
-    accounts = Account.objects.filter(budget_id=budget)
-    categories = ZeroBasedCategory.objects.filter(budget_id=budget).prefetch_related('expenses')
-    context = {
-        'transactions': transactions,
-        'accounts': accounts,
-        'categories': categories,
-        'today': datetime.date.today()
+        'today': datetime.date.today(),
+        'form': TransactionForm()  # Always provide an empty form here
     }
     return render(request, 'financeapp/transactions.html', context)
 
@@ -681,18 +680,10 @@ def add_transaction(request):
             transaction.account = form.cleaned_data['account']
             transaction.save()
             messages.success(request, 'Transaction added successfully.')
-            return redirect('financeapp:transactions')
         else:
             messages.error(request, 'Please correct the errors below.')
+    
+    # Always redirect to transaction_list after adding a transaction
+    return redirect('financeapp:transactions')
 
-    transactions = Transaction.objects.filter(account__budget_id=budget)
-    accounts = Account.objects.filter(budget_id=budget)
-    categories = ZeroBasedCategory.objects.filter(budget_id=budget).prefetch_related('expenses')
-    context = {
-        'transactions': transactions,
-        'accounts': accounts,
-        'categories': categories,
-        'today': datetime.date.today(),
-        'form': form if request.method == 'POST' else TransactionForm()
-    }
-    return render(request, 'financeapp/transactions.html', context)
+

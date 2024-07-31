@@ -2,7 +2,8 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  color: #333;
+  color: black;
+  padding-top: 60px;
 }
 
 header {
@@ -10,7 +11,14 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background-color: #f8f8f8;
+  background-color: white;
+  color: black;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  border-bottom: 1px solid #e9ecef;
 }
 
 header .logo {
@@ -22,6 +30,7 @@ nav {
   display: flex;
   justify-content: space-between;
   width: 100%;
+  color: black;
 }
 
 nav ul {
@@ -39,16 +48,17 @@ nav ul li {
 
 nav ul li a {
   text-decoration: none;
-  color: #333;
-  font-weight: bold;
+  color: black;
+  
 }
 
 .hero {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 50px;
-  background-color: #e9ecef;
+  padding: 120px;
+  background-color: white;
+  color: black;
 }
 
 .hero-content {
@@ -79,13 +89,15 @@ nav ul li a {
 .features {
   display: flex;
   justify-content: space-around;
-  padding: 50px;
-  background-color: #f1f1f1;
+  padding: 120px;
+  background-color: white;
+  border: 1px solid #e9ecef;
 }
 
 .feature {
   text-align: center;
   max-width: 200px;
+  
 }
 
 .feature h2 {
@@ -107,7 +119,8 @@ nav ul li a {
 .testimonials {
   text-align: center;
   padding: 50px;
-  background-color: #ffffff;
+  background-color: white;
+  border: 1px solid #e9ecef;
 }
 
 .testimonials h2 {
@@ -132,7 +145,8 @@ nav ul li a {
 .how-it-works {
   text-align: center;
   padding: 50px;
-  background-color: #f1f1f1;
+  background-color: white;
+  border: 1px solid #e9ecef;
 }
 
 .how-it-works h2 {
@@ -154,7 +168,8 @@ nav ul li a {
 
 footer {
   padding: 20px;
-  background-color: #f8f8f8;
+  background-color: white;
+  border: 1px solid #e9ecef;
   text-align: center;
 }
 
@@ -172,5 +187,58 @@ footer .social-media-icons {
 footer .contact-info p {
   margin: 5px 0;
 }
+
+
+.hero-content button,
+.feature button,
+.how-it-works button {
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.hero-content button {
+  margin-right: 10px;
+}
+
+.hero-content button:first-of-type {
+  background-color: #28a745; /* Green for Get Started */
+  color: white;
+}
+
+.hero-content button:first-of-type:hover {
+  background-color: #218838; /* Darker green on hover */
+}
+
+.hero-content button:last-of-type {
+  background-color: #007bff; /* Blue for Learn More */
+  color: white;
+}
+
+.hero-content button:last-of-type:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.feature button {
+  background-color: #6c757d; /* Grey for feature buttons */
+  color: white;
+}
+
+.feature button:hover {
+  background-color: #5a6268; /* Darker grey on hover */
+}
+
+.how-it-works button {
+  background-color: #ffc107; /* Yellow for How it works button */
+  color: black;
+}
+
+.how-it-works button:hover {
+  background-color: #e0a800; /* Darker yellow on hover */
+}
+
 
 
