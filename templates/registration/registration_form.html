@@ -11,12 +11,13 @@
         </div>
         <form method="post" action="." id="registrationForm">
             {% csrf_token %}
-            <input type="hidden" name="next" value="{% url 'financeapp:create_budget' %}">
+            <!-- This hidden field is to redirect users after registration. Ensure it's correctly set up. -->
+            <!--<input type="hidden" name="next" value="{% url 'financeapp:create_budget' %}"> -->  
 
             <div class="form-group">
                 <label for="id_username">Username</label>
                 <input id="id_username" maxlength="30" name="username" placeholder="Enter username" type="text" required value="{{ form.username.value|default:'' }}">
-                <span class="helptext">Required. 30 characters or fewer. Letters, digits and @/./+/-?_ only.</span>
+                <span class="helptext">Required. 30 characters or fewer. Letters, digits, and @/./+/-/_ only.</span>
                 <div class="error" id="usernameError"></div>
             </div>
 

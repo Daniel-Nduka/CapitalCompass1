@@ -135,21 +135,23 @@ STATIC_URL = '/static/'
 REGISTRATION_OPEN = True
 
 # If True, the user will be automatically logged in after registering.
-REGISTRATION_AUTO_LOGIN = True
+REGISTRATION_AUTO_LOGIN = False
 
 # The URL that Django redirects users to after logging in.
-LOGIN_REDIRECT_URL = 'financeapp:budget'
+LOGIN_REDIRECT_URL = '/overview/'
 
 # The page users are directed to if they are not logged in.
 LOGIN_URL = 'auth_login'
 
-SIMPLE_BACKEND_REDIRECT_URL = '/overview/'
+#SIMPLE_BACKEND_REDIRECT_URL = '/overview/'
 
 # Required settings
-'''
+
 ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window
-REGISTRATION_OPEN = True  # Allow registrations
-'''
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+#REGISTRATION_AUTO_LOGIN = True  # Automatically log the user in.
 
 
 
