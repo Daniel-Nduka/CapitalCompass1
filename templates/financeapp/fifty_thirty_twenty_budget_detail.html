@@ -65,7 +65,7 @@
                                     <span class="spent-expense">£{{ expense.spent }}</span>
                                     <span class="paid"> Paid </span>
                                 </span>
-                                <span class="edit-icon" onclick="showEditExpenseForm('{{ expense.id }}', '{{ category.id }}', '{{ expense.description }}', '{{ expense.assigned_amount }}', '{{ expense.spent }}', '{{ category.is_recurring|yesno:'true,false' }}', '{{ expense.is_recurring|yesno:'true,false' }}')" data-is-recurring="{{ expense.is_recurring|yesno:'true,false' }}">
+                                <span class="edit-icon" onclick="showEditExpenseForm('{{ expense.id }}', '{{ category.id }}', '{{ expense.description }}', '{{ expense.assigned_amount }}', '{{ category.is_recurring|yesno:'true,false' }}', '{{ expense.is_recurring|yesno:'true,false' }}')" data-is-recurring="{{ expense.is_recurring|yesno:'true,false' }}">
                                     &#9998; <!-- Pencil icon -->
                                 </span>
                             </span>
@@ -97,10 +97,11 @@
                 <label for="id_assigned_amount">Cost:</label>
                 <input type="number" name="assigned_amount" id="id_assigned_amount" required>
             </div>
+            <!--
             <div class="form-group">
                 <label for="id_spent">Paid:</label>
                 <input type="number" name="spent" id="id_spent" value="0" required>
-            </div>
+            </div> -->
             <input type="hidden" name="category_id" id="expense-category-id">
             <div id="add-expense-recurring-container" style="display: none;">
                 <div class="form-group">
@@ -134,10 +135,11 @@
                 <label for="edit-expense-assigned">Cost:</label>
                 <input type="number" name="assigned_amount" id="edit-expense-assigned" required>
             </div>
+            <!--
             <div class="form-group">
                 <label for="edit-expense-spent">Paid:</label>
                 <input type="number" name="spent" id="edit-expense-spent" required>
-            </div>
+            </div> -->
            
             <div class="form-group">
                     <label for="edit-is_recurring_expense">Recurring:</label>
@@ -206,13 +208,12 @@
     }
 
 
-    function showEditExpenseForm(expenseId, categoryId, expenseDescription, assignedAmount, spentAmount, isCategoryRecurring, isRecurring) {
+    function showEditExpenseForm(expenseId, categoryId, expenseDescription, assignedAmount, isCategoryRecurring, isRecurring) {
         console.log("Showing Edit Expense Form for Expense ID:", expenseId, "Category ID:", categoryId, "Is Category Recurring:", isCategoryRecurring);
         document.getElementById('edit-expense-id').value = expenseId;
         document.getElementById('edit-expense-category-id').value = categoryId;
         document.getElementById('edit-expense-description').value = expenseDescription;
         document.getElementById('edit-expense-assigned').value = assignedAmount;
-        document.getElementById('edit-expense-spent').value = spentAmount;
         document.getElementById('edit-is-category-recurring').value = isCategoryRecurring;
         document.getElementById('edit-expense-form').style.display = 'flex';
         document.getElementById('delete-expense-category-id').value = categoryId; // Ensure category ID is set

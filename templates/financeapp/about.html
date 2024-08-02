@@ -1,7 +1,9 @@
 {% extends 'financeapp/base.html' %}
 {% load static %}
 {% block title_block %} About us {% endblock %}
-
+{% block head_block %}
+<link rel="stylesheet" href="{% static 'styles/about.css' %}">
+{% endblock %}
 
 {% block body_block %}
 <section class="introduction">

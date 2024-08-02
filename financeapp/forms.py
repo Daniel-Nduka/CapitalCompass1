@@ -58,7 +58,7 @@ class ExpenseForm(forms.ModelForm):
     is_recurring = forms.BooleanField(required=False, label='Recurring')
     class Meta:
         model = Expense
-        fields = ['description', 'assigned_amount', 'spent', 'is_recurring']
+        fields = ['description', 'assigned_amount', 'is_recurring']
 
 class TransactionForm(forms.ModelForm):
     class Meta:

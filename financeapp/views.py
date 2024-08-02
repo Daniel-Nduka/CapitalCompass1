@@ -14,6 +14,8 @@ from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm, ZeroBudge
 from django.contrib.auth import logout
 import logging
 
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -685,5 +687,70 @@ def add_transaction(request):
     
     # Always redirect to transaction_list after adding a transaction
     return redirect('financeapp:transactions')
+'''
+@login_required
+def edit_transaction(request):
+    budget_id = request.session.get('selected_budget_id')
+    if not budget_id:
+        return redirect('financeapp:budget_list')
+    
+    transaction_id = request.POST.get('transaction_id')
+    transaction = get_object_or_404(Transaction, id=transaction_id, account__budget_id=budget_id)
 
+    if request.method == 'POST':
+        form = TransactionForm(request.POST, instance=transaction)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Transaction updated successfully.')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    
+    return redirect('financeapp:transactions')
+    
+'''
+@login_required
+def edit_transaction(request):
+    budget_id = request.session.get('selected_budget_id')
+    if not budget_id:
+        return redirect('financeapp:budget_list')
+    
+    transaction_id = request.POST.get('transaction_id')
+    if not transaction_id:
+        messages.error(request, 'Transaction ID is required.')
+        return redirect('financeapp:transactions')
 
+    transaction = get_object_or_404(Transaction, id=transaction_id, account__budget_id=budget_id)
+
+    if request.method == 'POST':
+        form = TransactionForm(request.POST, instance=transaction)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Transaction updated successfully.')
+        else:
+            # Log form errors
+            for field, errors in form.errors.items():
+                print(f"Error in {field}: {errors}")
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        # In case the request method is not POST, do nothing or render an error page.
+        messages.error(request, 'Invalid request method.')
+
+    return redirect('financeapp:transactions')
+
+@login_required
+def delete_transaction(request):
+    budget_id = request.session.get('selected_budget_id')
+    if not budget_id:
+        return redirect('financeapp:budget_list')
+    
+    transaction_id = request.POST.get('transaction_id')
+    if not transaction_id:
+        messages.error(request, 'Transaction ID is required.')
+        return redirect('financeapp:transactions')
+
+    transaction = get_object_or_404(Transaction, id=transaction_id, account__budget_id=budget_id)
+    if request.method == 'POST':
+        transaction.delete()
+        messages.success(request, 'Transaction deleted successfully.')
+    
+    return redirect('financeapp:transactions')

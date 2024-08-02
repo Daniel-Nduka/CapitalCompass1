@@ -3,7 +3,6 @@ from financeapp import views
 app_name = 'financeapp'
 
 urlpatterns = [
-    
     path('', views.index, name='index'),
     path('about/', views.about, name='about'),
     path('profile/', views.profile, name='profile'),
@@ -56,4 +55,8 @@ urlpatterns = [
     
     path('transactions/', views.transaction_list, name='transactions'),
     path('transactions/add/', views.add_transaction, name='add_transaction'),
+    path('transactions/edit/', views.edit_transaction, name='edit_transaction'),
+    path ('transactions/delete/', views.delete_transaction, name='delete_transaction'), 
+    
+    
 ]

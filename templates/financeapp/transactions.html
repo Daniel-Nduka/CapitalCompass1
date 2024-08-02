@@ -11,7 +11,7 @@
 <main>
     <section class="transaction-details">
         <h1>Transactions</h1>
-     
+
         <div class="add-transaction-class">
             <button class="btn btn-primary" onclick="showTransactionForm()">
                 <i class="fas fa-plus"></i> Add Transaction
@@ -41,7 +41,7 @@
                     <td>{{ transaction.outflow }}</td>
                     <td>{{ transaction.inflow }}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-secondary">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="showEditTransactionForm('{{ transaction.id }}', '{{ transaction.account.id }}', '{{ transaction.date|date:'Y-m-d' }}', '{{ transaction.description }}', '{{ transaction.payee }}', '{{ transaction.expense.id }}', '{{ transaction.outflow }}', '{{ transaction.inflow }}')">
                             <i class="fas fa-pencil-alt"></i> Edit
                         </button>
                     </td>
@@ -64,31 +64,31 @@
         <form id="transaction-form" method="post" action="{% url 'financeapp:add_transaction' %}">
             {% csrf_token %}
             <div class="form-group">
-                <label for="account">Account</label>
-                <select id="account" name="account" class="form-control">
+                <label for="add-account">Account</label>
+                <select id="add-account" name="account" class="form-control">
                     {% for account in accounts %}
                     <option value="{{ account.id }}">{{ account.account_name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="form-group">
-                <label for="date">Date</label>
-                <input type="date" id="date" name="date" class="form-control" value="{{ today|date:'Y-m-d' }}">
+                <label for="add-date">Date</label>
+                <input type="date" id="add-date" name="date" class="form-control" value="{{ today|date:'Y-m-d' }}">
             </div>
             <div id="common-fields">
                 <div class="form-group">
-                    <label for="description">Description</label>
-                    <input type="text" id="description" name="description" class="form-control" placeholder="Enter description">
+                    <label for="add-description">Description</label>
+                    <input type="text" id="add-description" name="description" class="form-control" placeholder="Enter description">
                 </div>
                 <div class="form-group">
-                    <label for="payee">Payee</label>
-                    <input type="text" id="payee" name="payee" class="form-control" placeholder="Enter payee name">
+                    <label for="add-payee">Payee</label>
+                    <input type="text" id="add-payee" name="payee" class="form-control" placeholder="Enter payee name">
                 </div>
             </div>
-            <div id="outflow-fields" style="display: none;">
+            <div id="add-outflow-fields" style="display: none;">
                 <div class="form-group">
-                    <label for="expense">Expense</label>
-                    <select id="expense" name="expense" class="form-control">
+                    <label for="add-expense">Expense</label>
+                    <select id="add-expense" name="expense" class="form-control">
                         <option value="">-- Select Expense --</option>
                         {% for category in categories %}
                             {% for expense in category.expenses.all %}
@@ -98,14 +98,14 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="outflow">Amount</label>
-                    <input type="number" id="outflow" name="outflow" class="form-control" placeholder="Enter outflow amount">
+                    <label for="add-outflow">Amount</label>
+                    <input type="number" id="add-outflow" name="outflow" class="form-control" placeholder="Enter outflow amount">
                 </div>
             </div>
-            <div id="inflow-fields" style="display: none;">
+            <div id="add-inflow-fields" style="display: none;">
                 <div class="form-group">
-                    <label for="inflow">Amount</label>
-                    <input type="number" id="inflow" name="inflow" class="form-control" placeholder="Enter inflow amount">
+                    <label for="add-inflow">Amount</label>
+                    <input type="number" id="add-inflow" name="inflow" class="form-control" placeholder="Enter inflow amount">
                 </div>
             </div>
             <div class="form-group submit-btn">
@@ -116,19 +116,93 @@
     </div>
 </div>
 
+<!-- Edit Transaction Modal -->
+<div id="edit_transaction_modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeEditTransactionForm()">&times;</span>
+        <h2>Edit Transaction</h2>
+        <div class="transaction-type-buttons" style="text-align: center;">
+            <button id="edit-inflow-btn" class="btn btn-primary" onclick="showEditInflowForm()">Inflow</button>
+            <button id="edit-outflow-btn" class="btn btn-secondary" onclick="showEditOutflowForm()">Outflow</button>
+        </div>
+        <form id="edit-transaction-form" method="post" action="{% url 'financeapp:edit_transaction' %}">
+            {% csrf_token %}
+            <input type="hidden" name="transaction_id" id="edit-transaction-id">
+            <div class="form-group">
+                <label for="edit-account">Account</label>
+                <select id="edit-account" name="account" class="form-control">
+                    {% for account in accounts %}
+                    <option value="{{ account.id }}">{{ account.account_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="edit-date">Date</label>
+                <input type="date" id="edit-date" name="date" class="form-control">
+            </div>
+            <div id="edit-common-fields">
+                <div class="form-group">
+                    <label for="edit-description">Description</label>
+                    <input type="text" id="edit-description" name="description" class="form-control" placeholder="Enter description">
+                </div>
+                <div class="form-group">
+                    <label for="edit-payee">Payee</label>
+                    <input type="text" id="edit-payee" name="payee" class="form-control" placeholder="Enter payee name">
+                </div>
+            </div>
+            <div id="edit-outflow-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="edit-expense">Expense</label>
+                    <select id="edit-expense" name="expense" class="form-control">
+                        <option value="">-- Select Expense --</option>
+                        {% for category in categories %}
+                            {% for expense in category.expenses.all %}
+                            <option value="{{ expense.id }}">{{ expense.description }} ({{ category.name }})</option>
+                            {% endfor %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-outflow">Amount</label>
+                    <input type="number" value="0"id="edit-outflow" name="outflow" class="form-control" placeholder="Enter outflow amount">
+                </div>
+            </div>
+            <div id="edit-inflow-fields" style="display: none;">
+                <div class="form-group">
+                    <label for="edit-inflow">Amount</label>
+                    <input type="number" value="0"id="edit-inflow" name="inflow" class="form-control" placeholder="Enter inflow amount">
+                </div>
+            </div>
+            <div class="form-group submit-btn">
+                <button type="submit" class="btn btn-primary">Edit Transaction</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEditTransactionForm()">Cancel</button>
+            </div>
+        </form>
+        <form method="post" action="{% url 'financeapp:delete_transaction' %}">
+            {% csrf_token %}
+            <input type="hidden" name="transaction_id" id="delete-transaction-id">
+            <div class="form-group submit-btn">
+                <button type="submit" name="delete_transaction" class="btn btn-danger">Delete Transaction</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
+    // Show and hide the Add Transaction form
     function showTransactionForm() {
         document.getElementById('transaction-form-modal').style.display = 'flex';
-        showInflowForm();  // Default to inflow form
+        showInflowForm(); // Default to inflow form
     }
 
     function closeTransactionForm() {
         document.getElementById('transaction-form-modal').style.display = 'none';
     }
 
+    // Toggle between Inflow and Outflow forms
     function showInflowForm() {
-        document.getElementById('inflow-fields').style.display = 'block';
-        document.getElementById('outflow-fields').style.display = 'none';
+        document.getElementById('add-inflow-fields').style.display = 'block';
+        document.getElementById('add-outflow-fields').style.display = 'none';
         document.getElementById('inflow-btn').classList.add('btn-primary');
         document.getElementById('inflow-btn').classList.remove('btn-secondary');
         document.getElementById('outflow-btn').classList.add('btn-secondary');
@@ -136,41 +210,134 @@
     }
 
     function showOutflowForm() {
-        document.getElementById('outflow-fields').style.display = 'block';
-        document.getElementById('inflow-fields').style.display = 'none';
+        document.getElementById('add-outflow-fields').style.display = 'block';
+        document.getElementById('add-inflow-fields').style.display = 'none';
         document.getElementById('outflow-btn').classList.add('btn-primary');
         document.getElementById('outflow-btn').classList.remove('btn-secondary');
         document.getElementById('inflow-btn').classList.add('btn-secondary');
         document.getElementById('inflow-btn').classList.remove('btn-primary');
     }
 
-    window.onload = function() {
-        closeTransactionForm();
+    // Show and hide the Edit Transaction form
+    function showEditTransactionForm(transactionId, accountId, date, description, payee, expenseId, outflow, inflow) {
+        document.getElementById('edit-transaction-id').value = transactionId;
+        document.getElementById('edit-account').value = accountId;
+        document.getElementById('edit-date').value = date;
+        document.getElementById('edit-description').value = description;
+        document.getElementById('edit-payee').value = payee;
+        document.getElementById('delete-transaction-id').value = transactionId;
+
+        if (outflow > 0) {
+            document.getElementById('edit-outflow-fields').style.display = 'block';
+            document.getElementById('edit-inflow-fields').style.display = 'none';
+            document.getElementById('edit-expense').value = expenseId;
+            document.getElementById('edit-outflow').value = outflow;
+            showEditOutflowForm();
+        } else {
+            document.getElementById('edit-outflow-fields').style.display = 'none';
+            document.getElementById('edit-inflow-fields').style.display = 'block';
+            document.getElementById('edit-inflow').value = inflow;
+            showEditInflowForm();
+        }
+
+        document.getElementById('edit_transaction_modal').style.display = 'flex';
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('transaction-form').addEventListener('submit', function(event) {
-            const inflowInput = document.getElementById('inflow');
-            const outflowInput = document.getElementById('outflow');
+    function closeEditTransactionForm() {
+        document.getElementById('edit_transaction_modal').style.display = 'none';
+    }
 
-            // Set default values if the fields are empty
-            if (!inflowInput.value) {
-                inflowInput.value = 0;
+    // Toggle between Inflow and Outflow forms in the edit modal
+    function showEditInflowForm() {
+        document.getElementById('edit-inflow-fields').style.display = 'block';
+        document.getElementById('edit-outflow-fields').style.display = 'none';
+        document.getElementById('edit-inflow-btn').classList.add('btn-primary');
+        document.getElementById('edit-inflow-btn').classList.remove('btn-secondary');
+        document.getElementById('edit-outflow-btn').classList.add('btn-secondary');
+        document.getElementById('edit-outflow-btn').classList.remove('btn-primary');
+    }
+
+    function showEditOutflowForm() {
+        document.getElementById('edit-outflow-fields').style.display = 'block';
+        document.getElementById('edit-inflow-fields').style.display = 'none';
+        document.getElementById('edit-outflow-btn').classList.add('btn-primary');
+        document.getElementById('edit-outflow-btn').classList.remove('btn-secondary');
+        document.getElementById('edit-inflow-btn').classList.add('btn-secondary');
+        document.getElementById('edit-inflow-btn').classList.remove('btn-primary');
+    }
+
+   // Set default values and validation
+   document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded and parsed'); // Debugging output
+    const form = document.getElementById('transaction-form');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            console.log('Form submit event detected'); // Debugging output
+            const inflowInput = document.getElementById('add-inflow');
+            const outflowInput = document.getElementById('add-outflow');
+
+            // Set default values if the fields are empty or invalid
+            inflowInput.value = inflowInput.value || 0;
+            outflowInput.value = outflowInput.value || 0;
+
+            const account = document.getElementById('add-account').value;
+            const date = document.getElementById('add-date').value;
+            const inflow = parseFloat(inflowInput.value);
+            const outflow = parseFloat(outflowInput.value);
+            expense = document.getElementById('add-expense').value;
+
+            if (outflow > 0 && expense === '') {
+                event.preventDefault();
+                alert('Please select an Expense for the Outflow transaction.');
             }
-            if (!outflowInput.value) {
-                outflowInput.value = 0;
-            }
-
-            const account = document.getElementById('account').value;
-            const date = document.getElementById('date').value;
-            const inflow = inflowInput.value;
-            const outflow = outflowInput.value;
-
-            if (!account || !date || (!inflow && !outflow)) {
+        
+            if (!account || !date || (inflow <= 0 && outflow <= 0)) {
                 event.preventDefault();
                 alert('Please fill out all required fields: Account, Date, and either Inflow or Outflow.');
             }
         });
+    } else {
+        console.error('Transaction form not found');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded and parsed'); // Debugging output
+    const form = document.getElementById('edit-transaction-form');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            console.log('Form submit event detected'); // Debugging output
+            const inflowInput = document.getElementById('edit-inflow');
+            const outflowInput = document.getElementById('edit-outflow');
+
+            // Set default values if the fields are empty or invalid
+            inflowInput.value = inflowInput.value || 0;
+            outflowInput.value = outflowInput.value || 0;
+
+            const account = document.getElementById('edit-account').value;
+            const date = document.getElementById('edit-date').value;
+            const inflow = parseFloat(inflowInput.value);
+            const outflow = parseFloat(outflowInput.value);
+            expense = document.getElementById('edit-expense').value;
+
+            if (outflow > 0 && expense === '') {
+                event.preventDefault();
+                alert('Please select an Expense for the Outflow transaction.');
+            }
+        
+            if (!account || !date || (inflow <= 0 && outflow <= 0)) {
+                event.preventDefault();
+                alert('Please fill out all required fields: Account, Date, and either Inflow or Outflow.');
+            }
+        });
+    } else {
+        console.error('Edit Transaction form not found');
+    }
     });
+     // Run on window load
+     window.onload = function() {
+        closeTransactionForm();
+        closeEditTransactionForm();
+    }
 </script>
 {% endblock %}

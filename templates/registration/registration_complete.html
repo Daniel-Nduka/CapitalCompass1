@@ -1,8 +1,14 @@
 {% extends "financeapp/base.html" %}
-
+{% load static %}
 {% block title_block %}Registration Complete{% endblock %}
 
+{% block head_block %}
+<link rel="stylesheet" href="{% static 'styles/activation.css' %}">
+{% endblock %}
+
 {% block body_block %}
-<h2>Registration Complete</h2>
-<p>Thank you for registering! A confirmation email has been sent to your email address. Please check your email to activate your account.</p>
+<div class="registration-complete-container">
+    <h2>Registration Complete</h2>
+    <p>Thank you for registering! A confirmation email has been sent to your email address. Please check your email to activate your account.</p>
+</div>
 {% endblock %}

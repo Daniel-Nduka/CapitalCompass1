@@ -2,11 +2,14 @@
 {% load static %}
 {% block title_block %} Login {% endblock %}
 
+{% block head_block %} 
+<link rel="stylesheet" href="{% static 'styles/authentications.css' %}">
+{% endblock %}
 {% block body_block%}
 
   <div class="container">
     <div class="form-login-container">
-      <div class="login-header">
+      <div class="form-header">
         <h2>Login Here</h2>
         <p>New to CapitalCompass? <a href="{% url 'registration_register' %}">Register here</a></p>
       </div>
@@ -28,3 +31,6 @@
     </div>
   </div>
 {% endblock%}
+{% block footer_block %}
+
+{% endblock %}

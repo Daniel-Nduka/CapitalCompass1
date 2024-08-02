@@ -2,10 +2,14 @@
 {% load static %}
 {% block title_block %} Register {% endblock %}
 
+{% block head_block %}
+<link rel="stylesheet" href="{% static 'styles/authentications.css' %}">
+{% endblock %}
+
 {% block body_block %}
 <div class="container">
     <div class="form-container">
-        <div class="signup-header">
+        <div class="form-header">
             <h2>Register Here</h2>
             <p>Already have an account? <a href="{% url 'auth_login' %}">Login here</a></p>
         </div>
@@ -118,4 +122,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
+{% endblock %}
+{% block footer_block %}
+
 {% endblock %}

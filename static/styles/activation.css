@@ -1,0 +1,53 @@
+/* Ensures that body and html take up the full height of the viewport */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Container for the body content, to handle layout positioning */
+.main-content {
+  min-height: calc(100% - 60px); /* 100% height minus the height of the header */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Registration complete styling */
+.registration-complete-container {
+  text-align: center;
+  padding: 20px;
+}
+
+/* Footer styling, fixed to bottom of the page */
+footer {
+  background-color: white;
+  padding: 20px;
+  border-top: 1px solid #e9ecef;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.footer-content a {
+  color: #333;
+  text-decoration: none;
+  display: inline-block;
+  margin: 5px 10px;
+}
+
+.footer-content a:hover {
+  text-decoration: underline;
+}
+
+.footer-content .social-media-icons {
+  margin: 10px 0;
+}
+
+.footer-content .contact-info p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #666;
+}

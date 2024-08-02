@@ -196,21 +196,38 @@ class Transaction(models.Model):
         return f"{self.date} - {self.description} ({self.inflow} / {self.outflow})"
 
     def save(self, *args, **kwargs):
-        # Update the account balance based on the transaction
+        if self.pk is None:  # This check is for a new transaction
+            if self.inflow > 0:
+                self.account.balance += Decimal(self.inflow)
+                self.outflow = 0
+            if self.outflow > 0:
+                self.account.balance -= Decimal(self.outflow)
+                self.inflow = 0
+
+            self.account.save()
+
+            # If this is an outflow, update the linked expense
+            if self.outflow > 0 and self.expense:
+                self.expense.spent += Decimal(self.outflow)
+                self.expense.save()
+
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Update the account balance based on the transaction before deleting it
         if self.inflow > 0:
-            self.account.balance += Decimal(self.inflow)
-            self.outflow = 0
+            self.account.balance -= Decimal(self.inflow)
         if self.outflow > 0:
-            self.account.balance -= Decimal(self.outflow)
-            self.inflow = 0
-        
+            self.account.balance += Decimal(self.outflow)
+
         self.account.save()
 
         # If this is an outflow, update the linked expense
         if self.outflow > 0 and self.expense:
-            self.expense.spent += Decimal(self.outflow)
+            self.expense.spent -= Decimal(self.outflow)
             self.expense.save()
 
-        super().save(*args, **kwargs)
+        super().delete(*args, **kwargs)
+
     
         

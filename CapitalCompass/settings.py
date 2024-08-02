@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'financeapp', 
     'registration',  # Add the registration package
+    'django.contrib.sites',  # Add the sites package
     
 ]
 
@@ -131,6 +132,9 @@ STATICFILES_DIRS = [STATIC_DIR, ]
 
 STATIC_URL = '/static/'
 
+# Sites framework settings
+SITE_ID = 1 
+
 # If True, users can register.
 REGISTRATION_OPEN = True
 
@@ -148,10 +152,15 @@ LOGIN_URL = 'auth_login'
 # Required settings
 
 ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-
-#REGISTRATION_AUTO_LOGIN = True  # Automatically log the user in.
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'nduka.ofoeyeno@gmail.com'
+EMAIL_HOST_PASSWORD = 'eilh zxol bmuq nzid'  
+DEFAULT_FROM_EMAIL = 'nduka.ofoeyeno@gmail.com'

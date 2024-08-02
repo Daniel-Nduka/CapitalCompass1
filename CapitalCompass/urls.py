@@ -21,4 +21,5 @@ urlpatterns = [
     path('', include('financeapp.urls')),
     path('accounts/', include('registration.backends.default.urls')), 
     path('admin/', admin.site.urls),
+
 ]

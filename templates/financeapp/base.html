@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title_block %}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'styles/HomeStyles.css' %}">
-    <link rel="stylesheet" href="{% static 'styles/authentications.css' %}">
-    {% block head_block %}{% endblock %}
+
+    {% block head_block %} {% endblock %}
 </head>
 <body>
     <header>
@@ -34,6 +34,7 @@
 
     {% block body_block %}{% endblock %}
 
+    {% block footer_block %}
     <footer>
         <div class="footer-content">
             <a href="#">About</a>
@@ -46,6 +47,7 @@
             </div>
         </div>
     </footer>
+    {% endblock %}
 
     <script src="{% static 'scripts.js' %}"></script>
 </body>
