@@ -10,9 +10,9 @@
             {% elif budget.budget_type == 'fifty_thirty_twenty' %}
                 <li><a href="{% url 'financeapp:fifty_thirty_twenty_page' budget.id %}">{{ budget.budget_name }} Budget </a></li>
             {% endif %}
-            <li><a href="{% url 'financeapp:transactions' %}">Transactions</a></li>
             <li><a href="{% url 'financeapp:financial_analysis' %}">Financial Analysis</a></li>
             <li><a href="{% url 'financeapp:account_list' %}">Accounts</a></li>
+            <li><a href="{% url 'financeapp:transactions' %}">Transactions</a></li>
             <li><a href="{% url 'financeapp:overview' %}">Overview</a></li>
         </ul>
     </nav>

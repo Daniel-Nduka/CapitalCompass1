@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import UserProfile, Account, Budget, ZeroBasedCategory, Expense, FiftyThirtyTwentyCategory, Transaction
+from .models import UserProfile, Account, Budget, ZeroBasedCategory, Expense, FiftyThirtyTwentyCategory, Transaction, ContactMessage
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
@@ -114,5 +114,46 @@ class TransactionForm(forms.ModelForm):
         # Check that only one of inflow or outflow is provided
         if inflow and outflow:
             raise forms.ValidationError("Please provide either an inflow or an outflow, not both.")
+
+        return cleaned_data
+    
+class ContactMessageForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ['name', 'email', 'message', 'subject', 'image']
+        
+    widgets = {
+        'name': forms.TextInput(attrs={'class': 'form-control'}),
+        'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        'message': forms.Textarea(attrs={'class': 'form-control'}),
+        'subject': forms.TextInput(attrs={'class': 'form-control'}),
+        'image': forms.FileInput(attrs={'class': 'form-control'}),
+    }
+    labels = {
+        'name': 'Your Name',
+        'email': 'Your Email',
+        'message': 'Your Message',
+        'subject': 'Subject',
+        'image': 'Upload an Image',
+    }
+    help_texts = {
+        'name': 'Enter your name',
+        'email': 'Enter your email address',
+        'message': 'Enter your message',
+        'subject': 'Enter the subject of your message',
+        'image': 'Upload an image (optional)',
+    }
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get("name")
+        email = cleaned_data.get("email")
+        message = cleaned_data.get("message")
+        subject = cleaned_data.get("subject")
+        image = cleaned_data.get("image")
+
+        # Check that all fields are provided
+        if not name or not email or not message:
+            raise forms.ValidationError("Please provide all fields.")
 
         return cleaned_data

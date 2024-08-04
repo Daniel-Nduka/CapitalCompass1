@@ -16,9 +16,7 @@
             <ul class="nav-left">
                 <li><a href="{% url 'financeapp:index' %}">Home</a></li>
                 <li><a href="{% url 'financeapp:about' %}">About us</a></li>
-                <li><a href="#">Share us</a></li>
-                <li><a href="#">Reviews</a></li>
-                <li><a href="#">Contact us</a></li>
+                <li><a href="{% url 'financeapp:contact'%}">Contact us</a></li>
             </ul>
             <ul class="nav-right">
               {% if user.is_authenticated %} 

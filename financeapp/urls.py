@@ -60,6 +60,9 @@ urlpatterns = [
     
     path('analysis/', views.financial_analysis, name='financial_analysis'),
     path('analysis/<int:year>/<int:month>/', views.financial_analysis, name='financial_analysis_with_date'),
+    
+    path('contact/', views.contact, name='contact'),
+    path('contactLog/', views.contactLoggedIn, name='contactLog'),
     #path('get-categories-for-date/', views.get_categories_for_date, name='get_categories_for_date'),
     
 ]

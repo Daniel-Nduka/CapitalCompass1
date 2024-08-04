@@ -229,6 +229,16 @@ class Transaction(models.Model):
             self.expense.save()
 
         super().delete(*args, **kwargs)
+#contactus model
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200, blank=True, null=True)
+    message = models.TextField()
+    image = models.ImageField(upload_to='contact_images/', null=True, blank=True, default=None)
+    sent_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"Message from {self.name} - {self.email}"
     
         

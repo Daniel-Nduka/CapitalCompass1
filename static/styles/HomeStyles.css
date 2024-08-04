@@ -19,6 +19,7 @@ header {
   right: 0;
   height: 30px;
   border-bottom: 1px solid #e9ecef;
+  z-index: 1000;
 }
 
 header .logo {
@@ -56,7 +57,7 @@ nav ul li a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 120px;
+  padding: 100px;
   background-color: white;
   color: black;
 }
@@ -86,18 +87,14 @@ nav ul li a {
   max-width: 100%;
 }
 
-.features {
-  display: flex;
-  justify-content: space-around;
-  padding: 120px;
-  background-color: white;
-  border: 1px solid #e9ecef;
-}
 
 .feature {
-  text-align: center;
-  max-width: 200px;
-  
+  perspective: 1000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px; /* Add some margin for spacing */
+  flex: 1; /* Make the feature take up the same amount of space */
 }
 
 .feature h2 {
@@ -110,17 +107,153 @@ nav ul li a {
   margin-bottom: 10px;
 }
 
+.features {
+  display: flex;
+  justify-content: space-around;
+  padding: 50px;
+  background-color: white;
+ /* border: 1px solid #e9ecef;*/
+}
+
+.feature {
+  perspective: 1000px;
+}
+
+.feature-card {
+  width: 200px;
+  height: 300px; /* Set a strict height */
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transform-origin: center; /* Rotate around the center */
+}
+
+
+.feature-front,
+.feature-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 45px;
+}
+
+.feature-front {
+  background-color: #fff;
+  transform: rotateX(0deg); /* Initial position */
+}
+
+.front-card1{
+  border-bottom: 8px solid #007bff; /* Add a blue border */
+  border-top: 8px solid #007bff; /* Add a blue border */
+  border-radius: 5px;
+}
+
+.front-card2{
+  border-bottom: 8px solid #28a745; /* Add a green border */
+  border-top: 8px solid #28a745; /* Add a green border */
+  border-radius: 5px;
+}
+
+.front-card3{
+  border-bottom: 8px solid #ffc107; /* Add a yellow border */
+  border-top: 8px solid #ffc107; /* Add a yellow border */
+  border-radius: 5px;
+}
+
+.front-card4{
+  border-bottom: 8px solid #dc3545; /* Add a red border */
+  border-top: 8px solid #dc3545; /* Add a red border */
+  border-radius: 5px;
+}
+
+.feature-back {
+  background-color: #f7f7f7;
+  transform: rotateX(180deg);
+  border-radius: 5px;
+}
+
+.back-card1{
+  border: 5px solid #007bff; /* Add a blue border */
+ 
+}
+.back-card2{
+  border: 5px solid #28a745; /* Add a green border */
+  
+}
+.back-card3{
+  border: 5px solid #ffc107; /* Add a yellow border */
+  
+}
+.back-card4{
+  border: 5px solid #dc3545; /* Add a red border */
+  
+}
+
+
+.feature:hover .feature-card {
+  transform: rotateX(180deg);
+}
+
+
 .feature button {
   padding: 10px 20px;
   font-size: 14px;
   cursor: pointer;
 }
 
+
+
+.feature-front h2:first-of-type{
+  /* Add your specific styles for the number "3" here */
+  font-size: 36px; /* Example: Increase the font size */
+  
+  font-weight: bold; /* Example: Make it bold */
+  margin-bottom: 10px; /* Example: Add some space below */
+  border: none;
+  border-radius: 50%;
+  
+  padding: 10px;
+  padding-right: 20px;
+  padding-left: 20px;
+
+}
+
+.feature-number1{
+  border-color: #007bff;
+  background-color: #007bff;
+}
+
+.feature-number2{
+  border-color: #28a745;
+  background-color: #28a745;
+}
+
+.feature-number3{
+  border-color: #ffc107;
+  background-color: #ffc107;
+}
+
+.feature-number4{
+  border-color: #dc3545;
+  background-color: #dc3545;
+}
+
+
 .testimonials {
   text-align: center;
   padding: 50px;
   background-color: white;
-  border: 1px solid #e9ecef;
+  /*border: 1px solid #e9ecef; */
 }
 
 .testimonials h2 {
@@ -138,10 +271,22 @@ nav ul li a {
   width: 30%;
   padding: 20px;
   margin: 10px;
-  background-color: #e9ecef;
+  background-color: white;
   border-radius: 5px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.testimonial1{
+  border-bottom: 8px solid #007bff; /* Add a blue border */
+}
+.testimonial2{
+  border-bottom: 8px solid #28a745; /* Add a green border */
+}
+
+.testimonial3{
+  border-bottom: 8px solid #ffc107; /* Add a yellow border */
+}
 .how-it-works {
   text-align: center;
   padding: 50px;
@@ -214,12 +359,12 @@ footer .contact-info p {
 }
 
 .hero-content button:last-of-type {
-  background-color: #007bff; /* Blue for Learn More */
+  background-color: #218838; /* Darker green on hover */
   color: white;
 }
 
 .hero-content button:last-of-type:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #28a745; /* Green for Get Started */
 }
 
 .feature button {

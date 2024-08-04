@@ -20,7 +20,7 @@
         <nav>
             <ul class="nav-bottom">
                 <li><a href="{% url 'financeapp:budget_list' %}">Your Budgets</a></li>
-                <li><a href="contactus.html">Contact us</a></li>
+                <li><a href="{% url 'financeapp:contactLog' %}">Contact Us</a></li>
                 <li><a href="{% url 'financeapp:profile' %}">Profile</a></li>
                 <li><a href="{% url 'auth_logout' %}?next={% url 'financeapp:index' %}">Log out</a></li>
             </ul>

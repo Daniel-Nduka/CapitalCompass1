@@ -12,7 +12,7 @@ h1, h2 {
   color: #444;
 }
 
-.introduction, .history, .mission, .team, .contact-info {
+.introduction, .history, .mission, .team, .contact-infomation {
   max-width: 800px;
   margin: 20px auto;
   padding: 20px;
@@ -47,12 +47,12 @@ p {
   margin: 5px 0;
 }
 
-.contact-info p {
+.contact-infomation p {
   margin: 5px 0;
 }
 
 @media (max-width: 600px) {
-  .introduction, .history, .mission, .team, .contact-info {
+  .introduction, .history, .mission, .team, .contact-information {
     padding: 15px;
   }
 }

@@ -8,7 +8,6 @@
         <h1>Take control of your Finances with CapitalCompass</h1>
         <p>Track your spending, track savings, and set financial goals</p>
         <button class="get_started_button" onclick="location.href='{% url 'registration_register' %}'">Get Started Here</button>
-        <button onclick="location.href='{% url 'financeapp:about' %}'">Learn More</button>
     </div>
     <div class="hero-image">
        <img src="#" alt="Financial Management"> 
@@ -17,39 +16,72 @@
 
 <section class="features">
     <div class="feature">
-        <h2>Budget Tracking</h2>
-        <p>Your Blueprint to Financial Success</p>
-        <button onclick="location.href='{% url 'financeapp:about' %}'">Learn More</button>
+        <div class="feature-card">
+            <div class="feature-front front-card1">
+                <h2 class="feature-number1">1</h2>
+                <h2>Budget Tracking</h2>
+                <p>Your Blueprint to Financial Success</p>
+                <p>Learn More</p>
+            </div>
+            <div class="feature-back back-card1">
+                <p>Track your spending, set budgets, and manage your finances effectively. Get started today and take control of your financial future!</p>
+            </div>
+        </div>
     </div>
     <div class="feature">
-        <h2>Expense Tracking</h2>
-        <p>Know where every pound is spent</p>
-        <button onclick="location.href='{% url 'financeapp:about' %}'">Learn More</button>
+        <div class="feature-card">
+            <div class="feature-front front-card2">
+                <h2 class="feature-number2">2</h2>
+                <h2>Expense Tracking</h2>
+                <p>Know where every pound is spent</p>
+                <p>Learn More</p>
+            </div>
+            <div class="feature-back back-card2">
+                <p>Gain insights into your spending habits and make informed decisions. Easily categorize expenses and monitor your cash flow.</p>
+            </div>
+        </div>
     </div>
     <div class="feature">
-        <h2>Data Visualisation</h2>
-        <p>See Your Finances Clearly</p>
-        <button onclick="location.href='{% url 'financeapp:about' %}'">Learn More</button>
+        <div class="feature-card c">
+            <div class="feature-front front-card3">
+                <h2 class="feature-number3">3</h2>
+                <h2>Data Visualisation</h2>
+                <p>Track, Visualise, and Understand Finances</p>
+                <p>Learn More</p>
+            </div>
+            <div class="feature-back back-card3">
+                <p>Visualize your financial data with charts and graphs. Understand trends and patterns to make better financial choices.</p>
+            </div>
+        </div>
     </div>
     <div class="feature">
-        <h2>Financial Insights</h2>
-        <p>Make Informed Decisions</p>
-        <button onclick="location.href='{% url 'financeapp:about' %}'">Learn More</button>
+        <div class="feature-card">
+            <div class="feature-front front-card4">
+                <h2 class="feature-number4">4</h2>
+                <h2>Financial Analysis</h2>
+                <p>Make Informed Financial Decisions</p>
+                <p>Learn More</p>
+            </div>
+            <div class="feature-back back-card4">
+                <p>Receive detailed analyses and insights to improve your financial strategy. Stay informed and enhance your financial well-being.</p>
+            </div>
+        </div>
     </div>
 </section>
+
 
 <section class="testimonials">
     <h2>Join People Who've Transformed Their Finances</h2>
     <p>Your financial health simplified</p>
-    <div class="testimonial">
+    <div class="testimonial testimonial1">
         <h3>John Doe</h3>
         <p>"CapitalCompass has completely transformed the way I manage my finances. The intuitive interface and insightful analytics have helped me save more and spend wisely."</p>
     </div>
-    <div class="testimonial">
+    <div class="testimonial testimonial2">
         <h3>Jane Smith</h3>
         <p>"I've tried multiple budgeting apps, but none compare to CapitalCompass. It's user-friendly and has all the features I need to track my expenses and plan for the future."</p>
     </div>
-    <div class="testimonial">
+    <div class="testimonial testimonial3">
         <h3>Michael Brown</h3>
         <p>"The financial insights feature is a game-changer. It has provided me with a clear picture of my financial situation and actionable advice to improve my financial health."</p>
     </div>
@@ -57,11 +89,19 @@
 
 <section class="how-it-works">
     <h2>How It Works</h2>
-    <ol>
-        <li>Sign Up and Link Accounts</li>
-        <li>Set Your Budget</li>
-        <li>Track and Analyse Spending</li>
-    </ol>
+    <div class="step">
+        <h3>1. Join for Free</h3>
+        <p>Start your journey. No credit card or commitment required.</p>
+    </div>
+    <div class="step">
+        <h3>2. Create Your Financial Plan</h3>
+        <p>Add your bank accounts and expenses. Set financial goals and savings targets. Share your plan with family or friends for support.</p>
+    </div>
+    <div class="step">
+        <h3>3. Monitor and Optimise Spending</h3>
+        <p>Track your spending habits in real-time. Receive personalised data visualisation and analysis. Adjust your plan to meet changing needs.</p>
+    </div>
     <button onclick="location.href='{% url 'registration_register' %}'">Sign up here</button>
 </section>
+
 {% endblock %}
