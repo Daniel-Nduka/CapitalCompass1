@@ -1,0 +1,133 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+}
+
+.financial-analysis-section {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.header-analysis {
+  margin-bottom: 0;
+}
+
+.header-analysis h1 {
+  font-size: 2em;
+  color: #333;
+  text-align: center;
+}
+
+.analysis-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-container {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  margin: 0 auto;
+}
+
+canvas {
+  width: 100%;
+  height: auto;
+}
+/* Container for the date navigation buttons */
+.date-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Styling for the date navigation buttons */
+.date-navigation a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: 2px solid #007bff;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.date-navigation a:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Styling for the current month label */
+.date-navigation .current-month {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+/* Container for the analysis type toggle buttons */
+.analysis-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Styling for the toggle buttons */
+.analysis-toggle button {
+  background-color: white;
+  border: 2px solid #007bff;
+  color: #007bff;
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  border-radius: 5px;
+  margin: 0 5px;
+}
+
+.analysis-toggle button.active,
+.analysis-toggle button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Styling for the category select dropdown */
+.category-select-container {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.category-select-container label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.category-select-container select {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+
+/* Styling for the chart container */
+.chart-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* Styling for the summary text */
+.summary {
+  text-align: center;
+  font-size: 1.1em;
+  margin-top: 20px;
+}
+

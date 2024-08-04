@@ -98,31 +98,40 @@
     </section>
 
     <!-- Add Category Modal -->
-    <div id="add-category-form" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeAddCategoryForm()">&times;</span>
-            <h2>New Category</h2>
-            <form method="post" action="{% url 'financeapp:add_zero_category' budget.id %}">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="id_name">Category Name:</label>
-                    <input type="text" name="name" id="id_name" required>
-                </div>
-                <div class="form-group">
-                    <label for="id_assigned_amount">Assigned Amount:</label>
-                    <input type="number" name="assigned_amount" id="id_assigned_amount" required>
-                </div>
-                <div class="form-group">
-                    <label for="id_is_recurring">Recurring:</label>
-                    <input type="checkbox" name="is_recurring" id="id_is_recurring">
-                </div>
-                <div class="form-group submit-btn">
-                    <button type="submit" name="add_category" class="btn btn-primary">Add Category</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeAddCategoryForm()">Cancel</button>
-                </div>
-            </form>
-        </div>
+    <!-- Add Category Modal -->
+<div id="add-category-form" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeAddCategoryForm()">&times;</span>
+        <h2>New Category</h2>
+        <form method="post" action="{% url 'financeapp:add_zero_category' budget.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_name">Category Name:</label>
+                <input type="text" name="name" id="id_name" required>
+                {% if form.errors.name %}
+                    <div class="error" style="color: red;">{{ form.errors.name }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_assigned_amount">Assigned Amount:</label>
+                <input type="number" name="assigned_amount" id="id_assigned_amount" required>
+                {% if form.errors.assigned_amount %}
+                    <div class="error">{{ form.errors.assigned_amount }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="id_is_recurring">Recurring:</label>
+                <input type="checkbox" name="is_recurring" id="id_is_recurring">
+            </div>
+            <div class="form-group submit-btn">
+                <button type="submit" name="add_category" class="btn btn-primary">Add Category</button>
+                <button type="button" class="btn btn-secondary" onclick="closeAddCategoryForm()">Cancel</button>
+            </div>
+        </form>
     </div>
+</div>
+
+    
 
     <!-- Edit Category Modal -->
     <div id="edit-category-form" class="modal">
@@ -135,6 +144,7 @@
                 <div class="form-group">
                     <label for="edit-category-name">Category Name:</label>
                     <input type="text" name="name" id="edit-category-name" required>
+
                 </div>
                 <div class="form-group">
                     <label for="edit-category-assigned-amount">Assigned Amount:</label>
@@ -250,6 +260,7 @@
             document.getElementById('add-category-form').style.display = 'none';
         }
 
+
         /* edit category */
         function showEditCategoryForm(categoryId, categoryName, assignedAmount, isRecurring) {
             document.getElementById('edit-category-form').style.display = 'flex';
@@ -263,6 +274,7 @@
         function closeEditCategoryForm() {
             document.getElementById('edit-category-form').style.display = 'none';
         }
+
 
         /* add expense form */
         function showAddExpenseForm(categoryId, isCategoryRecurring) {
@@ -326,6 +338,15 @@
                 }
             });
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            closeAddCategoryForm();
+            // Show the modal if form errors exist
+            {% if form.errors %}
+                showAddCategoryForm
+            {% endif %}
+        });
+        
 
         // Run the update function on page load
         window.onload = function() {

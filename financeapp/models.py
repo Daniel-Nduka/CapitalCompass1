@@ -26,17 +26,18 @@ class Budget(models.Model):
         ('zero_based', 'Zero-Based'),
         ('fifty_thirty_twenty', '50/30/20'),
     ]
-    
+    '''
     CURRENCY_TYPES = [
         ('POUNDS', 'Pounds'),
         ('DOLLARS', 'Dollars'),
         ('EUROS', 'euros'),   
         
     ]
+    '''
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='budgets')
-    budget_name = models.CharField(max_length=100)
+    budget_name = models.CharField(max_length=100, unique=True)
     budget_type = models.CharField(max_length=20, choices=BUDGET_TYPES)
-    currency_type = models.CharField(max_length=20, choices=CURRENCY_TYPES, default="POUNDS")
+    #currency_type = models.CharField(max_length=20, choices=CURRENCY_TYPES, default="POUNDS")
     month = models.DateField(auto_now_add=True)  # Add month field
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

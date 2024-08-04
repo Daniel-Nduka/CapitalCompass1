@@ -10,7 +10,8 @@ from django.template.loader import render_to_string
 
 from .models import UserProfile, Budget, ZeroBasedCategory, Expense, Account, FiftyThirtyTwentyCategory, Transaction
 from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm, ZeroBudgetForm, ExpenseForm, Fifty_Twenty_ThirtyForm, TransactionForm
-
+from django.db.models import Sum
+import random
 from django.contrib.auth import logout
 import logging
 
@@ -155,7 +156,12 @@ def create_budget(request):
             budget = form.save(commit=False)
             budget.user = request.user
             budget.save()
+            messages.success(request, 'Budget created successfully!')
             return redirect('financeapp:budget_list')
+        else:
+            # Capture and display form errors
+            for error in form.errors.values():
+                messages.error(request, error)
     else:
         form = BudgetForm()
     return render(request, 'financeapp/budget.html', {'form': form})
@@ -223,9 +229,11 @@ def copy_recurring_items(budget, selected_date):
         
 @login_required
 def zero_based_page(request, budget_id, year=None, month=None):
+    #Retrieve the selected budget from the session
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
     request.session['selected_budget_id'] = budget.id
 
+    # Get the selected date
     if not year or not month:
         today = datetime.date.today()
         year, month = today.year, today.month
@@ -287,6 +295,12 @@ def add_zero_based_category(request, budget_id):
             category.budget = budget
             category.save()
             return redirect('financeapp:zero_based_page', budget_id=budget.id)
+        else:
+            # Capture and display form errors
+            for error in form.errors.values():
+                messages.error(request, error)      
+    else:
+        form = ZeroBudgetForm(budget=budget)
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
 
 @login_required
@@ -687,27 +701,7 @@ def add_transaction(request):
     
     # Always redirect to transaction_list after adding a transaction
     return redirect('financeapp:transactions')
-'''
-@login_required
-def edit_transaction(request):
-    budget_id = request.session.get('selected_budget_id')
-    if not budget_id:
-        return redirect('financeapp:budget_list')
-    
-    transaction_id = request.POST.get('transaction_id')
-    transaction = get_object_or_404(Transaction, id=transaction_id, account__budget_id=budget_id)
 
-    if request.method == 'POST':
-        form = TransactionForm(request.POST, instance=transaction)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Transaction updated successfully.')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    
-    return redirect('financeapp:transactions')
-    
-'''
 @login_required
 def edit_transaction(request):
     budget_id = request.session.get('selected_budget_id')
@@ -754,3 +748,182 @@ def delete_transaction(request):
         messages.success(request, 'Transaction deleted successfully.')
     
     return redirect('financeapp:transactions')
+'''
+@login_required
+def get_categories_for_date(request):
+    budget = request.session.get('selected_budget_id')
+    if not budget:
+        return JsonResponse({'error': 'No budget selected'}, status=400)
+
+    budget = get_object_or_404(Budget, id=budget)
+
+    date_str = request.GET.get('date')
+    try:
+        selected_date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
+        year, month = selected_date.year, selected_date.month
+    except ValueError:
+        return JsonResponse({'error': 'Invalid date format'}, status=400)
+
+    if budget.budget_type == 'zero_based':
+        categories = ZeroBasedCategory.objects.filter(budget_id=budget,
+                                                      month__year=year,
+                                                      month__month=month)
+    else:
+        categories = FiftyThirtyTwentyCategory.objects.filter(budget_id=budget,
+                                                              month__year=year,
+                                                              month__month=month)
+
+    category_data = [{'id': category.id, 'name': category.name} for category in categories]
+
+    return JsonResponse({'categories': category_data})
+'''
+
+@login_required   
+def financial_analysis(request, year=None, month=None):
+    # Fetch categories and their assigned amounts
+    budget_id = request.session.get('selected_budget_id')
+    budget = get_object_or_404(Budget, id=budget_id)
+    analysis_type = request.GET.get('analysis_type', 'categories')
+    selected_category_id = request.GET.get('category_id')
+    
+    if not year or not month:
+        today = datetime.date.today()
+        year, month = today.year, today.month
+
+    selected_date = datetime.date(year, month, 1)
+    
+    previous_month_date = selected_date.replace(day=1) - datetime.timedelta(days=1)
+    next_month_date = (selected_date.replace(day=28) + datetime.timedelta(days=4)).replace(day=1)
+    previous_month = previous_month_date.month
+    previous_year = previous_month_date.year
+    next_month = next_month_date.month
+    next_year = next_month_date.year
+    
+
+    # Default to show all categories
+    if (budget.budget_type == 'zero_based'):
+        categories = ZeroBasedCategory.objects.filter(budget__id=budget_id, month__year=year, month__month=month)
+        previous_categories = ZeroBasedCategory.objects.filter(budget__id=budget_id, month__year=previous_year, month__month=previous_month)
+    else:
+        categories = FiftyThirtyTwentyCategory.objects.filter(budget__id=budget_id, month__year=year, month__month=month)
+        previous_categories = FiftyThirtyTwentyCategory.objects.filter(budget__id=budget_id, month__year=previous_year, month__month=previous_month)
+    category_labels = [category.name for category in categories]
+    assigned_amounts = [category.assigned_amount for category in categories]
+    total_assigned_amount = categories.aggregate(Sum('assigned_amount'))['assigned_amount__sum'] or 1
+    category_data = [float(category.assigned_amount / total_assigned_amount) * 100 for category in categories]
+    category_colors = ['#'+''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in categories]
+    
+    
+    # Create a dictionary for easy lookup of previous category amounts
+    previous_category_dict = {category.name: category.assigned_amount for category in previous_categories}
+    
+    # Compare the previous month's categories with the current month's categories
+    comparison_results_categories = {}
+    for category in categories:
+        prev_amount = previous_category_dict.get(category.name, 0)  # Get previous amount, default to 0 if not found
+        comparison_results_categories[category.name] = category.assigned_amount - prev_amount
+        
+    
+    # Identify the categories with the most and least budgeted amounts
+    
+   # previous_assigned_amounts = [category.assigned_amount for category in previous_categories]
+    max_budget_category = categories.order_by('-assigned_amount').first()
+    min_budget_category = categories.order_by('assigned_amount').first()
+
+    # Fetch all expenses for the "all_expenses" analysis
+    if (budget.budget_type == 'zero_based'):
+        expenses = Expense.objects.filter(category__budget__id=budget_id, category__month__year=year, category__month__month=month)
+    else:
+        expenses = Expense.objects.filter(fifty_30_twenty_category__budget__id=budget_id, fifty_30_twenty_category__month__year=year, fifty_30_twenty_category__month__month=month)
+    total_expense_amount = expenses.aggregate(Sum('assigned_amount'))['assigned_amount__sum'] or 1
+    expense_labels = [expense.description for expense in expenses]
+    expense_data = [float(expense.assigned_amount / total_expense_amount) * 100 for expense in expenses]
+    expense_colors = ['#' + ''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in expenses]
+    max_expense = expenses.order_by('-assigned_amount').first()
+    min_expense = expenses.order_by('assigned_amount').first()
+    
+    # Create a dictionary for easy lookup of previous category expenses
+    previous_expense_dict = {expense.description: expense.spent for category in previous_categories for expense in category.expenses.all()}
+    #compare the previous month's expenses with the current month's expenses spent
+    comparison_results_expenses = {}
+    for expense in expenses:
+        prev_amount = previous_expense_dict.get(expense.description, 0)
+        comparison_results_expenses[expense.description] = expense.spent - prev_amount
+    
+    # Check if there's any data for the selected month
+    has_category_data = categories.exists()
+    
+    has_expense_data = expenses.exists()
+    
+
+    context = {
+        'has_category_data': has_category_data,
+        'has_expense_data': has_expense_data,
+        'comparison_results_categories': comparison_results_categories,
+        'comparison_results_expenses': comparison_results_expenses,
+       # 'previous_assigned_amounts': previous_assigned_amounts,
+        'assigned_amounts': assigned_amounts,
+        'analysis_type': analysis_type,
+        'categories': categories,
+        'category_labels': category_labels,
+        'category_data': category_data,
+        'category_colors': category_colors,
+        'assigned_amounts': assigned_amounts,
+        'max_budget_category': max_budget_category,
+        'min_budget_category': min_budget_category,
+        'selected_date': selected_date,
+        'selected_month': month,
+        'selected_year': year,
+        'previous_month': previous_month,
+        'previous_year': previous_year,
+        'next_month': next_month,
+        'next_year': next_year,
+    }
+
+    if analysis_type == 'expenses_within_category':
+        selected_category = None
+        
+        if (budget.budget_type == 'zero_based'):
+            if selected_category_id:
+                selected_category = ZeroBasedCategory.objects.filter(id=selected_category_id, budget__id=budget_id).first()
+            if not selected_category:
+                selected_category = categories.first()  # Default to the first category if no valid selection
+        else:
+            if selected_category_id:
+                selected_category = FiftyThirtyTwentyCategory.objects.filter(id=selected_category_id, budget__id=budget_id).first()
+            if not selected_category:
+                selected_category = categories.first()
+        
+        if selected_category:
+            selected_category_id = selected_category.id  # Ensure selected_category_id is set
+            expenses_within_category = selected_category.expenses.all()
+            total_expense_within_category_amount = expenses_within_category.aggregate(Sum('assigned_amount'))['assigned_amount__sum'] or 1
+
+            expense_labels = [expense.description for expense in expenses_within_category]
+            expense_data = [float(expense.assigned_amount / total_expense_within_category_amount) * 100 for expense in expenses_within_category]
+            expense_colors = ['#' + ''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in expenses_within_category]
+
+            max_expense = expenses_within_category.order_by('-assigned_amount').first()
+            min_expense = expenses_within_category.order_by('assigned_amount').first()
+
+            context.update({
+                'selected_category_id': selected_category_id,
+                'category_name': selected_category.name,
+                'expense_labels': expense_labels,
+                'expense_data': expense_data,
+                'expense_colors': expense_colors,
+                'max_expense': max_expense,
+                'min_expense': min_expense,
+        })
+
+    
+    if analysis_type == 'all_expenses':
+        context.update({
+            'expense_labels': expense_labels,
+            'expense_data': expense_data,
+            'expense_colors': expense_colors,
+            'max_expense': max_expense,
+            'min_expense': min_expense,
+        })
+
+    return render(request, 'financeapp/financial_analysis.html', context)

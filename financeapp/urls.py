@@ -58,5 +58,8 @@ urlpatterns = [
     path('transactions/edit/', views.edit_transaction, name='edit_transaction'),
     path ('transactions/delete/', views.delete_transaction, name='delete_transaction'), 
     
+    path('analysis/', views.financial_analysis, name='financial_analysis'),
+    path('analysis/<int:year>/<int:month>/', views.financial_analysis, name='financial_analysis_with_date'),
+    #path('get-categories-for-date/', views.get_categories_for_date, name='get_categories_for_date'),
     
 ]

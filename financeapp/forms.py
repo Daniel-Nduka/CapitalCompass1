@@ -24,13 +24,29 @@ class AccountForm(forms.ModelForm):
 class BudgetForm(forms.ModelForm):
     class Meta:
         model = Budget
-        fields = ['budget_name', 'budget_type', 'currency_type']
+        fields = ['budget_name', 'budget_type' ]
+        
+    def clean_budget_name(self):
+        budget_name = self.cleaned_data.get('budget_name')
+        if Budget.objects.filter(budget_name=budget_name).exists():
+            raise forms.ValidationError("Budget name must be unique. The specified name is already in use.")
+        return budget_name
         
 class ZeroBudgetForm(forms.ModelForm):
-    is_recurring = forms.BooleanField(required=False, label='Recurring')
     class Meta:
         model = ZeroBasedCategory
         fields = ['name', 'assigned_amount', 'is_recurring']
+
+    def __init__(self, *args, **kwargs):
+        self.budget = kwargs.pop('budget', None)
+        super().__init__(*args, **kwargs)
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if ZeroBasedCategory.objects.filter(budget=self.budget, name=name).exists():
+            raise forms.ValidationError("Category with this name already exists.")
+        return name
+        
 
 class Fifty_Twenty_ThirtyForm(forms.ModelForm):
     class Meta:

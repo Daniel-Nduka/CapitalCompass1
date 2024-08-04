@@ -1,0 +1,182 @@
+{% extends 'financeapp/loggedin_base.html' %}
+{% load static %}
+
+{% block title_block %} Financial Analysis - CapitalCompass {% endblock %}
+
+{% block head_block %}
+<link rel="stylesheet" href="{% static 'styles/financial_analysis.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block body_block %}
+<main>
+    <section class="financial-analysis-section">
+        <div class="header">
+            <h1>Financial Analysis</h1>
+        </div>
+        <div class="date-navigation">
+            <a href="{% url 'financeapp:financial_analysis_with_date' previous_year previous_month %}" class="previous-month">Previous Month</a>
+            <span class="current-month">{{ selected_date|date:"F Y" }}</span>
+            <a href="{% url 'financeapp:financial_analysis_with_date' next_year next_month %}" class="next-month">Next Month</a>
+        </div>
+        <div class="analysis-toggle">
+            <button onclick="switchAnalysis('categories')" class="{% if analysis_type == 'categories' %}active{% endif %}">Categories</button>
+            <button onclick="switchAnalysis('expenses_within_category')" class="{% if analysis_type == 'expenses_within_category' %}active{% endif %}">Expenses in Category</button>
+            <button onclick="switchAnalysis('all_expenses')" class="{% if analysis_type == 'all_expenses' %}active{% endif %}">All Expenses</button>
+        </div>
+        
+        {% if analysis_type == 'categories' %}
+            {% if has_category_data %}
+                <div class="analysis-content">
+                    <div class="chart-container">
+                        <canvas id="financialChart"></canvas>
+                    </div>
+                    <div class="summary">
+                        <p>You've budgeted the most on <strong>{{ max_budget_category.name }}</strong> and the least on <strong>{{ min_budget_category.name }}</strong>.</p>
+                        {% if comparison_results %}
+                            {% for category, change in comparison_results_categories.items %}
+                                {% if change > 0 %}
+                                    <p>Compared to last month, you've budgeted {{ change }} more on <strong>{{ category }}</strong>.</p>
+                                {% elif change < 0 %}
+                                    <p>Compared to last month, you've budgeted {{ change }} less on <strong>{{ category }}</strong>.</p>
+                                {% endif %} 
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="no-data-message">
+                    <p>There is no data available for {{ selected_date|date:"F Y" }}. Please select another month or add data for this month.</p>
+                </div>
+            {% endif %}
+        {% elif analysis_type == 'expenses_within_category' %}
+            {% if has_expense_data %}
+                <div class="category-select-container">
+                    <label for="categorySelect">Select Category:</label>
+                    <select id="categorySelect" onchange="changeCategory()">
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category.id == selected_category_id %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="analysis-content">
+                    <div class="chart-container">
+                        <canvas id="financialChart"></canvas>
+                    </div>
+                    <div class="summary">
+                        <p>In the category <strong>{{ category_name }}</strong>, you've budgeted the most on <strong>{{ max_expense.description }}</strong> and the least on <strong>{{ min_expense.description }}</strong>.</p>
+                    
+
+                    </div>
+                </div>
+            {% else %}
+                <div class="no-data-message">
+                    <p>There is no data available for the selected category in {{ selected_date|date:"F Y" }}. Please select another category or month, or add data for this category and month.</p>
+                </div>
+            {% endif %}
+        {% elif analysis_type == 'all_expenses' %}
+            {% if has_expense_data %}
+                <div class="analysis-content">
+                    <div class="chart-container">
+                        <canvas id="financialChart"></canvas>
+                    </div>
+                    <div class="summary">
+                        <p>Among all your expenses, <strong>{{ max_expense.description }}</strong> had the highest amount, while <strong>{{ min_expense.description }}</strong> had the lowest.</p>
+                        {% if comparison_results_expenses %}
+                            {% for expense, change in comparison_results_expenses.items %}
+                                {% if change > 0 %}
+                                    <p>Compared to last month, you've spent {{ change }} more on <strong>{{ expense }}</strong>.</p>
+                                {% elif change < 0 %}
+                                    <p>Compared to last month, you've spent {{ change }} less on <strong>{{ expense }}</strong>.</p>
+                                {% endif %} 
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="no-data-message">
+                    <p>There is no data available for {{ selected_date|date:"F Y" }}. Please select another month or add data for this month.</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </section>
+</main>
+
+
+<script>
+    var chartData, chartLabels, chartColors;
+
+    {% if analysis_type == 'categories' %}
+        chartLabels = {{ category_labels|default:"[]"|safe }};
+        chartData = {{ category_data|default:"[]"|safe }};
+        chartColors = {{ category_colors|default:"[]"|safe }};
+    {% elif analysis_type == 'expenses_within_category' %}
+        chartLabels = {{ expense_labels|default:"[]"|safe }};
+        chartData = {{ expense_data|default:"[]"|safe }};
+        chartColors = {{ expense_colors|default:"[]"|safe }};
+    {% elif analysis_type == 'all_expenses' %}
+        chartLabels = {{ expense_labels|default:"[]"|safe }};
+        chartData = {{ expense_data|default:"[]"|safe }};
+        chartColors = {{ expense_colors|default:"[]"|safe }};
+    {% else %}
+        chartLabels = [];
+        chartData = [];
+        chartColors = [];
+    {% endif %}
+
+    var ctx = document.getElementById('financialChart').getContext('2d');
+    var financialChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                data: chartData,
+                backgroundColor: chartColors,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            var label = chartLabels[tooltipItem.dataIndex] || '';
+                            var percentage = chartData[tooltipItem.dataIndex];
+                            return label + ': ' + percentage.toFixed(2) + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    function switchAnalysis(type) {
+        var year = {{ selected_year }};
+        var month = {{ selected_month }};
+        var url = '{% url "financeapp:financial_analysis_with_date" 0 0 %}'.replace('/0/0/', '/' + year + '/' + month + '/') + '?analysis_type=' + type;
+
+        if (type === 'expenses_within_category') {
+            var categorySelect = document.getElementById('categorySelect');
+            if (categorySelect) {
+                var selectedCategoryId = categorySelect.value;
+                url += '&category_id=' + selectedCategoryId;
+            }
+        }
+
+        window.location.href = url;
+    }
+
+    function changeCategory() {
+        var selectedCategoryId = document.getElementById('categorySelect').value;
+        var year = {{ selected_year }};
+        var month = {{ selected_month }};
+        var url = '{% url "financeapp:financial_analysis_with_date" 0 0 %}'.replace('/0/0/', '/' + year + '/' + month + '/') + '?analysis_type=expenses_within_category&category_id=' + selectedCategoryId;
+        window.location.href = url;
+    }
+</script>
+
+{% endblock %}
