@@ -10,6 +10,11 @@
 <main>
     <section class="budget-overview">
         <h1 class="overview-title">Budget Overview</h1>
+        <div class="action-buttons">
+           
+            <button class="btn btn-primary" onclick="showCreateBudgetForm()">Create New Budget</button>
+            <button onclick="location.href='{% url 'financeapp:budget_list' %}'" class="btn btn-secondary">View All Budgets</button>
+        </div> 
         <div class="overview-intro">
             <p>Welcome to the Budget Overview section of CapitalCompass. This is your central hub for managing and tracking your personal finances. Whether you're just starting to take control of your finances or you're looking to optimize your budgeting strategies, this page has all the tools you need.</p>
             <p>Here, you can <strong>create a new budget</strong> to plan your expenses and savings, or <strong>view your existing budgets</strong> to make adjustments based on your financial goals. Our platform offers various budgeting methods, ensuring you have a system that suits your lifestyle and financial needs.</p>
@@ -36,7 +41,7 @@
             <p>Ready to get started? Use the buttons below to manage your budgets:</p>
             <button class="btn btn-primary" onclick="showCreateBudgetForm()">Create New Budget</button>
             <button onclick="location.href='{% url 'financeapp:budget_list' %}'" class="btn btn-secondary">View All Budgets</button>
-        </div>   
+        </div> 
     </section>
     <div id="create-budget-form" class="modal">
         <div class="modal-content">

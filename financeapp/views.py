@@ -8,8 +8,8 @@ import datetime
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
-from .models import UserProfile, Budget, ZeroBasedCategory, Expense, Account, FiftyThirtyTwentyCategory, Transaction, ContactMessage
-from .forms import UserForm, UserProfileForm, AccountForm, BudgetForm, ZeroBudgetForm, ExpenseForm, Fifty_Twenty_ThirtyForm, TransactionForm, ContactMessageForm
+from .models import UserProfile, Budget, ZeroBasedCategory, Expense, Account, FiftyThirtyTwentyCategory, Transaction, ContactMessage, AccountSupport
+from .forms import UserForm, AccountForm, BudgetForm, ZeroBudgetForm, ExpenseForm, Fifty_Twenty_ThirtyForm, TransactionForm, ContactMessageForm, AccountSupportForm, AddMoneyForm
 from django.db.models import Sum
 import random
 from django.contrib.auth import logout
@@ -17,10 +17,30 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.core.mail import send_mail
-
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
+from django.contrib.auth import views as auth_views
+from django.urls import reverse_lazy
 
+
+class CustomPasswordResetView(auth_views.PasswordResetView):
+    template_name = 'registration/password_reset_form.html'
+    email_template_name = 'registration/password_reset_email.html'
+    subject_template_name = 'registration/password_reset_subject.txt'
+    success_url = reverse_lazy('password_reset_done')
+
+class CustomPasswordResetDoneView(auth_views.PasswordResetDoneView):
+    template_name = 'registration/password_reset_done.html'
+
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    template_name = 'registration/password_reset_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+
+class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
+    template_name = 'registration/password_reset_complete.html'
 
 
 # Create your views here.
@@ -28,6 +48,9 @@ logger = logging.getLogger(__name__)
 #overview
 def overview(request):
     return render(request, 'financeapp/overview.html')
+
+def help_page(request):
+    return render(request, 'financeapp/help_page.html')
 #This ensures when a user clicks sign up, if there is an authenticated user, it logs them out and redirects them to the sign up page.
 def logout_and_signup(request):
     logout(request)
@@ -55,7 +78,7 @@ def select_budget(request, budget_id):
 def account_list(request):
     budget = request.selected_budget
     if not budget:
-        return redirect('financeapp:account_intro')
+        return redirect('financeapp:budget_list')   
 
     accounts = Account.objects.filter(budget=budget)
     total_balance = sum(account.balance for account in accounts)
@@ -113,7 +136,35 @@ def edit_account(request):
             return redirect('financeapp:account_list')
     return redirect('financeapp:account_list')
 
+#add money to account
+@login_required
+def add_money_to_account(request):
+    if request.method == 'POST':
+        form = AddMoneyForm(request.POST)
+        if form.is_valid():
+            account_id = request.POST.get('account_id')
+            account = get_object_or_404(Account, id=account_id, budget__user=request.user)
+            amount = form.cleaned_data['amount']
 
+            # Add money to the account
+            account.balance += amount
+            account.save()
+
+            # Create a transaction for adding money
+            Transaction.objects.create(
+                account=account,
+                inflow=amount,
+                outflow=0,
+                description=f'Added £{amount} to {account.account_name}',
+                date=timezone.now(),
+                created_by_account=True,
+            )
+
+            messages.success(request, f'£{amount} has been added to {account.account_name}.')
+        else:
+            messages.error(request, 'There was an error adding money. Please try again.')
+
+    return redirect('financeapp:account_list')
 '''
 
 def transactions(request):
@@ -126,26 +177,39 @@ def profile(request):
     try:
         user_profile = UserProfile.objects.get(user=user)
     except UserProfile.DoesNotExist:
-        user_profile = None
-    
-    if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=user)
-        profile_form = UserProfileForm(request.POST, instance=user_profile)
+        user_profile = UserProfile(user=user)  # Create a new UserProfile instance for the user
 
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            messages.success(request, 'Your profile has been updated successfully.')
-            return redirect('profile')
-        else:
-            messages.error(request, 'Please correct the errors below.')
+    if request.method == 'POST':
+        if 'profile_form' in request.POST:
+            user_form = UserForm(request.POST, instance=user)
+        #    profile_form = UserProfileForm(request.POST, instance=user_profile)
+            if user_form.is_valid():
+                user_form.save()
+              #  profile = profile_form.save(commit=False)
+              #  profile.user = user  # Ensure the user field is set
+             ##   profile.save()
+                messages.success(request, 'Your profile has been updated successfully.')
+                return redirect('financeapp:profile')
+            else:
+                messages.error(request, 'Please correct the errors below.')
+        elif 'password_form' in request.POST:
+            password_form = PasswordChangeForm(user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # Keep the user logged in
+                messages.success(request, 'Your password has been changed successfully.')
+                return redirect('financeapp:profile')
+            else:
+                messages.error(request, 'Please correct the errors below.')
     else:
         user_form = UserForm(instance=user)
-        profile_form = UserProfileForm(instance=user_profile)
+       # profile_form = UserProfileForm(instance=user_profile)
+        password_form = PasswordChangeForm(user)
 
     context = {
         'user_form': user_form,
-        'profile_form': profile_form,
+       # 'profile_form': profile_form,
+        'password_form': password_form,
         'user_profile': user_profile,
     }
     return render(request, 'financeapp/profile.html', context)
@@ -194,7 +258,6 @@ def delete_budget(request, budget_id):
     return render(request, 'financeapp/delete_budget.html', context)
 
 @login_required
-# Helper Function to copy recurring categories and expenses from the previous budget
 def copy_recurring_items(budget, selected_date):
     last_month = selected_date - datetime.timedelta(days=1)
     logger.warning(f"Last month's budget does not exist for budget {budget.id} and date {last_month}")
@@ -215,16 +278,9 @@ def copy_recurring_items(budget, selected_date):
                 assigned_amount=expense.assigned_amount,
                 spent=0,  # reset spent for new month
                 is_recurring=expense.is_recurring
-                )
-     # Update account balances
-    # Calculate and update account balances
-    
-    # Set new month's balance based on previous balance
-    '''
-    for account in budget.accounts.all():
-        account.balance = account.previous_balance  # Use the previous balance for the new month
-        account.save()
-   ''' 
+            )
+
+
     
 #Zero based budget page. It displays the categories and expenses associated with the budget.
 #when a user selects a budget, it stores the budget in the session.
@@ -251,18 +307,21 @@ def zero_based_page(request, budget_id, year=None, month=None):
     next_year = next_month_date.replace(day=1).year
 
     categories = ZeroBasedCategory.objects.filter(budget=budget, month__year=year, month__month=month)
-
+    
+    # Calculate the total balance for the budget
     total_balance = 0
-    budgeted_money = sum(category.assigned_amount for category in categories)
     accounts = budget.accounts.all()
-
     for account in accounts:
         total_balance += account.balance
 
-    money_available = total_balance - budgeted_money
+    budgeted_money = sum(category.assigned_amount for category in categories)
     
-        
-    copy_recurring_items(budget, selected_date)
+    # Calculate the total amount spent
+    spent_money = sum(category.activity for category in categories)
+    
+    # Calculate the money available
+    money_available = total_balance - spent_money
+
 
     category_form = ZeroBudgetForm()
     expense_form = ExpenseForm()
@@ -275,6 +334,7 @@ def zero_based_page(request, budget_id, year=None, month=None):
         'total_balance': total_balance,
         'money_available': money_available,
         'budgeted_money': budgeted_money,
+        'spent_money': spent_money,
         'selected_date': selected_date,
         'year': year,
         'month': month,
@@ -496,14 +556,19 @@ def fifty_thirty_twenty_page(request, budget_id, year=None, month=None):
     next_year = next_month_date.replace(day=1).year
 
     categories = FiftyThirtyTwentyCategory.objects.filter(budget=base_budget, month__year=year, month__month=month)
+    
+    # Calculate the total balance for the budget
     total_balance = 0
-    budgeted_money = sum(category.assigned_amount for category in categories)
     accounts = base_budget.accounts.all()
-
     for account in accounts:
         total_balance += account.balance
+        
+    budgeted_money = sum(category.assigned_amount for category in categories)
+    
+    # Calculate the total amount spent
+    spent_money = sum(category.activity for category in categories)
        
-    money_available = total_balance - budgeted_money
+    money_available = total_balance - spent_money
 
     category_form = Fifty_Twenty_ThirtyForm()
     expense_form = ExpenseForm()
@@ -516,6 +581,7 @@ def fifty_thirty_twenty_page(request, budget_id, year=None, month=None):
         'money_available': money_available,
         'total_balance': total_balance,
         'budgeted_money': budgeted_money,
+        'spent_money': spent_money,
         'selected_date': selected_date,
         'year': year,
         'month': month,
@@ -974,6 +1040,8 @@ def contact(request):
 
     return render(request, 'financeapp/contact.html', {'form': form})
 
+
+'''
 def contactLoggedIn(request):
     if request.method == 'POST':
         form = ContactMessageForm(request.POST, request.FILES)
@@ -1017,3 +1085,50 @@ def contactLoggedIn(request):
         form = ContactMessageForm()
 
     return render(request, 'financeapp/contactLoggedin.html', {'form': form})
+'''
+def account_support(request):
+    if request.method == 'POST':
+        form = AccountSupportForm(request.POST, request.FILES, user=request.user)
+        if form.is_valid():
+            # Save form data to the database
+            account_support = form.save(commit=False)
+            account_support.user = request.user
+            account_support.save()
+
+            # Prepare email content
+            subject = f"New Account Support Request from {request.user.username}"
+            message = (
+                f"Name: {request.user.get_full_name()}\n"
+                f"Email: {request.user.email}\n"
+                f"Problem Type: {account_support.problem_type}\n"
+                f"Subject: {account_support.subject}\n"
+                f"Message:\n{account_support.message}\n"
+            )
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [settings.CONTACT_EMAIL]
+
+            # Send the email to the support team
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+            
+            # Prepare the confirmation email content to the sender
+            sender_subject = "Thank you for contacting us!"
+            sender_message = (
+                f"Dear {request.user.get_full_name()},\n\n"
+                "Thank you for reaching out to us. We have received your message and will get back to you soon.\n\n"
+                "Best regards,\n"
+                "The CapitalCompass Team"
+            )
+            recipient_list = [request.user.email]
+
+            # Send the confirmation email to the sender
+            send_mail(sender_subject, sender_message, from_email, recipient_list, fail_silently=False)
+
+            # Display success message and redirect
+            messages.success(request, 'Your message has been sent successfully.')
+            return redirect('financeapp:account_support')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = AccountSupportForm(user=request.user)
+
+    return render(request, 'financeapp/account_support.html', {'form': form})

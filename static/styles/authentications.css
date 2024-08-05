@@ -76,3 +76,19 @@ body {
 .submit-btn button:hover {
   background-color: #0056b3;
 }
+/* Add this to your authentications.css */
+
+.forgot-password {
+  text-align: center;
+  margin-top: 10px; /* Add some space above the link */
+}
+
+.forgot-password a {
+  color: #007bff; /* or whatever color you prefer */
+  text-decoration: none; /* Remove underline */
+}
+
+.forgot-password a:hover {
+  text-decoration: underline; /* Add underline on hover */
+}
+

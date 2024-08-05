@@ -24,7 +24,8 @@
                         {{ account.account_name }}: Current Balance: £{{ account.balance }}
                     </div>
                     <div class="account-actions">
-                        <button class="btn btn-primary" onclick="showEditAccountForm({{ account.id }}, '{{ account.account_name }}', {{ account.balance }}, '{{ account.account_type }}')">Edit</button>
+                        <button class="btn btn-primary" onclick="showEditAccountForm({{ account.id }}, '{{ account.account_name }}', '{{ account.account_type }}')">Edit</button>
+                        <button class="btn btn-primary" onclick="showAddMoneyForm({{ account.id }})">Add Money</button>
                         <form method="get" action="{% url 'financeapp:delete_account' account.id %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger">Delete</button>
@@ -81,10 +82,6 @@
                 <input type="text" name="account_name" id="edit-account-name" required>
             </div>
             <div class="form-group">
-                <label for="edit-balance">Balance:</label>
-                <input type="number" name="balance" id="edit-balance" required>
-            </div>
-            <div class="form-group">
                 <label for="edit-account-type">Account Type:</label>
                 <select name="account_type" id="edit-account-type">
                     <option value="CHECKING">Checking</option>
@@ -100,34 +97,56 @@
     </div>
 </div>
 
+<!-- Add Money to Account Modal -->
+<div id="add-money-form-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeAddMoneyForm()">&times;</span>
+        <h2>Add Money to Account</h2>
+        <form method="post" action="{% url 'financeapp:add_money_to_account' %}">
+            {% csrf_token %}
+            <input type="hidden" name="account_id" id="add-money-account-id">
+            <div class="form-group">
+                <label for="id_amount">Amount:</label>
+                <input type="number" name="amount" id="id_amount" required>
+            </div>
+            <div class="form-group submit-btn">
+                <button type="submit" name="add_money" class="btn btn-primary">Add Money</button>
+                <button type="button" class="btn btn-secondary" onclick="closeAddMoneyForm()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script>
-    /* add account */
+    /* Add account */
     function showAddAccountForm() {
         document.getElementById('add-account-form-modal').style.display = 'flex';
     }
     function closeAddAccountForm() {
         document.getElementById('add-account-form-modal').style.display = 'none';
     }
-    function showEditAccountForm(accountId, accountName, balance, accountType) {
+    function showEditAccountForm(accountId, accountName, accountType) {
         document.getElementById('edit-account-id').value = accountId;
         document.getElementById('edit-account-name').value = accountName;
-        document.getElementById('edit-balance').value = balance;
         document.getElementById('edit-account-type').value = accountType;
-    
-    
         document.getElementById('edit-account-form').style.display = 'flex';
     }
-    
     function closeEditAccountForm() {
         document.getElementById('edit-account-form').style.display = 'none';
     }
-    
+    function showAddMoneyForm(accountId) {
+        document.getElementById('add-money-account-id').value = accountId;
+        document.getElementById('add-money-form-modal').style.display = 'flex';
+    }
 
+    function closeAddMoneyForm() {
+        document.getElementById('add-money-form-modal').style.display = 'none';
+    }
     // Run the update function on page load
     window.onload = function() {
         closeAddAccountForm();
         closeEditAccountForm();
+        closeAddMoneyForm();
     }
 </script>
 {% endblock %}

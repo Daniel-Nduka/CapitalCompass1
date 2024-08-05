@@ -2,46 +2,67 @@
 {% load static %}
 {% block title_block %} Profile - CapitalCompass {% endblock %}
 
-{% block body_block %}
-    <main>
-        <section class="profile-section">
-            <h1>User Profile</h1>
-            <div class="profile-container">
-                <div class="profile-info">
-                    <h2>Profile Information</h2>
-                    <p><strong>Name:</strong> {{ user_form.username.value }}</p>
-                    <p><strong>Email:</strong> {{ user_form.email.value }}</p>
-                    <p><strong>Bio:</strong> {{ user_profile.bio }}</p>
-                    <p><strong>Location:</strong> {{ user_profile.location }}</p>
-                    <p><strong>Date of Birth:</strong> {{ user_profile.birth_date }}</p>
-                    <button class="btn btn-primary" onclick="showEditProfileForm()">Edit Profile</button>
-                </div>
-                <div class="edit-profile-form" id="edit-profile-form">
-                    <h2>Edit Profile</h2>
-                    <form method="post" id="profile-form">
-                        {% csrf_token %}
-                        {{ user_form.as_p }}
-                        {{ profile_form.as_p }}
-                        <div class="form-group submit-btn">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                            <button type="button" class="btn btn-secondary" onclick="hideEditProfileForm()">Cancel</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="change-password-form">
-                    <h2>Change Password</h2>
-                    <!-- Include your change password form as needed -->
-                </div>
-            </div>
-        </section>
-    </main>
-    <script>
-        function showEditProfileForm() {
-            document.getElementById('edit-profile-form').style.display = 'block';
-        }
+{% block head_block %}
+<link rel="stylesheet" href="{% static 'styles/profile.css' %}">
+{% endblock %}
 
-        function hideEditProfileForm() {
-            document.getElementById('edit-profile-form').style.display = 'none';
-        }
-    </script>
+{% block body_block %}
+<main>
+    <section class="profile-section">
+        <h1>User Profile</h1>
+        <div class="profile-container">
+            <div class="profile-info">
+                <h2>Profile Information</h2>
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>First Name:</strong> {{ user.first_name }}</p>
+                <p><strong>Last Name:</strong> {{ user.last_name }}</p>            
+                <button class="btn btn-primary" onclick="showEditProfileForm()">Edit Profile</button>
+                <button class="btn btn-secondary" onclick="showChangePasswordForm()">Change Password</button>
+            </div>
+            <div class="edit-profile-form" id="edit-profile-form" style="display: none;">
+                <h2>Edit Profile</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ user_form.as_p }}
+    
+                    <div class="form-group submit-btn">
+                        <button type="submit" class="btn btn-primary" name="profile_form">Save Changes</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideEditProfileForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+            <div class="change-password-form" id="change-password-form" style="display: none;">
+                <h2>Change Password</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ password_form.as_p }}
+                    <div class="form-group submit-btn">
+                        <button type="submit" class="btn btn-primary" name="password_form">Change Password</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideChangePasswordForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+<script>
+    function showEditProfileForm() {
+        document.getElementById('edit-profile-form').style.display = 'block';
+        document.getElementById('change-password-form').style.display = 'none';
+    }
+
+    function hideEditProfileForm() {
+        document.getElementById('edit-profile-form').style.display = 'none';
+    }
+
+    function showChangePasswordForm() {
+        document.getElementById('change-password-form').style.display = 'block';
+        document.getElementById('edit-profile-form').style.display = 'none';
+    }
+
+    function hideChangePasswordForm() {
+        document.getElementById('change-password-form').style.display = 'none';
+    }
+</script>
 {% endblock %}

@@ -57,13 +57,24 @@ nav ul li a {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 100px;
+  padding: 120px;
   background-color: white;
   color: black;
+  position: relative; 
 }
 
 .hero-content {
-  max-width: 50%;
+  width: 1000px; /* Set max-width as needed for text */
+  margin-right: -100px; /* Negative margin to overlap the image's white space */
+  z-index: 1; /* Ensure text is on top of the image */
+}
+.index-image {
+
+  width: 900px;
+  height: auto;
+  
+  margin-right: -120px;
+  z-index: 0; /* Ensure image is behind the text */
 }
 
 .hero-content h1 {
@@ -82,10 +93,10 @@ nav ul li a {
   font-size: 16px;
   cursor: pointer;
 }
-
+/*
 .hero-image img {
   max-width: 100%;
-}
+}*/
 
 
 .feature {
@@ -311,27 +322,60 @@ nav ul li a {
   cursor: pointer;
 }
 
+/* Footer Styling */
 footer {
-  padding: 20px;
-  background-color: white;
-  border: 1px solid #e9ecef;
-  text-align: center;
+  background-color: white; /* Dark background color */
+  color: black;
+  padding: 20px 0; /* Padding for spacing */
+  text-align: center; /* Center-align the text */
+  font-size: 14px; /* Slightly smaller font size */
 }
 
-footer .footer-content a {
-  display: block;
-  margin: 5px 0;
-  text-decoration: none;
-  color: #333;
+footer a {
+  color: black; /* Black text color */
+  text-decoration: none; /* Remove underline */
+  margin: 0 10px; /* Space between links */
+}
+
+footer a:hover {
+  text-decoration: underline; /* Underline on hover for clarity */
+}
+
+footer .footer-content {
+  max-width: 1200px; /* Maximum width for the footer content */
+  margin: 0 auto; /* Center the content */
+  padding: 0 20px; /* Padding for content */
+  display: flex; /* Use flexbox for layout */
+  flex-wrap: wrap; /* Wrap items if needed */
+  justify-content: space-between; /* Distribute space between items */
+  align-items: center; /* Align items vertically */
+}
+
+footer p {
+  margin: 5px 0; /* Margin for spacing between elements */
 }
 
 footer .social-media-icons {
-  margin: 10px 0;
+  display: flex; /* Flex layout for icons */
+  justify-content: center; /* Center icons */
+  margin-top: 10px; /* Space above social icons */
 }
 
-footer .contact-info p {
-  margin: 5px 0;
+footer .social-media-icons a {
+  margin: 0 5px; /* Space between icons */
 }
+
+@media (max-width: 600px) {
+  footer .footer-content {
+      flex-direction: column; /* Stack items vertically on small screens */
+      text-align: center; /* Center-align text */
+  }
+
+  footer .social-media-icons {
+      margin-top: 15px; /* Adjust margin for small screens */
+  }
+}
+
 
 
 .hero-content button,

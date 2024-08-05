@@ -8,7 +8,7 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     
     path('overview/', views.overview, name='overview'),
-    #path('transactions/', views.transactions, name='transactions'),
+    path('help/', views.help_page, name='help'),
     
     path('select_budget/<int:budget_id>/', views.select_budget, name='select_budget'),
 
@@ -20,6 +20,7 @@ urlpatterns = [
     path('accounts/add/', views.add_account, name='add_account'),
     path('accounts/edit/', views.edit_account, name='edit_account'),
     path('accounts/delete/<int:account_id>/', views.delete_account, name='delete_account'),
+    path('accounts/add_money/', views.add_money_to_account, name='add_money_to_account'),
    
 
 
@@ -62,7 +63,15 @@ urlpatterns = [
     path('analysis/<int:year>/<int:month>/', views.financial_analysis, name='financial_analysis_with_date'),
     
     path('contact/', views.contact, name='contact'),
-    path('contactLog/', views.contactLoggedIn, name='contactLog'),
+    #path('contactLog/', views.contactLoggedIn, name='contactLog'),
+    path('account_support/', views.account_support, name='account_support'),
     #path('get-categories-for-date/', views.get_categories_for_date, name='get_categories_for_date'),
+    
+    # Other URL patterns...
+    path('password_reset/', views.CustomPasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', views.CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', views.CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', views.CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
     
 ]

@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title_block %}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'styles/application.css' %}">
-    <link rel="stylesheet" href="{% static 'styles/profile.css' %}">
 
     {% block head_block %}{% endblock %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -20,7 +19,8 @@
         <nav>
             <ul class="nav-bottom">
                 <li><a href="{% url 'financeapp:budget_list' %}">Your Budgets</a></li>
-                <li><a href="{% url 'financeapp:contactLog' %}">Contact Us</a></li>
+                <li><a href="{% url 'financeapp:account_support' %}">Account Support</a></li>
+                <li><a href="{% url 'financeapp:help' %}">Help and Support</a></li>
                 <li><a href="{% url 'financeapp:profile' %}">Profile</a></li>
                 <li><a href="{% url 'auth_logout' %}?next={% url 'financeapp:index' %}">Log out</a></li>
             </ul>

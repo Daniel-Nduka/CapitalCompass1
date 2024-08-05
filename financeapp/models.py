@@ -12,12 +12,7 @@ import datetime
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.TextField(blank=True)
-    location = models.CharField(max_length=100, blank=True)
-    birth_date = models.DateField(null=True, blank=True)
     last_accessed_budget = models.ForeignKey('Budget', on_delete=models.SET_NULL, null=True, blank=True)
-    # Add more fields as needed
-
     def __str__(self):
         return self.user.username
     
@@ -84,8 +79,20 @@ class Account(models.Model):
    
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        # Update the budget's categories if necessary
         self.budget.update_fifty_thirty_twenty_categories()
+        
+@receiver(post_save, sender=Account)
+def create_initial_transaction(sender, instance, created, **kwargs):
+    if created:
+        Transaction.objects.create(
+            account=instance,
+            date=timezone.now(),
+            description=f"Initial balance for {instance.account_name}",
+            inflow=instance.balance,
+            outflow=0,
+            created_by_account=True,
+        ) 
+
 #Base Category
 class BaseCategory(models.Model):
     assigned_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -147,6 +154,7 @@ def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
                 name=name,
                 assigned_amount=0.0,
                 month=instance.month
+                
             )
  
  
@@ -192,12 +200,13 @@ class Transaction(models.Model):
     payee = models.CharField(max_length=255, blank=True, null=True)
     inflow = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     outflow = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    created_by_account = models.BooleanField(default=False) 
     
     def __str__(self):
         return f"{self.date} - {self.description} ({self.inflow} / {self.outflow})"
 
     def save(self, *args, **kwargs):
-        if self.pk is None:  # This check is for a new transaction
+        if self.pk is None and not self.created_by_account :  # This check is for a new transaction
             if self.inflow > 0:
                 self.account.balance += Decimal(self.inflow)
                 self.outflow = 0
@@ -229,6 +238,7 @@ class Transaction(models.Model):
             self.expense.save()
 
         super().delete(*args, **kwargs)
+
 #contactus model
 class ContactMessage(models.Model):
     name = models.CharField(max_length=100)
@@ -240,5 +250,22 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"Message from {self.name} - {self.email}"
+    
+class AccountSupport(models.Model):
+    PROBLEM_CHOICES = [
+        ('General', 'General'),
+        ('Technical', 'Technical'),
+        ('Financial', 'Financial'),
+        ('Other', 'Other'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    problem_type = models.CharField(max_length=20, choices=PROBLEM_CHOICES)
+    subject = models.CharField(max_length=200, blank=True, null=True)
+    message = models.TextField()
+    image = models.ImageField(upload_to='contact_images/', null=True, blank=True, default=None)
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.user.username}"
     
         

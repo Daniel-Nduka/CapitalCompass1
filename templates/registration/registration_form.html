@@ -62,65 +62,107 @@
 </style>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    var form = document.getElementById("registrationForm");
-    var username = document.getElementById("id_username");
-    var password1 = document.getElementById("id_password1");
-    var password2 = document.getElementById("id_password2");
-    var lengthRequirement = document.getElementById("lengthRequirement");
-    var numericRequirement = document.getElementById("numericRequirement");
-    var password1Error = document.getElementById("password1Error");
-    var password2Error = document.getElementById("password2Error");
-
-    password1.addEventListener("input", validatePassword);
-    password2.addEventListener("input", validatePasswordMatch);
-    form.addEventListener("submit", function(event) {
-        if (!validatePassword() || !validatePasswordMatch()) {
-            event.preventDefault();
+    document.addEventListener("DOMContentLoaded", function() {
+        var form = document.getElementById("registrationForm");
+        var username = document.getElementById("id_username");
+        var email = document.getElementById("id_email");
+        var password1 = document.getElementById("id_password1");
+        var password2 = document.getElementById("id_password2");
+        var lengthRequirement = document.getElementById("lengthRequirement");
+        var numericRequirement = document.getElementById("numericRequirement");
+        var usernameError = document.getElementById("usernameError");
+        var emailError = document.getElementById("emailError");
+        var password1Error = document.getElementById("password1Error");
+        var password2Error = document.getElementById("password2Error");
+    
+        // Validate on input
+        password1.addEventListener("input", validatePassword);
+        password2.addEventListener("input", validatePasswordMatch);
+        form.addEventListener("submit", function(event) {
+            if (!validateUsername() || !validateEmail() || !validatePassword() || !validatePasswordMatch()) {
+                event.preventDefault();
+            }
+        });
+    
+        function validateUsername() {
+            var valid = true;
+            usernameError.innerHTML = "";
+    
+            // Check if username is provided
+            if (username.value.trim() === "") {
+                usernameError.innerHTML = "<span class='error-message'>Username is required.</span>";
+                valid = false;
+            }
+    
+            // Add more username validation logic if needed (e.g., length, character check)
+    
+            return valid;
+        }
+    
+        function validateEmail() {
+            var valid = true;
+            emailError.innerHTML = "";
+    
+            // Check if email is provided
+            if (email.value.trim() === "") {
+                emailError.innerHTML = "<span class='error-message'>Email is required.</span>";
+                valid = false;
+            } else {
+                // Simple email format validation
+                var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!emailPattern.test(email.value)) {
+                    emailError.innerHTML = "<span class='error-message'>Invalid email format.</span>";
+                    valid = false;
+                }
+            }
+    
+            return valid;
+        }
+    
+        function validatePassword() {
+            var valid = true;
+            password1Error.innerHTML = "";
+    
+            // Check length requirement
+            if (password1.value.length < 8) {
+                lengthRequirement.style.color = "red";
+                password1Error.innerHTML += "<span class='error-message'>Password must be at least 8 characters long.</span>";
+                valid = false;
+            } else {
+                lengthRequirement.style.color = "green";
+            }
+    
+            // Check numeric requirement
+            if (/^\d+$/.test(password1.value)) {
+                numericRequirement.style.color = "red";
+                password1Error.innerHTML += "<span class='error-message'>Password cannot be entirely numeric.</span>";
+                valid = false;
+            } else {
+                numericRequirement.style.color = "green";
+            }
+    
+            // Check if password contains the username
+            if (password1.value.toLowerCase().includes(username.value.toLowerCase())) {
+                password1Error.innerHTML += "<span class='error-message'>Password cannot contain the username.</span>";
+                valid = false;
+            }
+    
+            return valid;
+        }
+    
+        function validatePasswordMatch() {
+            var valid = true;
+            password2Error.innerHTML = "";
+    
+            if (password1.value !== password2.value) {
+                password2Error.innerHTML = "<span class='error-message'>Passwords do not match.</span>";
+                valid = false;
+            }
+    
+            return valid;
         }
     });
-
-    function validatePassword() {
-        var valid = true;
-        password1Error.innerHTML = "";
-
-        // Check length requirement
-        if (password1.value.length < 8) {
-            lengthRequirement.style.color = "red";
-            valid = false;
-        } else {
-            lengthRequirement.style.color = "green";
-        }
-
-        // Check numeric requirement
-        if (/^\d+$/.test(password1.value)) {
-            numericRequirement.style.color = "red";
-            valid = false;
-        } else {
-            numericRequirement.style.color = "green";
-        }
-
-        // Check if password contains the username
-        if (password1.value.toLowerCase().includes(username.value.toLowerCase())) {
-            password1Error.innerHTML = "<span class='error-message'>Password cannot contain the username.</span>";
-            valid = false;
-        }
-
-        return valid;
-    }
-
-    function validatePasswordMatch() {
-        var valid = true;
-        password2Error.innerHTML = "";
-
-        if (password1.value !== password2.value) {
-            password2Error.innerHTML = "<span class='error-message'>Passwords do not match.</span>";
-            valid = false;
-        }
-
-        return valid;
-    }
-});
+    
 </script>
 {% endblock %}
 {% block footer_block %}

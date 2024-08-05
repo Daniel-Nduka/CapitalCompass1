@@ -1,18 +1,13 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import UserProfile, Account, Budget, ZeroBasedCategory, Expense, FiftyThirtyTwentyCategory, Transaction, ContactMessage
+from .models import UserProfile, Account, Budget, ZeroBasedCategory, Expense, FiftyThirtyTwentyCategory, Transaction, ContactMessage, AccountSupport
 
 class UserForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput())
 
     class Meta:
         model = User
-        fields = ('username', 'email',)
+        fields = ['username', 'email', 'first_name', 'last_name']
 
-class UserProfileForm(forms.ModelForm):
-    class Meta:
-        model = UserProfile
-        fields = ('bio', 'location', 'birth_date')
 
 #Account form
 class AccountForm(forms.ModelForm):
@@ -20,6 +15,12 @@ class AccountForm(forms.ModelForm):
     class Meta:
         model = Account
         fields = ['account_name', 'account_type', 'balance']
+
+
+class AddMoneyForm(forms.Form):
+    amount = forms.DecimalField(max_digits=10, decimal_places=2)
+    
+
         
 class BudgetForm(forms.ModelForm):
     class Meta:
@@ -53,23 +54,6 @@ class Fifty_Twenty_ThirtyForm(forms.ModelForm):
         model = FiftyThirtyTwentyCategory
         fields = ['name', 'assigned_amount']
 
-'''
-class Fifty_Twenty_ThirtyForm(forms.ModelForm):
-    class Meta:
-        model = FiftyThirtyTwentyCategory
-        fields = ['assigned_amount']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['assigned_amount'].label = 'Custom Assigned Amount'
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        instance.is_user_modified = True  # Set the flag to indicate the user has modified the amount
-        if commit:
-            instance.save()
-        return instance
-  '''  
 class ExpenseForm(forms.ModelForm):
     is_recurring = forms.BooleanField(required=False, label='Recurring')
     class Meta:
@@ -157,3 +141,48 @@ class ContactMessageForm(forms.ModelForm):
             raise forms.ValidationError("Please provide all fields.")
 
         return cleaned_data
+    
+    
+
+class AccountSupportForm(forms.ModelForm):
+    user_email = forms.CharField(max_length=255, required=False, disabled=True, label='Your Email')
+
+    class Meta:
+        model = AccountSupport
+        fields = ['problem_type', 'subject', 'message', 'image']
+
+    widgets = {
+        'message': forms.Textarea(attrs={'class': 'form-control'}),
+        'problem_type': forms.Select(attrs={'class': 'form-control'}),
+        'subject': forms.TextInput(attrs={'class': 'form-control'}),
+        'image': forms.FileInput(attrs={'class': 'form-control'}),
+    }
+    labels = {
+        'message': 'Your Message',
+        'problem_type': 'Problem Type',
+        'subject': 'Subject',
+        'image': 'Upload an Image',
+    }
+    help_texts = {
+        'message': 'Enter your message',
+        'problem_type': 'Select the type of problem you are experiencing',
+        'subject': 'Enter the subject of your message',
+        'image': 'Upload an image (optional)',
+    }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(AccountSupportForm, self).__init__(*args, **kwargs)
+        if user:
+            self.fields['user_email'].initial = user.email
+
+    def clean(self):
+        cleaned_data = super().clean()
+        message = cleaned_data.get("message")
+
+        if not message:
+            raise forms.ValidationError("Please provide a message.")
+
+        return cleaned_data
+
+    

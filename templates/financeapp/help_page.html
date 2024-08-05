@@ -1,0 +1,94 @@
+{% extends 'financeapp/loggedin_base.html' %}
+{% load static %}
+{% block title_block %} Help Page- CapitalCompass {% endblock %}
+
+{% block head_block %}
+    <link rel="stylesheet" href="{% static 'styles/help.css' %}">
+{% endblock %}
+
+{% block body_block %}
+    <main>
+        <section class="help-page">
+            <h1>Help and Support </h1>
+            <div class="help-section">
+                <h2 onclick="toggleSection('overview-section')">Getting Started</h2>
+                <div id="overview-section" class="content">
+                    <p>Welcome to CapitalCompass! This guide will walk you through the key features of the app. To begin, Create a budget using the login button on the top right.
+                      You have the option to create a zero-based budget or a 50/30/20 budget. Once you have created a budget, you can start adding transactions and managing your finances.
+                    </p>
+                    <img src="{% static 'images/getting_started.png' %}" alt="Getting Started">
+                </div>
+            </div>
+
+            <div class="help-section">
+              <h2 onclick="toggleSection('budgets-section')">Budgets</h2>
+              <div id="budgets-section" class="content">
+                  <p>Navigate to the 'Your Budgets' section to manage your budgets. Here, you can add new budgets, view and edit existing ones, and track your financial goals. The interface and functionality slightly vary depending on the type of budget you choose:</p>
+                  
+                  <h3>Zero-Based Budget</h3>
+                  <p>The zero-based budget allows you to allocate every dollar to a specific expense, savings, or investment. At the start of each month, you allocate your income to various categories, ensuring that your total income minus expenses equals zero. This method helps you have full control over where your money goes.</p>
+                  <ul>
+                      <li><strong>Add Categories:</strong> Create categories for various expenses such as bills, groceries, entertainment, etc.</li>
+                      <li><strong>Track Spending:</strong> Monitor your spending against the budgeted amounts for each category.</li>
+                      <li><strong>Adjust Allocations:</strong> Modify your budget categories as needed throughout the month.</li>
+                  </ul>
+                  <img src="{% static 'images/zero_based_budget.png' %}" alt="Zero-Based Budget Interface">
+          
+                  <h3>50/30/20 Budget</h3>
+                  <p>The 50/30/20 budget divides your income into three main categories: 50% for needs, 30% for wants, and 20% for savings and debt repayment. This method provides a simple structure for managing your finances, ensuring that essential expenses are covered while still allowing for discretionary spending and savings.</p>
+                  <ul>
+                      <li><strong>Needs:</strong> Allocate 50% of your income to essentials like rent, groceries, utilities, and insurance.</li>
+                      <li><strong>Wants:</strong> Allocate 30% of your income to discretionary spending like dining out, entertainment, and hobbies.</li>
+                      <li><strong>Savings/Debt:</strong> Allocate 20% of your income to savings goals, investments, and debt repayment.</li>
+                  </ul>
+                  <img src="{% static 'images/50_30_20_budget.png' %}" alt="50/30/20 Budget Interface">
+              </div>
+          </div>
+          
+
+            <div class="help-section">
+                <h2 onclick="toggleSection('accounts-section')">Managing Accounts</h2>
+                <div id="accounts-section" class="content">
+                    <p>To view or add accounts, navigate to the 'Accounts' section. You can add new accounts, view current balances, and manage funds.</p>
+                    <img src="{% static 'images/accounts.png' %}" alt="Accounts Overview">
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 onclick="toggleSection('transactions-section')">Transactions</h2>
+                <div id="transactions-section" class="content">
+                    <p>The 'Transactions' section allows you to record all financial activities. You can add, edit, and delete transactions. Outflows are marked in red, while inflows are marked in green for easy differentiation.</p>
+                    <img src="{% static 'images/transactions.png' %}" alt="Transactions Overview">
+                </div>
+            </div>
+
+  
+
+            <div class="help-section">
+                <h2 onclick="toggleSection('support-section')">Account Support</h2>
+                <div id="support-section" class="content">
+                    <p>If you encounter any issues or have questions, visit the 'Account Support' section. Here you can submit a support request, and our team will assist you promptly.</p>
+                    <img src="{% static 'images/support.png' %}" alt="Support Overview">
+                </div>
+            </div>
+
+            <div class="help-section">
+                <h2 onclick="toggleSection('profile-section')">Profile Management</h2>
+                <div id="profile-section" class="content">
+                    <p>In the 'Profile' section, you can view and update your personal information, change your password, and manage your account settings.</p>
+                    <img src="{% static 'images/profile.png' %}" alt="Profile Overview">
+                </div>
+            </div>
+        </section>
+    </main>
+    <script>
+        function toggleSection(id) {
+            var content = document.getElementById(id);
+            if (content.style.display === "none" || content.style.display === "") {
+                content.style.display = "block";
+            } else {
+                content.style.display = "none";
+            }
+        }
+    </script>
+{% endblock %}

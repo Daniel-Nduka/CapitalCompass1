@@ -30,37 +30,60 @@ main {
 
 /* Table styling */
 table {
-  width: 100%; /* Make the table take up the full width */
-  margin: 0 auto; /* Centers the table horizontally */
-  border-collapse: collapse; /* Ensures borders are collapsed */
+  width: 100%; /* Full width */
+  margin: 0 auto; /* Center horizontally */
+  border-collapse: collapse; /* Collapse borders */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 th, td {
-  border: 1px solid #ddd; /* Adds borders to table cells */
-  text-align: left; /* Aligns text to the left */
-  padding: 8px; /* Adds padding to table cells */
+  border: 1px solid #ddd; /* Cell borders */
+  text-align: left; /* Align text to the left */
+  padding: 10px; /* Increased padding for better readability */
+  vertical-align: middle; /* Center text vertically */
 }
 
 th {
-  background-color: #f2f2f2; /* Adds background color to table headers */
-}
-
-/* Specific width for the date column */
-th:nth-child(2), td:nth-child(2) {
-  width: 150px; /* Adjust this value as needed */
+  background-color: #f7f7f7; /* Light grey for header background */
+  font-weight: bold; /* Bold text for headers */
+  text-transform: uppercase; /* Uppercase headers */
 }
 
 td {
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 14px;
-  padding-right: 8px;
+  background-color: #fff; /* White background for cells */
+  padding: 12px 15px; /* Additional padding */
 }
 
-tr:nth-child(even) {
-  background-color: #f9f9f9; /* Adds background color to even rows */
+td:hover{
+  background-color: #f1f1f1; /* Light grey for ho */
+}
+/* Specific width for the date column */
+th:nth-child(2), td:nth-child(2) {
+  width: 130px; /* Adjusted width for date column */
 }
 
+/* Row differentiation for inflow and outflow */
+.inflow-row {
+  background-color: #e6f7e6; /* Softer green for inflow */
+}
+
+.outflow-row {
+  background-color: #f7e6e6; /* Softer red for outflow */
+}
+
+/* Hover effect to darken the row color */
 tr:hover {
-  background-color: #ddd; /* Adds background color to rows on hover */
+  background-color: #f1f1f1; /* Light grey for hover */
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+  th, td {
+    padding: 8px; /* Reduce padding on smaller screens */
+    font-size: 14px; /* Smaller font size */
+  }
+
+  th:nth-child(2), td:nth-child(2) {
+    width: auto; /* Let the date column adjust */
+  }
 }

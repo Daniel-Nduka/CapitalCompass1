@@ -35,14 +35,16 @@
     {% block footer_block %}
     <footer>
         <div class="footer-content">
-            <a href="#">About</a>
-            <a href="#">Features</a>
-            <a href="#">Contact us anytime</a>
-            <div class="social-media-icons">[Social Media Icons]</div>
+            <a href="{% url 'financeapp:about' %}">About us</a>
+            <a href="{% url 'financeapp:contact'%}">Contact us anytime </a>
+            <p>&copy; 2024 CapitalCompass. All rights reserved.</p>
+            <p>Device Mockup created from <a href="https://deviceframes.com/templates/macbook-pro-m1-14" target="_blank">MacBook Pro mockups</a></p>
+           
+           <!-- <div class="social-media-icons">[Social Media Icons]</div>
             <div class="contact-info">
                 <p>Contact: email@example.com</p>
                 <p>Phone: (123) 456-7890</p>
-            </div>
+            </div> -->
         </div>
     </footer>
     {% endblock %}

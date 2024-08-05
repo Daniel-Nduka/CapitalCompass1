@@ -32,7 +32,7 @@
             </thead>
             <tbody id="transaction-table-body">
                 {% for transaction in transactions %}
-                <tr>
+                <tr class="{% if transaction.inflow > 0 %}inflow-row{% else %}outflow-row{% endif %}">
                     <td>{{ transaction.account.account_name }}</td>
                     <td>{{ transaction.date|date:"d-m-Y" }}</td>
                     <td>{{ transaction.description }}</td>
@@ -42,12 +42,13 @@
                     <td>{{ transaction.inflow }}</td>
                     <td>
                         <button class="btn btn-sm btn-outline-secondary" onclick="showEditTransactionForm('{{ transaction.id }}', '{{ transaction.account.id }}', '{{ transaction.date|date:'Y-m-d' }}', '{{ transaction.description }}', '{{ transaction.payee }}', '{{ transaction.expense.id }}', '{{ transaction.outflow }}', '{{ transaction.inflow }}')">
-                            <i class="fas fa-pencil-alt"></i> Edit
+                            <i class="fas fa-pencil-alt"></i>
                         </button>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
+            
         </table>
     </section>
 </main>
