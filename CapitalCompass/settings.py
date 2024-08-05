@@ -32,7 +32,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', default='your-default-secret-key')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['CapitalCompass.pythonanywhere.com']
 
 
 # Application definition
