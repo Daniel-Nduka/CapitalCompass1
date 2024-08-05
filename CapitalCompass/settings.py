@@ -167,5 +167,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = 'nduka.ofoeyeno@gmail.com'
-CONTACT_EMAIL = 'nduka.ofoeyeno@gmail.com'
+DEFAULT_FROM_EMAIL = 'Capital.Compass12@gmail.com'
+CONTACT_EMAIL = 'Capital.Compass12@gmail.com'

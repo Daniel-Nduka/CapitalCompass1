@@ -52,7 +52,7 @@ class ZeroBudgetForm(forms.ModelForm):
 class Fifty_Twenty_ThirtyForm(forms.ModelForm):
     class Meta:
         model = FiftyThirtyTwentyCategory
-        fields = ['name', 'assigned_amount']
+        fields = ['assigned_amount']
 
 class ExpenseForm(forms.ModelForm):
     is_recurring = forms.BooleanField(required=False, label='Recurring')

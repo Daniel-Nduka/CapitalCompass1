@@ -74,7 +74,7 @@
                     {% endfor %}
                 </div>
                 <div class="category-actions">
-                    <button class="action-button" onclick="showEditCategoryForm('{{ category.id }}', '{{ category.name }}', '{{ category.assigned_amount }}', this.getAttribute('data-is-recurring'))" data-is-recurring="{{ category.is_recurring|yesno:'true,false' }}">Edit Category</button>
+                    <button class="action-button" onclick="showEditCategoryForm('{{ category.id }}', '{{ category.assigned_amount }}', this.getAttribute('data-is-recurring'))" data-is-recurring="{{ category.is_recurring|yesno:'true,false' }}">Edit Category</button>
                     <button class="action-button" onclick="showAddExpenseForm({{ category.id }}, this.getAttribute('data-is-recurring'))" data-is-recurring="{{ category.is_recurring|yesno:'true,false' }}">+ Add Expense</button>
                 </div>
             </div>
@@ -171,10 +171,6 @@
             {% csrf_token %}
             <input type="hidden" name="category_id" id="edit-category-id">
             <div class="form-group">
-                <label for="edit-category-name">Category Name:</label>
-                <input type="text" name="name" id="edit-category-name" required>
-            </div>
-            <div class="form-group">
                 <label for="edit-category-assigned-amount">Assigned Amount:</label>
                 <input type="number" name="assigned_amount" id="edit-category-assigned-amount" required>
             </div>
@@ -235,10 +231,10 @@
     }
 
     /* edit category */
-    function showEditCategoryForm(categoryId, categoryName, assignedAmount, isRecurring) {
+    function showEditCategoryForm(categoryId, assignedAmount, isRecurring) {
         document.getElementById('edit-category-form').style.display = 'flex';
         document.getElementById('edit-category-id').value = categoryId;
-        document.getElementById('edit-category-name').value = categoryName;
+       
         document.getElementById('edit-category-assigned-amount').value = assignedAmount;
         document.getElementById('edit-category-is_recurring').checked = (isRecurring === 'true');
         document.getElementById('delete-category-id').value = categoryId; // Populate delete category ID
