@@ -90,8 +90,6 @@ USE_TZ = True
 STATICFILES_DIRS = [STATIC_DIR, ]
 STATIC_URL = '/static/'
 
-# Sites framework settings
-SITE_ID = 1  # Default; can be overridden in specific settings
 
 # Django Registration settings
 REGISTRATION_OPEN = True
