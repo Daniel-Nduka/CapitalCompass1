@@ -29,10 +29,18 @@ MEDIA_DIR = os.path.join(BASE_DIR, 'media')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('DJANGO_SECRET_KEY', default='your-default-secret-key')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# Initialize environment variables
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-ALLOWED_HOSTS = ['CapitalCompass.pythonanywhere.com']
+# Reading DEBUG from environment variables
+DEBUG = env('DEBUG')
+
+# Allowed hosts, defaulting to empty list
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
+
 
 
 # Application definition
