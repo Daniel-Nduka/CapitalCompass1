@@ -209,9 +209,14 @@ nav ul li a {
   border: 5px solid #dc3545; /* Add a red border */
   
 }
+.feature-card {
+  cursor: pointer;
+  /* Other existing styles */
+}
 
-
-.feature:hover .feature-card {
+.feature:hover .feature-card,
+.feature:focus .feature-card,
+.feature:active .feature-card {
   transform: rotateX(180deg);
 }
 
@@ -220,6 +225,13 @@ nav ul li a {
   padding: 10px 20px;
   font-size: 14px;
   cursor: pointer;
+}
+
+.feature-card p.learn-more {
+  color: #007bff; /* Link color */
+  text-decoration: underline; /* Underline to mimic link style */
+  cursor: pointer; /* Pointer cursor to indicate clickability */
+  padding-top: 50px; /* Remove default margin if necessary */
 }
 
 

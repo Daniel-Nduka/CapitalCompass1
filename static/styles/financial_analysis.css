@@ -1,7 +1,7 @@
 body, html {
   margin: 0;
-  padding: 0;
-  width: 100%;
+  padding-left: 200px;
+  width: 70%;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -13,6 +13,10 @@ body, html {
   max-width: 800px;
   margin: 0 auto;
   text-align: center;
+}
+.financial-analysis-section h1 {
+  font-size: 30px;
+  margin-bottom: 20px;
 }
 
 .header-analysis {
@@ -34,7 +38,7 @@ body, html {
 
 .chart-container {
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
   height: auto;
   margin: 0 auto;
 }
@@ -121,7 +125,7 @@ canvas {
 .chart-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 7px;
 }
 
 /* Styling for the summary text */
