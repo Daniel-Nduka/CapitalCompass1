@@ -39,7 +39,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 DEBUG = env('DEBUG')
 
 # Allowed hosts, defaulting to empty list
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['capitalcompass.pythonanywhere.com'])
+
 
 
 
