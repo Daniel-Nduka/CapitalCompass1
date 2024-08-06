@@ -97,6 +97,8 @@ REGISTRATION_AUTO_LOGIN = False
 LOGIN_REDIRECT_URL = '/overview/'
 LOGIN_URL = 'auth_login'
 
+ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window
+
 # Email settings (defaults, can be overridden)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -111,4 +113,4 @@ CONTACT_EMAIL = 'Capital.Compass12@gmail.com'
 SECRET_KEY = env('DJANGO_SECRET_KEY', default='your-default-secret-key')
 
 # Load environment-specific settings
-ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'local')
+#ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'local')
