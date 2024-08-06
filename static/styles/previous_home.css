@@ -1,4 +1,3 @@
-/* General Styles */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -42,6 +41,8 @@ nav ul {
   display: flex;
 }
 
+
+
 nav ul li {
   margin-left: 20px;
 }
@@ -49,9 +50,9 @@ nav ul li {
 nav ul li a {
   text-decoration: none;
   color: black;
+  
 }
 
-/* Hero Section */
 .hero {
   display: flex;
   justify-content: space-between;
@@ -67,10 +68,11 @@ nav ul li a {
   margin-right: -100px; /* Negative margin to overlap the image's white space */
   z-index: 1; /* Ensure text is on top of the image */
 }
-
 .index-image {
+
   width: 900px;
   height: auto;
+  
   margin-right: -120px;
   z-index: 0; /* Ensure image is behind the text */
 }
@@ -91,14 +93,11 @@ nav ul li a {
   font-size: 16px;
   cursor: pointer;
 }
+/*
+.hero-image img {
+  max-width: 100%;
+}*/
 
-/* Features Section */
-.features {
-  display: flex;
-  justify-content: space-around;
-  padding: 50px;
-  background-color: white;
-}
 
 .feature {
   perspective: 1000px;
@@ -119,6 +118,18 @@ nav ul li a {
   margin-bottom: 10px;
 }
 
+.features {
+  display: flex;
+  justify-content: space-around;
+  padding: 50px;
+  background-color: white;
+ /* border: 1px solid #e9ecef;*/
+}
+
+.feature {
+  perspective: 1000px;
+}
+
 .feature-card {
   width: 200px;
   height: 300px; /* Set a strict height */
@@ -129,8 +140,8 @@ nav ul li a {
   flex-direction: column;
   justify-content: center;
   transform-origin: center; /* Rotate around the center */
-  cursor: pointer;
 }
+
 
 .feature-front,
 .feature-back {
@@ -152,25 +163,25 @@ nav ul li a {
   transform: rotateX(0deg); /* Initial position */
 }
 
-.front-card1 {
+.front-card1{
   border-bottom: 8px solid #007bff; /* Add a blue border */
   border-top: 8px solid #007bff; /* Add a blue border */
   border-radius: 5px;
 }
 
-.front-card2 {
+.front-card2{
   border-bottom: 8px solid #28a745; /* Add a green border */
   border-top: 8px solid #28a745; /* Add a green border */
   border-radius: 5px;
 }
 
-.front-card3 {
+.front-card3{
   border-bottom: 8px solid #ffc107; /* Add a yellow border */
   border-top: 8px solid #ffc107; /* Add a yellow border */
   border-radius: 5px;
 }
 
-.front-card4 {
+.front-card4{
   border-bottom: 8px solid #dc3545; /* Add a red border */
   border-top: 8px solid #dc3545; /* Add a red border */
   border-radius: 5px;
@@ -182,72 +193,90 @@ nav ul li a {
   border-radius: 5px;
 }
 
-.back-card1 {
+.back-card1{
   border: 5px solid #007bff; /* Add a blue border */
+ 
 }
-
-.back-card2 {
+.back-card2{
   border: 5px solid #28a745; /* Add a green border */
+  
 }
-
-.back-card3 {
+.back-card3{
   border: 5px solid #ffc107; /* Add a yellow border */
+  
 }
-
-.back-card4 {
+.back-card4{
   border: 5px solid #dc3545; /* Add a red border */
+  
+}
+.feature-card {
+  cursor: pointer;
+  /* Other existing styles */
 }
 
-/* Flip Effect */
 .feature:hover .feature-card,
 .feature:focus .feature-card,
 .feature:active .feature-card {
   transform: rotateX(180deg);
 }
 
-/* Learn More Link Style */
+
+.feature button {
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 .feature-card p.learn-more {
   color: #007bff; /* Link color */
   text-decoration: underline; /* Underline to mimic link style */
   cursor: pointer; /* Pointer cursor to indicate clickability */
-  padding-top: 50px; /* Adjust padding to fit the design */
+  padding-top: 50px; /* Remove default margin if necessary */
 }
 
-/* Feature Number Styling */
-.feature-front h2:first-of-type {
+
+
+.feature-front h2:first-of-type{
+  /* Add your specific styles for the number "3" here */
   font-size: 36px; /* Example: Increase the font size */
+  
   font-weight: bold; /* Example: Make it bold */
   margin-bottom: 10px; /* Example: Add some space below */
   border: none;
   border-radius: 50%;
-  padding: 10px 20px;
+  
+  padding: 10px;
+  padding-right: 20px;
+  padding-left: 20px;
+
 }
 
-.feature-number1 {
+.feature-number1{
   border-color: #007bff;
   background-color: #007bff;
 }
 
-.feature-number2 {
+.feature-number2{
   border-color: #28a745;
   background-color: #28a745;
 }
 
-.feature-number3 {
+.feature-number3{
   border-color: #ffc107;
   background-color: #ffc107;
 }
 
-.feature-number4 {
+.feature-number4{
   border-color: #dc3545;
   background-color: #dc3545;
 }
 
-/* Testimonials Section */
+
 .testimonials {
   text-align: center;
   padding: 50px;
   background-color: white;
+  /*border: 1px solid #e9ecef; */
 }
 
 .testimonials h2 {
@@ -267,22 +296,20 @@ nav ul li a {
   margin: 10px;
   background-color: white;
   border-radius: 5px;
+  border-radius: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.testimonial1 {
+.testimonial1{
   border-bottom: 8px solid #007bff; /* Add a blue border */
 }
-
-.testimonial2 {
+.testimonial2{
   border-bottom: 8px solid #28a745; /* Add a green border */
 }
 
-.testimonial3 {
+.testimonial3{
   border-bottom: 8px solid #ffc107; /* Add a yellow border */
 }
-
-/* How It Works Section */
 .how-it-works {
   text-align: center;
   padding: 50px;
@@ -350,19 +377,19 @@ footer .social-media-icons a {
   margin: 0 5px; /* Space between icons */
 }
 
-/* Responsive Styles */
 @media (max-width: 600px) {
   footer .footer-content {
-    flex-direction: column; /* Stack items vertically on small screens */
-    text-align: center; /* Center-align text */
+      flex-direction: column; /* Stack items vertically on small screens */
+      text-align: center; /* Center-align text */
   }
 
   footer .social-media-icons {
-    margin-top: 15px; /* Adjust margin for small screens */
+      margin-top: 15px; /* Adjust margin for small screens */
   }
 }
 
-/* Button Styles */
+
+
 .hero-content button,
 .feature button,
 .how-it-works button {
@@ -413,3 +440,6 @@ footer .social-media-icons a {
 .how-it-works button:hover {
   background-color: #e0a800; /* Darker yellow on hover */
 }
+
+
+
