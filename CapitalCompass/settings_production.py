@@ -4,7 +4,7 @@ from .settings_base import *
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 DEBUG = env.bool('DEBUG', default=False)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['capitalcompass.pythonanywhere.com'])
+ALLOWED_HOSTS = ['capitalcompass.pythonanywhere.com']
 
 
 
