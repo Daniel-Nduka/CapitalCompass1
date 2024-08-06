@@ -10,6 +10,11 @@
   border-radius: 5px;
 }
 
+.container h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  text-align: center;
+}
 /* Contact Form Styles */
 .contact-form {
   margin-bottom: 20px;
