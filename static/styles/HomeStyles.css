@@ -4,7 +4,11 @@ body {
   margin: 0;
   padding: 0;
   color: black;
-  padding-top: 60px;
+  padding-top: 60px; /* Adjust for fixed header */
+}
+
+html, body {
+  overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 header {
@@ -18,7 +22,8 @@ header {
   top: 0;
   left: 0;
   right: 0;
-  height: 30px;
+  height: auto; /* Allow height to adjust based on content */
+  min-height: 30px; /* Minimum height for header */
   border-bottom: 1px solid #e9ecef;
   z-index: 1000;
 }
@@ -31,15 +36,16 @@ header .logo {
 nav {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
-  color: black;
+
 }
 
 nav ul {
+  display: flex;
   list-style-type: none;
   margin: 0;
   padding: 0;
-  display: flex;
 }
 
 nav ul li {
@@ -49,31 +55,105 @@ nav ul li {
 nav ul li a {
   text-decoration: none;
   color: black;
+  transition: font-weight 0.3s, color 0.3s; /* Smooth transition for hover effect */
 }
 
-/* Hero Section */
+nav ul li a:hover {
+  font-weight: bold; /* Bolden text on hover */
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  header .logo {
+    font-size: 22px; /* Slightly reduce font size */
+  }
+
+  nav ul li {
+    margin-left: 15px; /* Reduce space between nav items */
+  }
+
+  nav ul li a {
+    padding: 8px 12px; /* Reduce padding for clickable area */
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  header .logo {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  nav {
+    width: 100%;
+  }
+
+  nav ul {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  nav ul li {
+    margin-left: 0;
+    margin-bottom: 10px;
+  }
+
+  nav ul li a {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  header .logo {
+    font-size: 18px; /* Further reduce font size */
+  }
+
+  nav ul li a {
+    padding: 8px 10px; /* Further reduce padding */
+  }
+}
+
+
 .hero {
   display: flex;
-  justify-content: space-between;
+  flex-direction: row; /* Align items in a row */
+  justify-content: center; /* Center items horizontally */
   align-items: center;
-  padding: 120px;
+  padding:150px;
   background-color: white;
   color: black;
   position: relative;
+  width:100%;
 }
 
 .hero-content {
-  width: 1000px;
-  margin-right: -100px;
-  z-index: 1;
+  flex: 1; /* Allow to grow and fill the remaining space */
+  margin-right: 20px; /* Space between content and image */
+  box-sizing: border-box;
+}
+
+.hero-image {
+
+  max-width: 100%; /* Do not exceed the width of its container */
+  box-sizing: border-box; /* Include padding and border in size */
+  margin-right: 100px;
 }
 
 .index-image {
-  width: 900px;
-  height: auto;
-  margin-right: -120px;
-  z-index: 0;
+  width: 800px; /* Make the image responsive */
+  height: auto; /* Maintain aspect ratio */
+  display: block; /* Ensure image is displayed as block element */
+  max-width: 95%; /* Prevent image from exceeding its container */
+  box-sizing: border-box; /* Include padding and border in size */
 }
+
 
 .hero-content h1 {
   font-size: 36px;
@@ -363,6 +443,7 @@ footer .social-media-icons a {
 
 /* Responsive Styles */
 @media (max-width: 1200px) {
+ 
   .hero-content {
     width: 80%;
   }
@@ -387,6 +468,7 @@ footer .social-media-icons a {
   .testimonial {
     width: 45%;
   }
+
 }
 
 @media (max-width: 992px) {
