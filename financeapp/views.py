@@ -49,8 +49,6 @@ class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
 def overview(request):
     return render(request, 'financeapp/overview.html')
 
-def help_page(request):
-    return render(request, 'financeapp/help_page.html')
 #This ensures when a user clicks sign up, if there is an authenticated user, it logs them out and redirects them to the sign up page.
 def logout_and_signup(request):
     logout(request)
@@ -63,6 +61,10 @@ def index(request):
 #This is the about page
 def about(request):
     return render(request, 'financeapp/about.html')
+
+@login_required
+def help_page(request):
+    return render(request, 'financeapp/help_page.html')
 
 #This ensures when a user selects a budget, it is stored in the session
 @login_required
@@ -215,22 +217,27 @@ def profile(request):
     return render(request, 'financeapp/profile.html', context)
 
 #Create budget page. after creating a budget, it redirects the user to the budget list page.
+@login_required
 def create_budget(request):
     if request.method == 'POST':
-        form = BudgetForm(request.POST)
+        form = BudgetForm(request.POST, user=request.user)  # Pass user here
         if form.is_valid():
             budget = form.save(commit=False)
             budget.user = request.user
-            budget.save()
-            messages.success(request, 'Budget created successfully!')
-            return redirect('financeapp:budget_list')
+            try:
+                budget.save()
+                messages.success(request, 'Budget created successfully!')
+                return redirect('financeapp:budget_list')
+            except IntegrityError:
+                form.add_error('budget_name', 'A budget with this name already exists.')
         else:
             # Capture and display form errors
             for error in form.errors.values():
                 messages.error(request, error)
     else:
-        form = BudgetForm()
+        form = BudgetForm(user=request.user)  # Pass user here
     return render(request, 'financeapp/budget.html', {'form': form})
+
 
 #Budget list page. It displays the budgets associated with the user.
 @login_required
@@ -1086,6 +1093,8 @@ def contactLoggedIn(request):
 
     return render(request, 'financeapp/contactLoggedin.html', {'form': form})
 '''
+
+@login_required  
 def account_support(request):
     if request.method == 'POST':
         form = AccountSupportForm(request.POST, request.FILES, user=request.user)

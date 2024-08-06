@@ -25,12 +25,16 @@ class AddMoneyForm(forms.Form):
 class BudgetForm(forms.ModelForm):
     class Meta:
         model = Budget
-        fields = ['budget_name', 'budget_type' ]
-        
+        fields = ['budget_name', 'budget_type']
+    
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
     def clean_budget_name(self):
         budget_name = self.cleaned_data.get('budget_name')
-        if Budget.objects.filter(budget_name=budget_name).exists():
-            raise forms.ValidationError("Budget name must be unique. The specified name is already in use.")
+        if Budget.objects.filter(budget_name=budget_name, user=self.user).exists():
+            raise forms.ValidationError("You already have a budget with this name. Please choose a different name.")
         return budget_name
         
 class ZeroBudgetForm(forms.ModelForm):

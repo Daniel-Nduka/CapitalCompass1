@@ -30,14 +30,17 @@ class Budget(models.Model):
     ]
     '''
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='budgets')
-    budget_name = models.CharField(max_length=100, unique=True)
+    budget_name = models.CharField(max_length=100)
     budget_type = models.CharField(max_length=20, choices=BUDGET_TYPES)
     #currency_type = models.CharField(max_length=20, choices=CURRENCY_TYPES, default="POUNDS")
     month = models.DateField(auto_now_add=True)  # Add month field
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     balance_initialized = models.BooleanField(default=False)  # Add this line
-
+    
+    class Meta:
+        unique_together = ('user', 'budget_name')
+        
     def __str__(self):
         return f"{self.budget_name} ({self.get_budget_type_display()}) - {self.user.username}"
     

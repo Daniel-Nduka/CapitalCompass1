@@ -1,3 +1,12 @@
+html, body {
+  height: 100%;
+  width: 70%;
+  margin: 0;
+  display: flex;
+  justify-content: center; /* Center horizontally */
+}
+
+
 /* Profile Section */
 .profile-section {
   margin: auto;
@@ -13,9 +22,9 @@
 .profile-section {
   width: 80%;
   width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  margin-left: 120px;
+  margin: 20px;
+  padding: 10px;
+  margin-left: 50px;
   background-color: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
