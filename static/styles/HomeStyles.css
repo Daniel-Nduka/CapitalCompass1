@@ -59,20 +59,20 @@ nav ul li a {
   padding: 120px;
   background-color: white;
   color: black;
-  position: relative; 
+  position: relative;
 }
 
 .hero-content {
-  width: 1000px; /* Set max-width as needed for text */
-  margin-right: -100px; /* Negative margin to overlap the image's white space */
-  z-index: 1; /* Ensure text is on top of the image */
+  width: 1000px;
+  margin-right: -100px;
+  z-index: 1;
 }
 
 .index-image {
   width: 900px;
   height: auto;
   margin-right: -120px;
-  z-index: 0; /* Ensure image is behind the text */
+  z-index: 0;
 }
 
 .hero-content h1 {
@@ -95,9 +95,14 @@ nav ul li a {
 /* Features Section */
 .features {
   display: flex;
-  justify-content: space-around;
-  padding: 50px;
-  background-color: white;
+  flex-wrap: wrap;
+  justify-content: center; /* Center items horizontally */
+  align-items: center;
+  padding: 0;
+  margin: 0; /* Remove any margin settings */
+  width: 100%; /* Ensure the container spans the full width of its parent */
+   /* Set a max-width if you want to limit the container size */
+  box-sizing: border-box; /* Include padding in size calculations */
 }
 
 .feature {
@@ -105,9 +110,14 @@ nav ul li a {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20px; /* Add some margin for spacing */
-  flex: 1; /* Make the feature take up the same amount of space */
+  margin: 30px; /* Space between cards */
+  flex: 1 1 200px; /* Flex-grow, flex-shrink, and flex-basis */
+  max-width: 300px; /* Optional: maximum width for cards */
+  box-sizing: border-box; /* Ensure padding is included in size */
+  padding: 20px;
 }
+
+
 
 .feature h2 {
   font-size: 20px;
@@ -121,14 +131,15 @@ nav ul li a {
 
 .feature-card {
   width: 200px;
-  height: 300px; /* Set a strict height */
+  height: 250px;
   position: relative;
   transform-style: preserve-3d;
   transition: transform 0.6s;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  transform-origin: center; /* Rotate around the center */
+  align-items: center;
+  transform-origin: center;
   cursor: pointer;
 }
 
@@ -144,35 +155,35 @@ nav ul li a {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 45px;
+  padding: 40px;
 }
 
 .feature-front {
   background-color: #fff;
-  transform: rotateX(0deg); /* Initial position */
+  transform: rotateX(0deg);
 }
 
 .front-card1 {
-  border-bottom: 8px solid #007bff; /* Add a blue border */
-  border-top: 8px solid #007bff; /* Add a blue border */
+  border-bottom: 8px solid #007bff;
+  border-top: 8px solid #007bff;
   border-radius: 5px;
 }
 
 .front-card2 {
-  border-bottom: 8px solid #28a745; /* Add a green border */
-  border-top: 8px solid #28a745; /* Add a green border */
+  border-bottom: 8px solid #28a745;
+  border-top: 8px solid #28a745;
   border-radius: 5px;
 }
 
 .front-card3 {
-  border-bottom: 8px solid #ffc107; /* Add a yellow border */
-  border-top: 8px solid #ffc107; /* Add a yellow border */
+  border-bottom: 8px solid #ffc107;
+  border-top: 8px solid #ffc107;
   border-radius: 5px;
 }
 
 .front-card4 {
-  border-bottom: 8px solid #dc3545; /* Add a red border */
-  border-top: 8px solid #dc3545; /* Add a red border */
+  border-bottom: 8px solid #dc3545;
+  border-top: 8px solid #dc3545;
   border-radius: 5px;
 }
 
@@ -183,19 +194,19 @@ nav ul li a {
 }
 
 .back-card1 {
-  border: 5px solid #007bff; /* Add a blue border */
+  border: 5px solid #007bff;
 }
 
 .back-card2 {
-  border: 5px solid #28a745; /* Add a green border */
+  border: 5px solid #28a745;
 }
 
 .back-card3 {
-  border: 5px solid #ffc107; /* Add a yellow border */
+  border: 5px solid #ffc107;
 }
 
 .back-card4 {
-  border: 5px solid #dc3545; /* Add a red border */
+  border: 5px solid #dc3545;
 }
 
 /* Flip Effect */
@@ -207,17 +218,17 @@ nav ul li a {
 
 /* Learn More Link Style */
 .feature-card p.learn-more {
-  color: #007bff; /* Link color */
-  text-decoration: underline; /* Underline to mimic link style */
-  cursor: pointer; /* Pointer cursor to indicate clickability */
-  padding-top: 50px; /* Adjust padding to fit the design */
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+  padding-top: 50px;
 }
 
 /* Feature Number Styling */
 .feature-front h2:first-of-type {
-  font-size: 36px; /* Example: Increase the font size */
-  font-weight: bold; /* Example: Make it bold */
-  margin-bottom: 10px; /* Example: Add some space below */
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 10px;
   border: none;
   border-radius: 50%;
   padding: 10px 20px;
@@ -271,15 +282,15 @@ nav ul li a {
 }
 
 .testimonial1 {
-  border-bottom: 8px solid #007bff; /* Add a blue border */
+  border-bottom: 8px solid #007bff;
 }
 
 .testimonial2 {
-  border-bottom: 8px solid #28a745; /* Add a green border */
+  border-bottom: 8px solid #28a745;
 }
 
 .testimonial3 {
-  border-bottom: 8px solid #ffc107; /* Add a yellow border */
+  border-bottom: 8px solid #ffc107;
 }
 
 /* How It Works Section */
@@ -309,70 +320,165 @@ nav ul li a {
 
 /* Footer Styling */
 footer {
-  background-color: white; /* Dark background color */
+  background-color: white;
   color: black;
-  padding: 20px 0; /* Padding for spacing */
-  text-align: center; /* Center-align the text */
-  font-size: 14px; /* Slightly smaller font size */
+  padding: 20px 0;
+  text-align: center;
+  font-size: 14px;
 }
 
 footer a {
-  color: black; /* Black text color */
-  text-decoration: none; /* Remove underline */
-  margin: 0 10px; /* Space between links */
+  color: black;
+  text-decoration: none;
+  margin: 0 10px;
 }
 
 footer a:hover {
-  text-decoration: underline; /* Underline on hover for clarity */
+  text-decoration: underline;
 }
 
 footer .footer-content {
-  max-width: 1200px; /* Maximum width for the footer content */
-  margin: 0 auto; /* Center the content */
-  padding: 0 20px; /* Padding for content */
-  display: flex; /* Use flexbox for layout */
-  flex-wrap: wrap; /* Wrap items if needed */
-  justify-content: space-between; /* Distribute space between items */
-  align-items: center; /* Align items vertically */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
 }
 
 footer p {
-  margin: 5px 0; /* Margin for spacing between elements */
+  margin: 5px 0;
 }
 
 footer .social-media-icons {
-  display: flex; /* Flex layout for icons */
-  justify-content: center; /* Center icons */
-  margin-top: 10px; /* Space above social icons */
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
 }
 
 footer .social-media-icons a {
-  margin: 0 5px; /* Space between icons */
+  margin: 0 5px;
 }
 
 /* Responsive Styles */
-@media (max-width: 600px) {
-  footer .footer-content {
-    flex-direction: column; /* Stack items vertically on small screens */
-    text-align: center; /* Center-align text */
+@media (max-width: 1200px) {
+  .hero-content {
+    width: 80%;
   }
 
-  footer .social-media-icons {
-    margin-top: 15px; /* Adjust margin for small screens */
+  .index-image {
+    width: 80%;
+  }
+
+  .feature-card {
+    width: 180px;
+    height: 270px;
+  }
+
+  .feature h2 {
+    font-size: 18px;
+  }
+
+  .feature p {
+    font-size: 14px;
+  }
+
+  .testimonial {
+    width: 45%;
   }
 }
 
-/* Button Styles */
-.hero-content button,
-.feature button,
-.how-it-works button {
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+@media (max-width: 992px) {
+  .hero-content {
+    width: 70%;
+  }
+
+  .index-image {
+    width: 70%;
+  }
+
+  .feature-card {
+    width: 160px;
+    height: 240px;
+  }
+
+  .feature h2 {
+    font-size: 16px;
+  }
+
+  .feature p {
+    font-size: 12px;
+  }
+
+  .testimonial {
+    width: 90%;
+  }
 }
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    padding: 80px 20px;
+  }
+
+  .hero-content {
+    width: 100%;
+    margin-right: 0;
+    text-align: center;
+  }
+
+  .index-image {
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  .features {
+    flex-direction: column;
+  }
+
+  .feature-card {
+    width: 140px;
+    height: 210px;
+  }
+
+  .feature h2 {
+    font-size: 14px;
+  }
+
+  .feature p {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-content h1 {
+    font-size: 24px;
+  }
+
+  .hero-content p {
+    font-size: 16px;
+  }
+
+  .hero-content button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .feature-card {
+    width: 120px;
+    height: 180px;
+  }
+
+  .feature h2 {
+    font-size: 12px;
+  }
+
+  .feature p {
+    font-size: 10px;
+  }
+}
+
 
 .hero-content button {
   margin-right: 10px;
@@ -396,14 +502,6 @@ footer .social-media-icons a {
   background-color: #28a745; /* Green for Get Started */
 }
 
-.feature button {
-  background-color: #6c757d; /* Grey for feature buttons */
-  color: white;
-}
-
-.feature button:hover {
-  background-color: #5a6268; /* Darker grey on hover */
-}
 
 .how-it-works button {
   background-color: #ffc107; /* Yellow for How it works button */
@@ -412,4 +510,15 @@ footer .social-media-icons a {
 
 .how-it-works button:hover {
   background-color: #e0a800; /* Darker yellow on hover */
+}
+/* Button Styles */
+.hero-content button,
+.feature button,
+.how-it-works button {
+  border: none; /* Explicitly set border to none */
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
