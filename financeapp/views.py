@@ -1098,7 +1098,7 @@ def account_support(request):
             # Prepare email content
             subject = f"New Account Support Request from {request.user.username}"
             message = (
-                f"Name: {request.user.get_full_name()}\n"
+                f"Name: {request.user.username}\n"
                 f"Email: {request.user.email}\n"
                 f"Problem Type: {account_support.problem_type}\n"
                 f"Subject: {account_support.subject}\n"
