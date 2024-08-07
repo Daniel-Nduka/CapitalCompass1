@@ -4,6 +4,16 @@
 
 {% block head_block %}
 <link rel="stylesheet" href="{% static 'styles/authentications.css' %}">
+
+<style>
+.error{
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+</style>
+
+
 {% endblock %}
 
 {% block body_block %}
@@ -15,7 +25,8 @@
         </div>
         <form method="post" action="." id="registrationForm">
             {% csrf_token %}
-            {{ form.non_field_errors }}
+                {{ form.non_field_errors }}
+           
             <div class="form-group">
                 <label for="id_username">Username</label>
                 <input id="id_username" maxlength="30" name="username" placeholder="Enter username" type="text" required value="{{ form.username.value|default:'' }}">

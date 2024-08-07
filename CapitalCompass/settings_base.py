@@ -114,3 +114,6 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', default='your-default-secret-key')
 
 # Load environment-specific settings
 #ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'local')
+
+CSRF_FAILURE_VIEW = 'financeapp.views.csrf_failure'
+

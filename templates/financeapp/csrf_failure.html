@@ -1,0 +1,34 @@
+{% extends 'financeapp/base.html' %}
+{% load static %}
+{% block title_block %} CSRF Verification Failed {% endblock %}
+
+{% block head_block %}
+<style>
+    .error-container {
+        text-align: center;
+        margin-top: 50px;
+    }
+    .error-container h1 {
+        color: red;
+    }
+    .error-container p {
+        margin: 20px 0;
+    }
+    .error-container a {
+        color: blue;
+        text-decoration: none;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block body_block %}
+<div class="error-container">
+    <h1>CSRF Verification Failed</h1>
+    <p>Reason: {{ reason }}</p>
+    <p>For security reasons, your request was aborted. Please try again.</p>
+    <p><a href="{% url 'financeapp:index' %}">Go back to Home Page</a></p>
+</div>
+{% endblock %}
+
+{% block footer_block %}{% endblock %}
