@@ -15,20 +15,18 @@
         </div>
         <form method="post" action="." id="registrationForm">
             {% csrf_token %}
-            <!-- This hidden field is to redirect users after registration. Ensure it's correctly set up. -->
-            <!--<input type="hidden" name="next" value="{% url 'financeapp:create_budget' %}"> -->  
-
+            {{ form.non_field_errors }}
             <div class="form-group">
                 <label for="id_username">Username</label>
                 <input id="id_username" maxlength="30" name="username" placeholder="Enter username" type="text" required value="{{ form.username.value|default:'' }}">
                 <span class="helptext">Required. 30 characters or fewer. Letters, digits, and @/./+/-/_ only.</span>
-                <div class="error" id="usernameError"></div>
+                <div class="error" id="usernameError">{{ form.username.errors }}</div>
             </div>
 
             <div class="form-group">
                 <label for="id_email">Email</label>
                 <input id="id_email" name="email" placeholder="Enter email" type="email" required value="{{ form.email.value|default:'' }}">
-                <div class="error" id="emailError"></div>
+                <div class="error" id="emailError">{{ form.email.errors }}</div>
             </div>
 
             <div class="form-group">
@@ -38,14 +36,14 @@
                     <li id="lengthRequirement">At least 8 characters long.</li>
                     <li id="numericRequirement">Cannot be entirely numeric.</li>
                 </ul>
-                <div class="error" id="password1Error"></div>
+                <div class="error" id="password1Error">{{ form.password1.errors }}</div>
             </div>
 
             <div class="form-group">
                 <label for="id_password2">Confirm Password</label>
                 <input id="id_password2" name="password2" placeholder="Enter password" type="password" required>
                 <span class="helptext">Enter the same password as before, for verification.</span>
-                <div class="error" id="password2Error"></div>
+                <div class="error" id="password2Error">{{ form.password2.errors }}</div>
             </div>
 
             <div class="form-group submit-btn">
@@ -74,8 +72,23 @@
         var emailError = document.getElementById("emailError");
         var password1Error = document.getElementById("password1Error");
         var password2Error = document.getElementById("password2Error");
-    
-        // Validate on input
+
+        {% if errors %}
+            var errors = {{ errors|safe }};
+            if (errors.username) {
+                usernameError.innerHTML = "<span class='error-message'>" + errors.username[0].message + "</span>";
+            }
+            if (errors.email) {
+                emailError.innerHTML = "<span class='error-message'>" + errors.email[0].message + "</span>";
+            }
+            if (errors.password1) {
+                password1Error.innerHTML = "<span class='error-message'>" + errors.password1[0].message + "</span>";
+            }
+            if (errors.password2) {
+                password2Error.innerHTML = "<span class='error-message'>" + errors.password2[0].message + "</span>";
+            }
+        {% endif %}
+
         password1.addEventListener("input", validatePassword);
         password2.addEventListener("input", validatePasswordMatch);
         form.addEventListener("submit", function(event) {
@@ -83,47 +96,41 @@
                 event.preventDefault();
             }
         });
-    
+
         function validateUsername() {
             var valid = true;
             usernameError.innerHTML = "";
-    
-            // Check if username is provided
+
             if (username.value.trim() === "") {
                 usernameError.innerHTML = "<span class='error-message'>Username is required.</span>";
                 valid = false;
             }
-    
-            // Add more username validation logic if needed (e.g., length, character check)
-    
+
             return valid;
         }
-    
+
         function validateEmail() {
             var valid = true;
             emailError.innerHTML = "";
-    
-            // Check if email is provided
+
             if (email.value.trim() === "") {
                 emailError.innerHTML = "<span class='error-message'>Email is required.</span>";
                 valid = false;
             } else {
-                // Simple email format validation
                 var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
                 if (!emailPattern.test(email.value)) {
                     emailError.innerHTML = "<span class='error-message'>Invalid email format.</span>";
                     valid = false;
                 }
             }
-    
+
             return valid;
         }
-    
+
         function validatePassword() {
             var valid = true;
             password1Error.innerHTML = "";
-    
-            // Check length requirement
+
             if (password1.value.length < 8) {
                 lengthRequirement.style.color = "red";
                 password1Error.innerHTML += "<span class='error-message'>Password must be at least 8 characters long.</span>";
@@ -131,8 +138,7 @@
             } else {
                 lengthRequirement.style.color = "green";
             }
-    
-            // Check numeric requirement
+
             if (/^\d+$/.test(password1.value)) {
                 numericRequirement.style.color = "red";
                 password1Error.innerHTML += "<span class='error-message'>Password cannot be entirely numeric.</span>";
@@ -140,31 +146,28 @@
             } else {
                 numericRequirement.style.color = "green";
             }
-    
-            // Check if password contains the username
+
             if (password1.value.toLowerCase().includes(username.value.toLowerCase())) {
                 password1Error.innerHTML += "<span class='error-message'>Password cannot contain the username.</span>";
                 valid = false;
             }
-    
+
             return valid;
         }
-    
+
         function validatePasswordMatch() {
             var valid = true;
             password2Error.innerHTML = "";
-    
+
             if (password1.value !== password2.value) {
                 password2Error.innerHTML = "<span class='error-message'>Passwords do not match.</span>";
                 valid = false;
             }
-    
+
             return valid;
         }
     });
-    
 </script>
 {% endblock %}
 {% block footer_block %}
-
 {% endblock %}
