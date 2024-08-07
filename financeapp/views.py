@@ -24,7 +24,7 @@ from django.utils import timezone
 logger = logging.getLogger(__name__)
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
-
+from django.db import IntegrityError
 
 class CustomPasswordResetView(auth_views.PasswordResetView):
     template_name = 'registration/password_reset_form.html'
