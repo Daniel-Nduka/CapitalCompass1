@@ -27,7 +27,7 @@ from django.urls import reverse_lazy
 from django.db import IntegrityError
 
 def csrf_failure(request, reason=""):
-    return render(request, 'financeapp/csrf_failure.html', {'reason': reason})
+    return render(request, 'financeapp/index.html')
 
 class CustomPasswordResetView(auth_views.PasswordResetView):
     template_name = 'registration/password_reset_form.html'
