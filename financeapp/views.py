@@ -46,6 +46,7 @@ class CustomPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
 # Create your views here.
 
 #overview
+@login_required
 def overview(request):
     return render(request, 'financeapp/overview.html')
 
