@@ -14,19 +14,19 @@
             <button class="add-money-button" onclick="location.href='{% url 'financeapp:account_list' %}'">Add Money</button>
         </div>
         <div class="budget-overview">
-            <div class="budget-amount">
-                <span class="budget-income-label">Total Income</span>
+           <!-- <div class="budget-amount">
+                <span class="budget-income-label">Total Income Available</span>
                 <span class="budget-income-value">£{{ total_balance }}</span>
-            </div>
+            </div> -->
             <div class="budget-activity">
                 <span class="budget-activity-label">Total Spent</span>
                 <span class="budget-activity-value">£{{ spent_money }}</span>
             </div>
-            <div class="budget-available {% if money_available < 0 %}negative-value{% else %}positive-value{% endif %}">
+            <div class="budget-available {% if total_balance < 0 %}negative-value{% else %}positive-value{% endif %}">
                 <span class="budget-available-label">Total Money Available</span>
                 <span class="budget-available-value">
-                    £{{ money_available }}
-                    {% if money_available < 0 %}
+                    £{{ total_balance }}
+                    {% if total_balance < 0 %}
                     <i class="fas fa-exclamation-circle warning-icon"></i>
                     {% endif %}
                 </span>
@@ -62,7 +62,7 @@
                 </div>
                 <div class="expenses-list">
                     {% for expense in category.expenses.all %}
-                    <div class="expense-item">
+                    <div class="expense-item {% if expense.spent >= expense.assigned_amount %}paid-in-full {% endif %}">
                         <span class="expense-description">
                             <span class="description-expense">{{ expense.description }}</span>
                             <span class="expense"> Expense </span>
@@ -75,7 +75,11 @@
                             <span class="spent-container">
                                 <span class="spent-paid-container">
                                     <span class="spent-expense">£{{ expense.spent }}</span>
-                                    <span class="paid"> Paid </span>
+                                    {% if expense.spent >= expense.assigned_amount %}
+                                        <span class="paid"> Complete </span>
+                                    {% else %}
+                                        <span class="paid"> Paid </span>
+                                    {% endif %}
                                 </span>
                                 <span class="edit-icon" onclick="showEditExpenseForm('{{ expense.id }}', '{{ category.id }}', '{{ expense.description }}', '{{ expense.assigned_amount }}', '{{ category.is_recurring|yesno:'true,false' }}', '{{ expense.is_recurring|yesno:'true,false' }}')" data-is-recurring="{{ expense.is_recurring|yesno:'true,false' }}">
                                     &#9998; <!-- Pencil icon -->

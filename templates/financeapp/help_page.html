@@ -26,11 +26,11 @@
                   <p>Navigate to the 'Your Budgets' section to manage your budgets. Here, you can add new budgets, view and edit existing ones, and track your financial goals. The interface and functionality slightly vary depending on the type of budget you choose:</p>
                   
                   <h3>Zero-Based Budget</h3>
-                  <p>The zero-based budget allows you to allocate every dollar to a specific expense, savings, or investment. At the start of each month, you allocate your income to various categories, ensuring that your total income minus expenses equals zero. This method helps you have full control over where your money goes.</p>
+                  <p>The zero-based budget allows you to allocate every POUND to a specific expense, savings, or investment. At the start of each month, you allocate your income to various categories, ensuring that your total income minus expenses equals zero. This method helps you have full control over where your money goes.</p>
                   <ul>
-                      <li><strong>Add Categories:</strong> Create categories for various expenses such as bills, groceries, entertainment, etc.</li>
-                      <li><strong>Track Spending:</strong> Monitor your spending against the budgeted amounts for each category.</li>
-                      <li><strong>Adjust Allocations:</strong> Modify your budget categories as needed throughout the month.</li>
+                      <li><strong>Create a new category:</strong> Create categories for various expenses such as bills, groceries, entertainment, etc.</li>
+                      <li><strong>Add Expense:</strong> Add expenses for each category.</li>
+                      <li><strong>Edit category and Expenses:</strong> Modify your budget categories and expenses as needed throughout the month.</li>
                   </ul>
                   <img src="{% static 'images/zero_based_budget.png' %}" alt="Zero-Based Budget Interface">
           
@@ -57,7 +57,9 @@
             <div class="help-section">
                 <h2 onclick="toggleSection('transactions-section')">Transactions</h2>
                 <div id="transactions-section" class="content">
-                    <p>The 'Transactions' section allows you to manage all your financial activities. You can add, edit, and delete transactions. Outflows represent money leaving your account, while inflows represent money coming into your account.</p>
+                    <p>The 'Transactions' section allows you to manage all your financial activities. You can add, edit, and delete transactions. </p>
+                    <li> <strong>Outflows: </strong> represent money leaving your account. They require an expense </li>
+                    <li> <strong>Inflows: </strong> inflows represent money coming into your account.</li>
                     <img src="{% static 'images/transactions.png' %}" alt="Transactions Overview">
                 </div>
             </div>
