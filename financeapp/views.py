@@ -71,11 +71,17 @@ def help_page(request):
     return render(request, 'financeapp/help_page.html')
 
 #This ensures when a user selects a budget, it is stored in the session
+'''
 @login_required
 def select_budget(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user)
     request.session['selected_budget_id'] = budget.id
-    return redirect('financeapp:zero_based_page', budget_id=budget.id)
+    
+    if budget.budget_type == 'zero_based':
+        return redirect('financeapp:zero_based_page', budget_id=budget.id)
+    else: 
+        return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
+'''
 
 #This is the account list page. When a user selects a budget, it displays the accounts associated with that budget.
 #if there is no budget selected, it redirects the user to the budget list page.
@@ -291,7 +297,18 @@ def copy_recurring_items(budget, selected_date):
                 is_recurring=expense.is_recurring
             )
 
-
+#Helper ensures when a user selects a budget, it is stored in the session
+'''
+@login_required
+def select_budget(request, budget_id):
+    budget = get_object_or_404(Budget, id=budget_id, user=request.user)
+    request.session['selected_budget_id'] = budget.id
+    
+    if budget.budget_type == 'zero_based':
+        return redirect('financeapp:zero_based_page', budget_id=budget.id)
+    else: 
+        return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
+'''
     
 #Zero based budget page. It displays the categories and expenses associated with the budget.
 #when a user selects a budget, it stores the budget in the session.
@@ -407,7 +424,7 @@ def edit_zero_based_category(request, budget_id):
             return redirect('financeapp:zero_based_page', budget_id=budget.id)
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
 
-
+#Delete zero-based Category
 @login_required
 def delete_category(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')

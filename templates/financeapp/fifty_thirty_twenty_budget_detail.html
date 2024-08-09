@@ -42,10 +42,14 @@
     <section class="budget-details">  
         <div class="categories-container">
             {% for category in categories %}
-            <div class="category-card">
+            <div class="category-card {% if category.expenses_assigned_amount_total > category.assigned_amount %}over-budget{% endif %}">
                 <div class="category-header">
                     <span class="category-name"><span class="name-category">{{ category.name }}</span><span class="budget"> Budget</span></span>
-                    <span class="category-assigned"><span class="assigned-category">£{{ category.assigned_amount }}</span><span class="assigned"> Total Money Assigned </span></span>
+                    <span class="category-assigned" data-assigned-amount="{{ category.assigned_amount }}" data-expenses-assigned-amount-total="{{ category.expenses_assigned_amount_total }}">
+                        <span class="assigned-category">£{{ category.assigned_amount }}</span>
+                        <span class="assigned"> Total Money Assigned </span>
+                        <span class="warning-message">Alert: Expenses Exceed Budget!</span>
+                    </span>
                     <span class="category-activity"><span class="activity-category">£{{ category.activity }}</span><span class="activity"> Money Spent</span></span>
                 </div>
                 <div class="expenses-list">
@@ -244,12 +248,30 @@
         document.getElementById('edit-category-form').style.display = 'none';
     }
 
+     // Function to update category assigned amount color based on total assigned expenses
+     function updateCategoryAssignedColor() {
+        const categories = document.querySelectorAll('.category-assigned');
+        categories.forEach(category => {
+            const assignedAmount = parseFloat(category.getAttribute('data-assigned-amount'));
+            const expensesAssignedAmountTotal = parseFloat(category.getAttribute('data-expenses-assigned-amount-total'));
+            console.log("Assigned Amount:", assignedAmount, "Expenses Assigned Amount Total:", expensesAssignedAmountTotal);
+            if (expensesAssignedAmountTotal > assignedAmount) {
+                category.style.color = 'red';
+                category.querySelector('.warning-message').style.display = 'inline';
+            } else {
+                category.style.color = ''; // Reset to default if not exceeded
+                category.querySelector('.warning-message').style.display = 'none';
+            }
+        });
+    }
+
     // Ensure modals are hidden by default on page load
     window.onload = function() {
        
         closeAddExpenseForm();
         closeEditExpenseForm();
         closeEditCategoryForm();
+        updateCategoryAssignedColor();
     }
 </script>
 {% endblock %}
