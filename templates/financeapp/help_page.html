@@ -13,10 +13,10 @@
             <div class="help-section">
                 <h2 onclick="toggleSection('overview-section')">Getting Started</h2>
                 <div id="overview-section" class="content">
-                    <p>Welcome to CapitalCompass! This guide will walk you through the key features of the app. To begin, Create a budget using the create budget buttom on the top left.
-                      You have the option to create a zero-based budget or a 50/30/20 budget. Once you have created a budget, you can start adding transactions and managing your finances.
-                    </p>
-                    <img src="{% static 'images/getting_started.png' %}" alt="Getting Started">
+                    <p>Welcome to CapitalCompass! This guide will walk you through the key features of the app. </p>
+                    <p> To begin, Create a budget by navigating to the create budget button on the top left of the sidebar. </p>
+                    <p>  You have the option to create a zero-based budget or a 50/30/20 budget. Once you have created a budget, you can start adding transactions and managing your finances. </p>
+                    <img src="{% static 'images/help-page/create-budget-screenshot.jpg' %}" alt="Getting Started">
                 </div>
             </div>
 
@@ -27,12 +27,13 @@
                   
                   <h3>Zero-Based Budget</h3>
                   <p>The zero-based budget allows you to allocate every POUND to a specific expense, savings, or investment. At the start of each month, you allocate your income to various categories, ensuring that your total income minus expenses equals zero. This method helps you have full control over where your money goes.</p>
-                  <ul>
-                      <li><strong>Create a new category:</strong> Create categories for various expenses such as bills, groceries, entertainment, etc.</li>
-                      <li><strong>Add Expense:</strong> Add expenses for each category.</li>
-                      <li><strong>Edit category and Expenses:</strong> Modify your budget categories and expenses as needed throughout the month.</li>
+                  <p>Key features of the zero-based budget include:</p>
+                    <ul>
+                        <li><strong>Create a new category:</strong> Create categories for various expenses such as bills, groceries, entertainment, etc.</li>
+                        <li><strong>Add Expense:</strong> Add expenses for each category.</li>
+                        <li><strong>Edit category and Expenses:</strong> Modify your budget categories and expenses as needed throughout the month.</li>
                   </ul>
-                  <img src="{% static 'images/zero_based_budget.png' %}" alt="Zero-Based Budget Interface">
+                  <img src="{% static 'images/help-page/zero-based-screenshot.jpg' %}" alt="Zero-Based Budget Interface">
           
                   <h3>50/30/20 Budget</h3>
                   <p>The 50/30/20 budget divides your income into three main categories: 50% for needs, 30% for wants, and 20% for savings and debt repayment. This method provides a simple structure for managing your finances, ensuring that essential expenses are covered while still allowing for discretionary spending and savings.</p>
@@ -41,7 +42,8 @@
                       <li><strong>Wants:</strong> Allocate 30% of your income to discretionary spending like dining out, entertainment, and hobbies.</li>
                       <li><strong>Savings/Debt:</strong> Allocate 20% of your income to savings goals, investments, and debt repayment.</li>
                   </ul>
-                  <img src="{% static 'images/50_30_20_budget.png' %}" alt="50/30/20 Budget Interface">
+                    <p>Key features of the 50/30/20 budget include:</p>
+                  <img src="{% static 'images/help-page/50-30-20-screenshot.jpg' %}" alt="50/30/20 Budget Interface">
               </div>
           </div>
           
@@ -50,19 +52,29 @@
                 <h2 onclick="toggleSection('accounts-section')">Managing Accounts</h2>
                 <div id="accounts-section" class="content">
                     <p>To view or add accounts, navigate to the 'Accounts' section. You can add new accounts, view current balances, and manage funds.</p>
-                    <img src="{% static 'images/accounts.png' %}" alt="Accounts Overview">
+                    <ul>
+                        <li><strong>Account Overview:</strong> View all your accounts, including Checking, Savings, and Cash accounts, in one place.</li>
+                        <li><strong>Account Details:</strong> Check the balance, account type, and other details for each account.</li>
+                        <li><strong>Account Management:</strong> Edit or delete accounts as needed to keep your financial records up to date.</li>
+                    </ul>
+                    <img src="{% static 'images/help-page/accounts-screenshot.jpg' %}" alt="Accounts Overview">
                 </div>
             </div>
 
             <div class="help-section">
                 <h2 onclick="toggleSection('transactions-section')">Transactions</h2>
                 <div id="transactions-section" class="content">
-                    <p>The 'Transactions' section allows you to manage all your financial activities. You can add, edit, and delete transactions. </p>
-                    <li> <strong>Outflows: </strong> represent money leaving your account. They require an expense </li>
-                    <li> <strong>Inflows: </strong> inflows represent money coming into your account.</li>
-                    <img src="{% static 'images/transactions.png' %}" alt="Transactions Overview">
+                    <p>The 'Transactions' section helps you manage all your financial activities seamlessly. Here, you can add, edit, and delete transactions with ease.</p>
+                    <p>To add a new transaction, simply click on the 'Add Transaction' button and fill in the necessary details. You can categorize each transaction, add notes, and set the transaction date to keep your records organized.</p>
+                    <ul>
+                        <li><strong>Outflows:</strong> These represent expenses, where money is leaving your account. Outflows must be associated with an expense. If an expense isn’t available, you can create one on the budget page.</li>
+                        <li><strong>Inflows:</strong> Inflows represent income or any funds coming into your account, helping you track your earnings and deposits.</li>
+                    </ul>
+                    <p> To edit or delete a transaction, click on the transaction and select the appropriate action. </p>
+                    <img src="{% static 'images/help-page/Transaction-screenshot.jpg' %}" alt="Transactions Overview">
                 </div>
             </div>
+            
 
   
 
@@ -70,7 +82,7 @@
                 <h2 onclick="toggleSection('support-section')">Account Support</h2>
                 <div id="support-section" class="content">
                     <p>If you encounter any issues or have questions, visit the 'Account Support' section. Here you can submit a support request, and our team will assist you promptly.</p>
-                    <img src="{% static 'images/support.png' %}" alt="Support Overview">
+                    <a href="{% url 'financeapp:account_support' %}">Account Support</a>
                 </div>
             </div>
 
@@ -78,7 +90,6 @@
                 <h2 onclick="toggleSection('profile-section')">Profile Management</h2>
                 <div id="profile-section" class="content">
                     <p>In the 'Profile' section, you can view and update your personal information, change your password, and manage your account settings.</p>
-                    <img src="{% static 'images/profile.png' %}" alt="Profile Overview">
                 </div>
             </div>
         </section>
