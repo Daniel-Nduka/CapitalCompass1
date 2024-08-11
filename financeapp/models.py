@@ -8,42 +8,36 @@ from decimal import Decimal
 
 import datetime
 
-# Create your models here.
-
+# USer Profile Model
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     last_accessed_budget = models.ForeignKey('Budget', on_delete=models.SET_NULL, null=True, blank=True)
     def __str__(self):
         return self.user.username
     
+#Budget Model
 class Budget(models.Model):
     BUDGET_TYPES = [
         ('zero_based', 'Zero-Based'),
         ('fifty_thirty_twenty', '50/30/20'),
     ]
-    '''
-    CURRENCY_TYPES = [
-        ('POUNDS', 'Pounds'),
-        ('DOLLARS', 'Dollars'),
-        ('EUROS', 'euros'),   
-        
-    ]
-    '''
+   
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='budgets')
     budget_name = models.CharField(max_length=100)
     budget_type = models.CharField(max_length=20, choices=BUDGET_TYPES)
-    #currency_type = models.CharField(max_length=20, choices=CURRENCY_TYPES, default="POUNDS")
     month = models.DateField(auto_now_add=True)  # Add month field
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    balance_initialized = models.BooleanField(default=False)  # Add this line
+   # balance_initialized = models.BooleanField(default=False)  
     
+    # Meta class to ensure that the budget name is unique for each user
     class Meta:
         unique_together = ('user', 'budget_name')
         
     def __str__(self):
         return f"{self.budget_name} ({self.get_budget_type_display()}) - {self.user.username}"
     
+    # Update the assigned amount for each category in the 50/30/20 budget
     def update_fifty_thirty_twenty_categories(self):
         if self.budget_type == 'fifty_thirty_twenty':
             total_balance = sum(account.balance for account in self.accounts.all())
@@ -70,11 +64,9 @@ class Account(models.Model):
     account_name = models.CharField(max_length=100)
     account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES)
     balance = models.DecimalField(max_digits=15, decimal_places=2)
-    previous_balance = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-   # current_balance = models.DecimalField(max_digits=15, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    #recurring_income = models.BooleanField(default=False)
+
     
     
     def __str__(self):
@@ -114,11 +106,11 @@ class BaseCategory(models.Model):
     @property
     def available(self):
         return self.assigned_amount - self.activity
-
+'''
     @property
     def expenses_assigned_amount_total(self):
         return sum(expense.assigned_amount for expense in self.expenses.all())
-    '''
+    
     def save(self, *args, **kwargs):
         if self.assigned_amount_total > self.assigned_amount:
             self.assigned_amount = self.assigned_amount_total

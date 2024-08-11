@@ -110,7 +110,7 @@
                 <label for="id_spent">Paid:</label>
                 <input type="number" name="spent" id="id_spent" value="0" required>
             </div> -->
-            <input type="hidden" name="category_id" id="expense-category-id">
+            <input type="hidden" name="fifty_30_twenty_category_id" id="expense-category-id">
             <div id="add-expense-recurring-container" style="display: none;">
                 <div class="form-group">
                     <label for="id_is_recurring">Recurring:</label>
@@ -133,7 +133,7 @@
         <form method="post" action="{% url 'financeapp:edit_fifty_thirty_twenty_expense' budget.id %}">
             {% csrf_token %}
             <input type="hidden" name="expense_id" id="edit-expense-id">
-            <input type="hidden" name="category_id" id="edit-expense-category-id">
+            <input type="hidden" name="fifty_30_twenty_category_id" id="edit-expense-category-id">
             <input type="hidden" id="edit-is-category-recurring" name="is_category_recurring">
             <div class="form-group">
                 <label for="edit-expense-description">Expense Description:</label>

@@ -30,6 +30,7 @@ class FinanceAppTests(TestCase):
         self.user = User.objects.create_user(username='testuser', password='testpass')
         self.client.login(username='testuser', password='testpass')
         self.budget = Budget.objects.create(user=self.user, budget_name='Test Budget', budget_type='zero_based')
+        self.fifty_thirty_twenty_budget = Budget.objects.create(user=self.user, budget_name='Test Fifty Budget', budget_type='fifty_thirty_twenty')
         
         
     #Post Logged in Test for Zero Based Budget
@@ -202,7 +203,34 @@ class FinanceAppTests(TestCase):
       self.assertEqual(response.status_code, 302)
       self.assertTrue(Expense.objects.filter(category=category, description='Test Expense', assigned_amount=50).exists())
       
+       #Test for add_zero_based_expense 
+    def test_edit_zero_based_expense_view(self):
+      self.set_session()
+      category = ZeroBasedCategory.objects.create(name='Test Category', assigned_amount=100, budget=self.budget)
+      expense = Expense.objects.create(category=category, description='Test Expense', assigned_amount=50)
+        
+      form_data = {
+        'expense_id': expense.id,
+        'category_id': category.id,
+        'description': 'Test Expense',
+        'assigned_amount': 200
+         }
+      response = self.client.post(reverse('financeapp:edit_zero_expense', args=[self.budget.id]), form_data)
+      self.assertEqual(response.status_code, 302)
+      self.assertTrue(Expense.objects.filter(category=category, description='Test Expense', assigned_amount=200).exists())
+      self.assertRedirects(response, reverse('financeapp:zero_based_page', args=[self.budget.id]))
       
+    #Test for delete_zero_expense
+    def test_delete_zero_based_expense_view(self):
+      self.set_session()
+      
+      category = ZeroBasedCategory.objects.create(name='Test Category', assigned_amount=100, budget=self.budget)
+      expense = Expense.objects.create(category=category, description='Test Expense', assigned_amount=50)
+      
+      response = self.client.post(reverse('financeapp:delete_zero_expense', args=[self.budget.id]), {'expense_id': expense.id, 'category_id': category.id})
+      self.assertEqual(response.status_code, 302)
+      self.assertFalse(Expense.objects.filter(category=category, description='Test Expense', assigned_amount=50).exists())
+      self.assertRedirects(response, reverse('financeapp:zero_based_page', args=[self.budget.id]))
 
       
     def test_recurring_category_and_expense_in_next_month(self):
@@ -253,8 +281,108 @@ class FinanceAppTests(TestCase):
           is_recurring=True
     ).exists()
       self.assertTrue(next_month_expense)
+      
+    def set_session_for_fifty(self):
+      session = self.client.session
+      session['selected_budget_id'] = self.fifty_thirty_twenty_budget.id
+      session.save()
+      
+    #Test for 50.30.20 Budget
+    
+    def test_fifty_thirty_twenty_page_view(self):
+      self.set_session_for_fifty()
+      
+      response = self.client.get(reverse('financeapp:fifty_thirty_twenty_page', args=[self.fifty_thirty_twenty_budget.id]))
+      self.assertEqual(response.status_code, 200)
+      self.assertTemplateUsed(response, 'financeapp/fifty_thirty_twenty_budget_detail.html')
+      
+    #Test for add_fifty_thirty_twenty_expense
+    def test_Needs_Wants_Savings_Category_were_created(self):
+      self.set_session_for_fifty()
+      
+      # Ensure categories associated with the budget were created
+      needs_category = FiftyThirtyTwentyCategory.objects.filter(
+        budget=self.fifty_thirty_twenty_budget,
+        name='Needs'
+        ).exists()
+
+      wants_category = FiftyThirtyTwentyCategory.objects.filter(
+        budget=self.fifty_thirty_twenty_budget,
+        name='Wants'
+        ).exists()
+
+      savings_category = FiftyThirtyTwentyCategory.objects.filter(
+        budget=self.fifty_thirty_twenty_budget,
+        name='Savings'
+       ).exists()
+
+      # Assertions to check that all categories were created
+      self.assertTrue(needs_category, "Needs category was not created")
+      self.assertTrue(wants_category, "Wants category was not created")
+      self.assertTrue(savings_category, "Savings category was not created")
+      
+    def test_add_fifty_thirty_twenty_expense_view(self):
+      self.set_session_for_fifty()
+      
+      #Get the Needs Category
+      needs_category = FiftyThirtyTwentyCategory.objects.get(budget=self.fifty_thirty_twenty_budget, name='Needs')
+      
+      #give the need category an assigned amount
+      needs_category.assigned_amount = 50
+      needs_category.save()
+    
+      
+      #Create a form data for the expense
+      form_data = {
+        'fifty_30_twenty_category_id': needs_category.id, 
+        'description': 'Test Expense',
+        'assigned_amount': 50
+      }
+      
+      #Post the form data
+      response = self.client.post(reverse('financeapp:add_fifty_thirty_twenty_expense', args=[self.fifty_thirty_twenty_budget.id]),  form_data)
+      
+      self.assertEqual(response.status_code, 302)
+      self.assertTrue(Expense.objects.filter(fifty_30_twenty_category=needs_category, description='Test Expense', assigned_amount=50).exists())
+      self.assertRedirects(response, reverse('financeapp:fifty_thirty_twenty_page', args=[self.fifty_thirty_twenty_budget.id]))
+      
+  
+    def test_edit_fifty_thirty_twenty_expense_view(self):
+      self.set_session_for_fifty()
+      
+      # Get the Needs Category
+      wants_category = FiftyThirtyTwentyCategory.objects.get(budget=self.fifty_thirty_twenty_budget, name='Wants')
+      
+      # Create an expense within the Needs Category
+      expense = Expense.objects.create(
+        fifty_30_twenty_category=wants_category, 
+        description='Test Expense', 
+        assigned_amount=50
+      )
+      
+      # Create a form data for the expense
+      form_data = {
+        'expense_id': expense.id,
+        'fifty_30_twenty_category_id': wants_category.id, 
+        'description': 'Test Expense',
+        'assigned_amount': 100
+      }
+      
+      # Post the form data
+      response = self.client.post(reverse('financeapp:edit_fifty_thirty_twenty_expense', args=[self.fifty_thirty_twenty_budget.id]), form_data)
+      
+      self.assertEqual(response.status_code, 302)
+      self.assertTrue(Expense.objects.filter(fifty_30_twenty_category=wants_category, description='Test Expense', assigned_amount=100).exists())
+      self.assertRedirects(response, reverse('financeapp:fifty_thirty_twenty_page', args=[self.fifty_thirty_twenty_budget.id]))
+      
+      
+      
+      
 
       
+      
+   
+
       
       
       

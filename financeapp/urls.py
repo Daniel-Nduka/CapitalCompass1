@@ -40,8 +40,8 @@ urlpatterns = [
     path('budgets/zero_based/<int:budget_id>/add_expense/', views.add_zero_based_expense, name='add_zero_expense'),
     path('budgets/zero_based/<int:budget_id>/edit_expense/', views.edit_zero_based_expense, name='edit_zero_expense'),
     
-    path('budgets/zero_based/<int:budget_id>/delete_category/', views.delete_category, name='delete_zero_category'),
-    path('budgets/zero_based/<int:budget_id>/delete_expense/', views.delete_expense, name='delete_zero_expense'),
+    path('budgets/zero_based/<int:budget_id>/delete_category/', views.delete_zero_based_category, name='delete_zero_category'),
+    path('budgets/zero_based/<int:budget_id>/delete_expense/', views.delete_zero_based_expense, name='delete_zero_expense'),
 
     #path for 50.30.20 budget
     path('budgets/fifty_thirty_twenty/<int:budget_id>/', views.fifty_thirty_twenty_page, name='fifty_thirty_twenty_page'),

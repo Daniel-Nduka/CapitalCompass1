@@ -243,7 +243,7 @@ def create_budget(request):
         else:
             # Capture and display form errors
             for error in form.errors.values():
-                messages.error(request, error)
+                messages.error(request, error, extra_tags='budget_danger')
     else:
         form = BudgetForm(user=request.user)  # Pass user here
     return render(request, 'financeapp/budget.html', {'form': form})
@@ -277,7 +277,6 @@ def delete_budget(request, budget_id):
 @login_required
 def copy_recurring_items(budget, selected_date):
     last_month = selected_date - datetime.timedelta(days=1)
-    logger.warning(f"Last month's budget does not exist for budget {budget.id} and date {last_month}")
     last_month_categories = ZeroBasedCategory.objects.filter(budget=budget, month__year=last_month.year, month__month=last_month.month, is_recurring=True)
 
     for category in last_month_categories:
@@ -393,6 +392,7 @@ def add_zero_based_category(request, budget_id):
         form = ZeroBudgetForm(budget=budget)
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
 
+#Edit zero based category
 @login_required
 def edit_zero_based_category(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
@@ -426,7 +426,7 @@ def edit_zero_based_category(request, budget_id):
 
 #Delete zero-based Category
 @login_required
-def delete_category(request, budget_id):
+def delete_zero_based_category(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
     category_id = request.POST.get('category_id')
     category = get_object_or_404(ZeroBasedCategory, id=category_id, budget=budget)
@@ -436,6 +436,7 @@ def delete_category(request, budget_id):
         return redirect('financeapp:zero_based_page', budget_id=budget.id)
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
 
+#Add zero based expense
 @login_required
 def add_zero_based_expense(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
@@ -447,29 +448,10 @@ def add_zero_based_expense(request, budget_id):
             expense.save()
 
             # Ensure future recurring items are copied when a new recurring expense is added
-            '''
-            if expense.is_recurring:
-                future_date = expense.category.month + datetime.timedelta(days=31)
-                next_month = future_date.replace(day=1)
-                copy_recurring_items(budget, next_month)
-            '''
             return redirect('financeapp:zero_based_page', budget_id=budget.id)
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
 
-'''
-@login_required
-def add_zero_based_expense(request, budget_id):
-    budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
-    if request.method == 'POST':
-        expense_form = ExpenseForm(request.POST)
-        if expense_form.is_valid():
-            expense = expense_form.save(commit=False)
-            expense.category = get_object_or_404(ZeroBasedCategory, id=request.POST.get('category_id'))
-            expense.save()
-            return redirect('financeapp:zero_based_page', budget_id=budget.id)
-    return redirect('financeapp:zero_based_page', budget_id=budget.id)
-'''
-
+#Edit zero based expense
 @login_required
 def edit_zero_based_expense(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
@@ -483,14 +465,12 @@ def edit_zero_based_expense(request, budget_id):
         if form.is_valid():
             updated_expense = form.save(commit=False)
             is_recurring = 'is_recurring' in request.POST
-            print (f"Is recurring: {is_recurring}")  # Debugging line
 
             # Save the current expense
             updated_expense.is_recurring = is_recurring
-            print (f"Updated is_recurring: {is_recurring}")  # Debugging line
+           
             updated_expense.save()
-            print (is_recurring)
-            # If the expense is recurring, update future instances
+          
             if is_recurring:
                 future_expenses = Expense.objects.filter(
                     category__budget=budget,
@@ -512,16 +492,12 @@ def edit_zero_based_expense(request, budget_id):
 
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
 
-
-
+#Delete zero based expense
 @login_required
-def delete_expense(request, budget_id):
+def delete_zero_based_expense(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
     category_id = request.POST.get('category_id')
     expense_id = request.POST.get('expense_id')
-    print(f"Budget ID: {budget_id}")
-    print(f"Category ID: {category_id}")
-    print(f"Expense ID: {expense_id}")
 
     if category_id and expense_id:
         category = get_object_or_404(ZeroBasedCategory, id=category_id, budget=budget)
@@ -654,7 +630,7 @@ def add_fifty_thirty_twenty_expense(request, budget_id):
         if expense_form.is_valid():
             expense = expense_form.save(commit=False)
             #expense.category = None  # Explicitly set category to None
-            expense.fifty_30_twenty_category = get_object_or_404(FiftyThirtyTwentyCategory, id=request.POST.get('category_id'))
+            expense.fifty_30_twenty_category = get_object_or_404(FiftyThirtyTwentyCategory, id=request.POST.get('fifty_30_twenty_category_id'))
             expense.save()
             return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
     return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
@@ -664,7 +640,7 @@ def add_fifty_thirty_twenty_expense(request, budget_id):
 def edit_fifty_thirty_twenty_expense(request, budget_id):
     base_budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='fifty_thirty_twenty')
 
-    category_id = request.POST.get('category_id')
+    category_id = request.POST.get('fifty_30_twenty_category_id')
     category = get_object_or_404(FiftyThirtyTwentyCategory, id=category_id, budget=base_budget)
     expense_id = request.POST.get('expense_id')
     expense = get_object_or_404(Expense, id=expense_id, fifty_30_twenty_category=category)
@@ -786,10 +762,10 @@ def add_transaction(request):
         return redirect('financeapp:budget_list')
 
     if request.method == 'POST':
-        form = TransactionForm(request.POST)
-        if form.is_valid():
-            transaction = form.save(commit=False)
-            transaction.account = form.cleaned_data['account']
+        transaction_form = TransactionForm(request.POST)
+        if transaction_form.is_valid():
+            transaction = transaction_form.save(commit=False)
+            transaction.account = transaction_form.cleaned_data['account']
             transaction.save()
             messages.success(request, 'Transaction added successfully.')
         else:
@@ -1059,10 +1035,10 @@ def contact(request):
             send_mail(sender_subject, sender_message, from_email, recipient_list, fail_silently=False)
 
             # Display success message and redirect
-            messages.success(request, 'Your message has been sent successfully.')
+            messages.success(request, 'Your message has been sent successfully.', extra_tags='contact')
             return redirect('financeapp:contact')
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, 'Please correct the errors below.', extra_tags='contact')    
     else:
         form = ContactMessageForm()
 
@@ -1154,10 +1130,10 @@ def account_support(request):
             send_mail(sender_subject, sender_message, from_email, recipient_list, fail_silently=False)
 
             # Display success message and redirect
-            messages.success(request, 'Your message has been sent successfully.')
+            messages.success(request, 'Your message has been sent successfully.', extra_tags='account_support')
             return redirect('financeapp:account_support')
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, 'Please correct the errors below.', extra_tags='account_support')
     else:
         form = AccountSupportForm(user=request.user)
 

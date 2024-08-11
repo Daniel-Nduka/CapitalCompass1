@@ -14,7 +14,9 @@
     {% if messages %}
     <div class="messages">
         {% for message in messages %}
+        {% if 'account_support' in message.tags %}
         <div class="alert {{ message.tags }}">{{ message }}</div>
+        {% endif %}
         {% endfor %}
     </div>
     {% endif %}
