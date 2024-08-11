@@ -112,16 +112,17 @@
             <div class="form-group">
                 <label for="id_name">Category Name:</label>
                 <input type="text" name="name" id="id_name" required>
-                {% if form.errors.name %}
-                    <div class="error" style="color: red;">{{ form.errors.name }}</div>
+                {% if messages %}
+                {% for message in messages %}
+                    {% if "add_zero_category_danger" in message.tags %}
+                        <div class="error" style="color: red;">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
                 {% endif %}
             </div>
             <div class="form-group">
                 <label for="id_assigned_amount">Assigned Amount:</label>
                 <input type="number" name="assigned_amount" id="id_assigned_amount" required>
-                {% if form.errors.assigned_amount %}
-                    <div class="error">{{ form.errors.assigned_amount }}</div>
-                {% endif %}
             </div>
             <div class="form-group">
                 <label for="id_is_recurring">Recurring:</label>
@@ -148,12 +149,19 @@
                 <div class="form-group">
                     <label for="edit-category-name">Category Name:</label>
                     <input type="text" name="name" id="edit-category-name" required>
-
+                    {% if messages %}
+                    {% for message in messages %}
+                        {% if "edit_zero_category_danger" in message.tags %}
+                            <div class="error" style="color: red;">{{ message }}</div>
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     <label for="edit-category-assigned-amount">Assigned Amount:</label>
                     <input type="number" name="assigned_amount" id="edit-category-assigned-amount" required>
                 </div>
+
                 <div class="form-group">
                     <label for="edit-category-is_recurring">Recurring:</label>
                     <input type="checkbox" name="is_recurring" id="edit-category-is_recurring">
@@ -184,6 +192,13 @@
             <div class="form-group">
                 <label for="id_description">Expense Description:</label>
                 <input type="text" name="description" id="id_description" required>
+                {% if messages %}
+                {% for message in messages %}
+                    {% if "add_zero_expense_danger" in message.tags %}
+                        <div class="error" style="color: red;">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+                {% endif %}
             </div>
             <div class="form-group">
                 <label for="id_assigned_amount">Cost:</label>
@@ -224,6 +239,13 @@
                 <div class="form-group">
                     <label for="edit-expense-description">Expense Description:</label>
                     <input type="text" name="description" id="edit-expense-description" required>
+                    {% if messages %}
+                    {% for message in messages %}
+                        {% if "edit_zero_expense_danger" in message.tags %}
+                            <div class="error" style="color: red;">{{ message }}</div>
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     <label for="edit-expense-assigned">Cost:</label>
@@ -257,6 +279,7 @@
 
     <script>
         /* add category */
+        
         function showAddCategoryForm() {
             document.getElementById('add-category-form').style.display = 'flex';
         }
@@ -345,20 +368,67 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             closeAddCategoryForm();
-            // Show the modal if form errors exist
-            {% if form.errors %}
-                showAddCategoryForm
+            closeEditCategoryForm();
+            closeAddExpenseForm();
+            closeEditExpenseForm();
+            updateCategoryAssignedColor(); // Check and update category assigned amount colors
+            
+            // Show the Add Category modal if there are errors related to adding a category
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "add_zero_category_danger" in message.tags %}
+                        showAddCategoryForm();
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        
+            // Show the Edit Category modal if there are errors related to editing a category
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "edit_zero_category_danger" in message.tags %}
+                        showEditCategoryForm('{{ form.category_id.value }}', '{{ form.name.value }}', '{{ form.assigned_amount.value }}', '{{ form.is_recurring.value }}');
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            // Show the Add Expense modal if there are errors related to adding an expense
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "add_zero_expense_danger" in message.tags %}
+                        showAddExpenseForm('{{ form.category_id.value }}', '{{ form.is_recurring.value }}');
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            // Show the Edit Expense modal if there are errors related to editing an expense
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "edit_zero_expense_danger" in message.tags %}
+                        showEditExpenseForm('{{ form.expense_id.value }}', '{{ form.category_id.value }}', '{{ form.description.value }}', '{{ form.assigned_amount.value }}', '{{ form.is_category_recurring.value }}', '{{ form.is_recurring.value }}');
+                    {% endif %}
+                {% endfor %}
             {% endif %}
         });
         
+        
 
         // Run the update function on page load
+        /*
         window.onload = function() {
             closeAddCategoryForm();
             closeEditCategoryForm();
             closeAddExpenseForm();
             closeEditExpenseForm();
             updateCategoryAssignedColor(); // Check and update category assigned amount colors
-        }
+            {% if form.errors and 'add_zero_expense_danger' in form.errors %}
+                showAddExpenseForm('{{ form.category_id.value }}', '{{ form.is_recurring.value }}');
+            {% endif %}
+
+            {% if form.errors and 'edit_zero_expense_danger' in form.errors %}
+                showEditExpenseForm('{{ form.expense_id.value }}', '{{ form.category_id.value }}', '{{ form.description.value }}', '{{ form.assigned_amount.value }}', '{{ form.is_category_recurring.value }}', '{{ form.is_recurring.value }}');
+            {% endif %}
+        };
+        */
+        
     </script>
 {% endblock %}

@@ -376,7 +376,73 @@ class FinanceAppTests(TestCase):
       self.assertRedirects(response, reverse('financeapp:fifty_thirty_twenty_page', args=[self.fifty_thirty_twenty_budget.id]))
       
       
+    def test_delete_fifty_thirty_twenty_expense_view(self):
+      self.set_session_for_fifty()
+        
+      # Get the Needs Category
+      savings_category = FiftyThirtyTwentyCategory.objects.get(budget=self.fifty_thirty_twenty_budget, name='Savings')
+        
+      # Create an expense within the Needs Category
+      expense = Expense.objects.create(
+        fifty_30_twenty_category=savings_category, 
+        description='Test Expense', 
+        assigned_amount=50
+      )
       
+      form_data = {
+        'expense_id': expense.id,
+        'fifty_30_twenty_category_id': savings_category.id
+      }
+        
+      # Post the form data
+      response = self.client.post(reverse('financeapp:delete_expense', args=[self.fifty_thirty_twenty_budget.id]), form_data)
+        
+      self.assertEqual(response.status_code, 302)
+      self.assertFalse(Expense.objects.filter(fifty_30_twenty_category=savings_category, description='Test Expense', assigned_amount=50).exists())
+      self.assertRedirects(response, reverse('financeapp:fifty_thirty_twenty_page', args=[self.fifty_thirty_twenty_budget.id]))
+    
+    #Test for recurring category and expense in next month
+    def test_recurring_fifty_thirty_twenty_category_and_expense_in_next_month(self):
+      self.set_session_for_fifty()
+      
+      # Set up the initial category and expense
+      initial_month = timezone.now().replace(day=1)  # Get the first day of the current month
+      next_month = (initial_month + datetime.timedelta(days=31)).replace(day=1)  # Get the first day of the next month
+      
+      # Create a recurring category
+      savings_category = FiftyThirtyTwentyCategory.objects.get(budget=self.fifty_thirty_twenty_budget, name='Savings')
+      
+      # Create a recurring expense within the category
+      expense = Expense.objects.create(
+          fifty_30_twenty_category=savings_category, 
+          description='Recurring Expense', 
+          assigned_amount=50, 
+          spent=0, 
+          is_recurring=True
+      )
+      
+      # Simulate the user moving to the next month's budget
+      response = self.client.get(reverse('financeapp:fifty_thirty_twenty_page_with_date', args=[self.fifty_thirty_twenty_budget.id, next_month.year, next_month.month]))
+      self.assertEqual(response.status_code, 200)
+      
+      # Check if the recurring category exists in the next month's budget
+      next_month_category = FiftyThirtyTwentyCategory.objects.filter(
+          name='Savings', 
+          budget=self.fifty_thirty_twenty_budget, 
+          month=next_month,
+          is_recurring=True
+      ).exists()
+      
+      # Check if the recurring expense exists in the next month's category
+      next_month_expense = Expense.objects.filter(
+          fifty_30_twenty_category__name='Savings', 
+          description='Recurring Expense', 
+          assigned_amount=50, 
+          fifty_30_twenty_category__budget=self.fifty_thirty_twenty_budget, 
+          fifty_30_twenty_category__month=next_month,
+          is_recurring=True
+      ).exists()
+      self.assertTrue(next_month_expense)
       
 
       

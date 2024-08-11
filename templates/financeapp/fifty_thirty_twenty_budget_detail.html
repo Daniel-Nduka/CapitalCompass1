@@ -100,6 +100,13 @@
             <div class="form-group">
                 <label for="id_description">Expense Description:</label>
                 <input type="text" name="description" id="id_description" required>
+                {% if messages %}
+                {% for message in messages %}
+                    {% if "add_fifty_expense_danger" in message.tags %}
+                        <div class="error" style="color: red;">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+                {% endif %}
             </div>
             <div class="form-group">
                 <label for="id_assigned_amount">Cost:</label>
@@ -138,6 +145,13 @@
             <div class="form-group">
                 <label for="edit-expense-description">Expense Description:</label>
                 <input type="text" name="description" id="edit-expense-description" required>
+                {% if messages %}
+                {% for message in messages %}
+                    {% if "edit_fifty_expense_danger" in message.tags %}
+                        <div class="error" style="color: red;">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+                {% endif %}
             </div>
             <div class="form-group">
                 <label for="edit-expense-assigned">Cost:</label>
@@ -177,7 +191,7 @@
         <h2>Edit Category</h2>
         <form method="post" action="{% url 'financeapp:edit_category' budget.id %}">
             {% csrf_token %}
-            <input type="hidden" name="category_id" id="edit-category-id">
+            <input type="hidden" name="fifty_30_twenty_category_id" id="edit-category-id">
             <div class="form-group">
                 <label for="edit-category-assigned-amount">Assigned Amount:</label>
                 <input type="number" name="assigned_amount" id="edit-category-assigned-amount" required>
@@ -245,7 +259,7 @@
        
         document.getElementById('edit-category-assigned-amount').value = assignedAmount;
         document.getElementById('edit-category-is_recurring').checked = (isRecurring === 'true');
-        document.getElementById('delete-category-id').value = categoryId; // Populate delete category ID
+       // document.getElementById('delete-category-id').value = categoryId; // Populate delete category ID
     }
 
     function closeEditCategoryForm() {
@@ -268,14 +282,32 @@
             }
         });
     }
-
-    // Ensure modals are hidden by default on page load
-    window.onload = function() {
-       
+    document.addEventListener('DOMContentLoaded', function () {
+        closeEditCategoryForm();
         closeAddExpenseForm();
         closeEditExpenseForm();
-        closeEditCategoryForm();
-        updateCategoryAssignedColor();
-    }
+        updateCategoryAssignedColor(); // Check and update category assigned amount colors
+    
+
+        // Show the Add Expense modal if there are errors related to adding an expense
+        {% if messages %}
+            {% for message in messages %}
+                {% if "add_fifty_expense_danger" in message.tags %}
+                    showAddExpenseForm('{{ form.fifty_30_twenty_category_id.value }}', '{{ form.is_recurring.value }}');
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        // Show the Edit Expense modal if there are errors related to editing an expense
+        {% if messages %}
+            {% for message in messages %}
+                {% if "edit_fifty_expense_danger" in message.tags %}
+                    showEditExpenseForm('{{ form.expense_id.value }}', '{{ form.fifty_30_twenty_category_id.value }}', '{{ form.description.value }}', '{{ form.assigned_amount.value }}', '{{ form.is_category_recurring.value }}', '{{ form.is_recurring.value }}');
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    });
+
+
 </script>
 {% endblock %}

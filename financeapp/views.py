@@ -382,12 +382,16 @@ def add_zero_based_category(request, budget_id):
         if form.is_valid():
             category = form.save(commit=False)
             category.budget = budget
-            category.save()
-            return redirect('financeapp:zero_based_page', budget_id=budget.id)
+            try:
+                category.save()
+                messages.success(request, 'Category added successfully.')
+                return redirect('financeapp:zero_based_page', budget_id=budget.id)  
+            except IntegrityError:
+                messages.error(request, 'A category with this name already exists.', extra_tags='add_zero_category_danger')
         else:
             # Capture and display form errors
             for error in form.errors.values():
-                messages.error(request, error)      
+                messages.error(request, error, extra_tags='add_zero_category_danger')      
     else:
         form = ZeroBudgetForm(budget=budget)
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
@@ -404,24 +408,26 @@ def edit_zero_based_category(request, budget_id):
         if category_form.is_valid():
             updated_category = category_form.save(commit=False)
             is_recurring = updated_category.is_recurring
+            
+            try: 
+                # Save the current category
+                updated_category.save()
 
-            # Save the current category
-            updated_category.save()
+                # If the category is recurring, update future instances
+                if is_recurring:
+                    future_categories = ZeroBasedCategory.objects.filter(
+                        budget=budget,
+                        name=updated_category.name,
+                        month__gt=updated_category.month,
+                        is_recurring=True
+                    )
+                    for future_category in future_categories:
+                        future_category.assigned_amount = updated_category.assigned_amount
+                        future_category.save()
 
-            # If the category is recurring, update future instances
-            if is_recurring:
-                future_categories = ZeroBasedCategory.objects.filter(
-                    budget=budget,
-                    name=updated_category.name,
-                    month__gt=updated_category.month,
-                    is_recurring=True
-                )
-
-                for future_category in future_categories:
-                    future_category.assigned_amount = updated_category.assigned_amount
-                    future_category.save()
-
-            return redirect('financeapp:zero_based_page', budget_id=budget.id)
+                return redirect('financeapp:zero_based_page', budget_id=budget.id)
+            except IntegrityError:
+                messages.error(request, 'A category with this name already exists.', extra_tags='edit_zero_category_danger')      
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
 
 #Delete zero-based Category
@@ -440,16 +446,33 @@ def delete_zero_based_category(request, budget_id):
 @login_required
 def add_zero_based_expense(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='zero_based')
+    
     if request.method == 'POST':
         expense_form = ExpenseForm(request.POST)
+        category_id = request.POST.get('category_id')
+        
+        # Ensure category_id is provided and valid
+        if not category_id or not category_id.isdigit():
+            messages.error(request, 'Please select a valid category.', extra_tags='add_zero_expense_danger')
+            return redirect('financeapp:zero_based_page', budget_id=budget.id)
+        
         if expense_form.is_valid():
             expense = expense_form.save(commit=False)
-            expense.category = get_object_or_404(ZeroBasedCategory, id=request.POST.get('category_id'))
-            expense.save()
-
-            # Ensure future recurring items are copied when a new recurring expense is added
-            return redirect('financeapp:zero_based_page', budget_id=budget.id)
+            category = get_object_or_404(ZeroBasedCategory, id=category_id)
+            expense.category = category
+            
+            try: 
+                expense.save()
+                messages.success(request, 'Expense added successfully.')
+                return redirect('financeapp:zero_based_page', budget_id=budget.id)
+            except IntegrityError:
+                messages.error(request, 'An expense with this description already exists.', extra_tags='add_zero_expense_danger')
+        else:
+            print(f"Form is invalid: {expense_form.errors}")  # Debugging line
+            messages.error(request, 'Form is invalid. Please correct the errors and try again.', extra_tags='add_zero_expense_danger')
+    
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
+
 
 #Edit zero based expense
 @login_required
@@ -468,23 +491,25 @@ def edit_zero_based_expense(request, budget_id):
 
             # Save the current expense
             updated_expense.is_recurring = is_recurring
-           
-            updated_expense.save()
+            
+            try: 
+                updated_expense.save()
           
-            if is_recurring:
-                future_expenses = Expense.objects.filter(
-                    category__budget=budget,
-                    category__name=category.name,
-                    description=updated_expense.description,
-                    category__month__gt=category.month,
-                    is_recurring=True
-                )
+                if is_recurring:
+                    future_expenses = Expense.objects.filter(
+                        category__budget=budget,
+                        category__name=category.name,
+                        description=updated_expense.description,
+                        category__month__gt=category.month,
+                        is_recurring=True
+                    )
+                    for future_expense in future_expenses:
+                        future_expense.assigned_amount = updated_expense.assigned_amount
+                        future_expense.save()
 
-                for future_expense in future_expenses:
-                    future_expense.assigned_amount = updated_expense.assigned_amount
-                    future_expense.save()
-
-            return redirect('financeapp:zero_based_page', budget_id=budget.id)
+                return redirect('financeapp:zero_based_page', budget_id=budget.id)
+            except IntegrityError:
+                messages.error(request, 'An expense with this description already exists.', extra_tags='edit_zero_expense_danger')
         else:
             print("Form is invalid", form.errors)  # Debugging line
     else:
@@ -599,7 +624,7 @@ def fifty_thirty_twenty_page(request, budget_id, year=None, month=None):
 @login_required
 def edit_fifty_thirty_twenty_category(request, budget_id):
     base_budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='fifty_thirty_twenty')
-    category_id = request.POST.get('category_id')
+    category_id = request.POST.get('fifty_30_twenty_category_id')
     category = get_object_or_404(FiftyThirtyTwentyCategory, id=category_id, budget=base_budget)
     if request.method == 'POST':
         category_form = Fifty_Twenty_ThirtyForm(request.POST, instance=category)
@@ -625,14 +650,28 @@ def edit_fifty_thirty_twenty_category(request, budget_id):
 @login_required
 def add_fifty_thirty_twenty_expense(request, budget_id):
     budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='fifty_thirty_twenty')
+    
     if request.method == 'POST':
         expense_form = ExpenseForm(request.POST)
+        
         if expense_form.is_valid():
             expense = expense_form.save(commit=False)
-            #expense.category = None  # Explicitly set category to None
-            expense.fifty_30_twenty_category = get_object_or_404(FiftyThirtyTwentyCategory, id=request.POST.get('fifty_30_twenty_category_id'))
-            expense.save()
-            return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
+            category_id = request.POST.get('fifty_30_twenty_category_id')
+
+            if not category_id or not category_id.isdigit():
+                messages.error(request, 'Please select a valid category.', extra_tags='add_fifty_expense_danger')
+                return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
+            
+            try:
+                expense.fifty_30_twenty_category = get_object_or_404(FiftyThirtyTwentyCategory, id=category_id)
+                expense.save()
+                messages.success(request, 'Expense added successfully.')
+                return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
+            except IntegrityError:
+                messages.error(request, 'An expense with this description already exists.', extra_tags='add_fifty_expense_danger')
+        else:
+            messages.error(request, 'Form is invalid. Please correct the errors and try again.', extra_tags='add_fifty_expense_danger')
+
     return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
 
 
@@ -650,27 +689,29 @@ def edit_fifty_thirty_twenty_expense(request, budget_id):
         if form.is_valid():
             updated_expense = form.save(commit=False)
             is_recurring = 'is_recurring' in request.POST
-            print(f"Is recurring: {is_recurring}")  # Debugging line
 
             # Save the current expense
             updated_expense.is_recurring = is_recurring
-            updated_expense.save()
+            
+            try: 
+                updated_expense.save()
 
-            # If the expense is recurring, update future instances
-            if is_recurring:
-                future_expenses = Expense.objects.filter(
-                    fifty_30_twenty_category__budget=base_budget,
-                    fifty_30_twenty_category__name=category.name,
-                    description=updated_expense.description,
-                    fifty_30_twenty_category__month__gt=category.month,
-                    is_recurring=True
-                )
-
-                for future_expense in future_expenses:
-                    future_expense.assigned_amount = updated_expense.assigned_amount
-                    future_expense.save()
+                # If the expense is recurring, update future instances
+                if is_recurring:
+                    future_expenses = Expense.objects.filter(
+                        fifty_30_twenty_category__budget=base_budget,
+                        fifty_30_twenty_category__name=category.name,
+                        description=updated_expense.description,
+                        fifty_30_twenty_category__month__gt=category.month,
+                        is_recurring=True
+                    )
+                    for future_expense in future_expenses:
+                        future_expense.assigned_amount = updated_expense.assigned_amount
+                        future_expense.save()
                     
-            return redirect('financeapp:fifty_thirty_twenty_page', budget_id=base_budget.id)
+                return redirect('financeapp:fifty_thirty_twenty_page', budget_id=base_budget.id)
+            except IntegrityError:
+                messages.error(request, 'An expense with this description already exists.', extra_tags='edit_fifty_expense_danger')
         else:
             print("Form is invalid", form.errors)  # Debugging line
     else:
@@ -688,7 +729,7 @@ def delete_50_expense(request, budget_id):
     selected_date = datetime.date(today.year, today.month, 1)
     #fifty_thirty_twenty_budget, _ = FiftyThirtyTwentyBudget.objects.get_or_create(budget=base_budget, month=selected_date)
 
-    category_id = request.POST.get('category_id')
+    category_id = request.POST.get('fifty_30_twenty_category_id')
     expense_id = request.POST.get('expense_id')
 
     if category_id and expense_id:
