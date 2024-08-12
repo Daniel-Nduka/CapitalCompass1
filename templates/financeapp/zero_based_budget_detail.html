@@ -285,12 +285,14 @@
         }
         function closeAddCategoryForm() {
             document.getElementById('add-category-form').style.display = 'none';
+   
         }
 
 
         /* edit category */
         function showEditCategoryForm(categoryId, categoryName, assignedAmount, isRecurring) {
             document.getElementById('edit-category-form').style.display = 'flex';
+            sessionStorage.setItem('editCategoryFormClosed', 'false');
             document.getElementById('edit-category-id').value = categoryId;
             document.getElementById('edit-category-name').value = categoryName;
             document.getElementById('edit-category-assigned-amount').value = assignedAmount;
@@ -300,6 +302,8 @@
 
         function closeEditCategoryForm() {
             document.getElementById('edit-category-form').style.display = 'none';
+            sessionStorage.setItem('editCategoryFormClosed', 'true');
+        
         }
 
 
@@ -317,10 +321,15 @@
                 recurringContainer.style.display = 'none';
                 console.log("Hiding Recurring Option for Add Expense");
             }
+            // Set form field values
+            document.getElementById('id_description').value = description;
+            document.getElementById('id_assigned_amount').value = assignedAmount;
+            document.getElementById('id_is_recurring').checked = (isRecurring === 'true');
         }
 
         function closeAddExpenseForm() {
             document.getElementById('add-expense-form').style.display = 'none';
+         
         }
 
         function showEditExpenseForm(expenseId, categoryId, expenseDescription, assignedAmount, isCategoryRecurring, isRecurring) {
@@ -347,6 +356,7 @@
 
         function closeEditExpenseForm() {
             document.getElementById('edit-expense-form').style.display = 'none';
+        
         }
 
         // Function to update category assigned amount color based on total assigned expenses
@@ -366,13 +376,15 @@
             });
         }
 
+     
+
         document.addEventListener('DOMContentLoaded', function () {
             closeAddCategoryForm();
             closeEditCategoryForm();
             closeAddExpenseForm();
             closeEditExpenseForm();
             updateCategoryAssignedColor(); // Check and update category assigned amount colors
-            
+        
             // Show the Add Category modal if there are errors related to adding a category
             {% if messages %}
                 {% for message in messages %}
@@ -383,38 +395,59 @@
             {% endif %}
         
             // Show the Edit Category modal if there are errors related to editing a category
-            {% if messages %}
-                {% for message in messages %}
-                    {% if "edit_zero_category_danger" in message.tags %}
-                        showEditCategoryForm('{{ form.category_id.value }}', '{{ form.name.value }}', '{{ form.assigned_amount.value }}', '{{ form.is_recurring.value }}');
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+            
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if "edit_zero_category_danger" in message.tags %}
+                            showEditCategoryForm(
+                                '{{ category_id }}', 
+                                '{{ category_form.name.value }}', 
+                                '{{ category_form.assigned_amount.value }}', 
+                                '{{ category_form.is_recurring.value|default:"false" }}'
+                            );
+                        {% endif %}
+                    {% endfor %}    
+                {% endif %}
 
+        
             // Show the Add Expense modal if there are errors related to adding an expense
             {% if messages %}
                 {% for message in messages %}
                     {% if "add_zero_expense_danger" in message.tags %}
-                        showAddExpenseForm('{{ form.category_id.value }}', '{{ form.is_recurring.value }}');
+                    showAddExpenseForm(
+                        '{{ category_id }}', 
+                        '{{ expense_form.description.value|escapejs }}', 
+                        '{{ expense_form.assigned_amount.value|escapejs }}', 
+                        '{{ expense_form.is_recurring.value|yesno:"true,false" }}', 
+                        '{{ expense_form.is_recurring.value|default:"false" }}'
+                    );
+
                     {% endif %}
                 {% endfor %}
             {% endif %}
-
+        
             // Show the Edit Expense modal if there are errors related to editing an expense
             {% if messages %}
                 {% for message in messages %}
                     {% if "edit_zero_expense_danger" in message.tags %}
-                        showEditExpenseForm('{{ form.expense_id.value }}', '{{ form.category_id.value }}', '{{ form.description.value }}', '{{ form.assigned_amount.value }}', '{{ form.is_category_recurring.value }}', '{{ form.is_recurring.value }}');
+                    showEditExpenseForm(
+                        '{{ form.instance.id|default:"" }}', 
+                        '{{ form.instance.category.id|default:"" }}', 
+                        '{{ form.description.value|default:"" }}', 
+                        '{{ form.assigned_amount.value|default:"" }}', 
+                        '{{ form.instance.category.is_recurring|yesno:"true,false" }}', 
+                        '{{ form.is_recurring.value|default:"false" }}'
+                    );
                     {% endif %}
                 {% endfor %}
             {% endif %}
         });
         
         
+        
 
-        // Run the update function on page load
-        /*
-        window.onload = function() {
+        
+       /*window.onload = function() {
             closeAddCategoryForm();
             closeEditCategoryForm();
             closeAddExpenseForm();

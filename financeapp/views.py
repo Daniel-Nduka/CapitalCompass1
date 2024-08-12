@@ -396,6 +396,64 @@ def add_zero_based_category(request, budget_id):
         form = ZeroBudgetForm(budget=budget)
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
 
+def handle_integrity_error(request, budget, form, category_id=None, template_name='financeapp/zero_based_budget_detail.html'):
+    # Determine the budget type and get the appropriate category model and context name
+    if budget.budget_type == 'zero_based':
+        CategoryModel = ZeroBasedCategory
+        category_context_name = 'category_id'
+        template_name = 'financeapp/zero_based_budget_detail.html'
+    elif budget.budget_type == 'fifty_thirty_twenty':
+        CategoryModel = FiftyThirtyTwentyCategory
+        category_context_name = 'fifty_30_twenty_category_id'
+        template_name = 'financeapp/fifty_thirty_twenty_budget_detail.html'
+    else:
+        raise ValueError("Unsupported budget type")
+    
+    # Log the category ID and budget details for debugging
+    print(f"Handling IntegrityError for budget: {budget.budget_type}, Category ID: {category_id}")
+
+    # Retrieve the category based on the category_id
+    category = get_object_or_404(CategoryModel, id=category_id, budget=budget)
+    
+    # Query for the categories in the selected month
+    categories = CategoryModel.objects.filter(budget=budget, month__year=category.month.year, month__month=category.month.month)
+    
+    # Calculate totals
+    total_balance = budget.accounts.aggregate(Sum('balance'))['balance__sum'] or 0
+    budgeted_money = sum(cat.assigned_amount for cat in categories)
+    spent_money = sum(cat.activity for cat in categories)
+    money_available = total_balance - spent_money
+
+    # Determine previous and next month
+    previous_month_date = category.month.replace(day=1) - datetime.timedelta(days=1)
+    next_month_date = category.month.replace(day=28) + datetime.timedelta(days=4)
+    previous_month = previous_month_date.month
+    previous_year = previous_month_date.year
+    next_month = next_month_date.replace(day=1).month
+    next_year = next_month_date.replace(day=1).year
+
+    # Create context dictionary
+    context = {
+        'budget': budget,
+        'category_form': form,  # Pass the bound form to retain values
+        'form': form,
+        category_context_name: category_id,  # Use the appropriate context name for the category ID
+        'categories': categories,
+        'total_balance': total_balance,
+        'budgeted_money': budgeted_money,
+        'spent_money': spent_money,
+        'money_available': money_available,
+        'selected_date': category.month,
+        'year': category.month.year,
+        'month': category.month.month,
+        'previous_month': previous_month,
+        'previous_year': previous_year,
+        'next_month': next_month,
+        'next_year': next_year,
+    }
+
+    return render(request, template_name, context)
+
 #Edit zero based category
 @login_required
 def edit_zero_based_category(request, budget_id):
@@ -408,8 +466,8 @@ def edit_zero_based_category(request, budget_id):
         if category_form.is_valid():
             updated_category = category_form.save(commit=False)
             is_recurring = updated_category.is_recurring
-            
-            try: 
+
+            try:
                 # Save the current category
                 updated_category.save()
 
@@ -427,8 +485,10 @@ def edit_zero_based_category(request, budget_id):
 
                 return redirect('financeapp:zero_based_page', budget_id=budget.id)
             except IntegrityError:
-                messages.error(request, 'A category with this name already exists.', extra_tags='edit_zero_category_danger')      
+                messages.error(request, 'A category with this name already exists.', extra_tags='edit_zero_category_danger')
+                return handle_integrity_error(request, budget, category_form, category_id)
     return redirect('financeapp:zero_based_page', budget_id=budget.id)
+
 
 #Delete zero-based Category
 @login_required
@@ -467,6 +527,7 @@ def add_zero_based_expense(request, budget_id):
                 return redirect('financeapp:zero_based_page', budget_id=budget.id)
             except IntegrityError:
                 messages.error(request, 'An expense with this description already exists.', extra_tags='add_zero_expense_danger')
+                return handle_integrity_error(request, budget, expense_form, category_id)
         else:
             print(f"Form is invalid: {expense_form.errors}")  # Debugging line
             messages.error(request, 'Form is invalid. Please correct the errors and try again.', extra_tags='add_zero_expense_danger')
@@ -482,6 +543,7 @@ def edit_zero_based_expense(request, budget_id):
     category = get_object_or_404(ZeroBasedCategory, id=category_id, budget=budget)
     expense_id = request.POST.get('expense_id')
     expense = get_object_or_404(Expense, id=expense_id, category=category)
+    
 
     if request.method == 'POST':
         form = ExpenseForm(request.POST, instance=expense)
@@ -510,6 +572,8 @@ def edit_zero_based_expense(request, budget_id):
                 return redirect('financeapp:zero_based_page', budget_id=budget.id)
             except IntegrityError:
                 messages.error(request, 'An expense with this description already exists.', extra_tags='edit_zero_expense_danger')
+                return handle_integrity_error(request, budget, form, category_id)
+
         else:
             print("Form is invalid", form.errors)  # Debugging line
     else:
@@ -669,12 +733,64 @@ def add_fifty_thirty_twenty_expense(request, budget_id):
                 return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
             except IntegrityError:
                 messages.error(request, 'An expense with this description already exists.', extra_tags='add_fifty_expense_danger')
+                return handle_integrity_error(request, budget, expense_form, category_id)
         else:
             messages.error(request, 'Form is invalid. Please correct the errors and try again.', extra_tags='add_fifty_expense_danger')
 
     return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
 
+'''
+@login_required
+def handle_fifty_thirty_twenty_integrity_error(request, budget, form, category_id=None, template_name='financeapp/fifty_thirty_twenty_budget_detail.html'):
+    # Ensure the correct model and context name are being used
+    CategoryModel = FiftyThirtyTwentyCategory
+    category_context_name = 'fifty_30_twenty_category_id'
+    
+    # Log the category ID and budget details for debugging
+    print(f"Handling IntegrityError for budget: {budget.budget_type}, Category ID: {category_id}")
+    
+    # Retrieve the category based on the category_id
+    category = get_object_or_404(CategoryModel, id=category_id, budget=budget)
+    
+    # Query for the categories in the selected month
+    categories = CategoryModel.objects.filter(budget=budget, month__year=category.month.year, month__month=category.month.month)
+    
+    # Calculate totals
+    total_balance = budget.accounts.aggregate(Sum('balance'))['balance__sum'] or 0
+    budgeted_money = sum(cat.assigned_amount for cat in categories)
+    spent_money = sum(cat.activity for cat in categories)
+    money_available = total_balance - spent_money
 
+    # Determine previous and next month
+    previous_month_date = category.month.replace(day=1) - datetime.timedelta(days=1)
+    next_month_date = category.month.replace(day=28) + datetime.timedelta(days=4)
+    previous_month = previous_month_date.month
+    previous_year = previous_month_date.year
+    next_month = next_month_date.replace(day=1).month
+    next_year = next_month_date.replace(day=1).year
+
+    # Create context dictionary
+    context = {
+        'budget': budget,
+        'category_form': form,  # Pass the bound form to retain values
+        'form': form,
+        category_context_name: category_id,  # Ensure the correct category ID is passed
+        'categories': categories,
+        'total_balance': total_balance,
+        'budgeted_money': budgeted_money,
+        'spent_money': spent_money,
+        'money_available': money_available,
+        'selected_date': category.month,
+        'year': category.month.year,
+        'month': category.month.month,
+        'previous_month': previous_month,
+        'previous_year': previous_year,
+        'next_month': next_month,
+        'next_year': next_year,
+    }
+
+    return render(request, template_name, context)
+'''
 @login_required
 def edit_fifty_thirty_twenty_expense(request, budget_id):
     base_budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='fifty_thirty_twenty')
@@ -691,8 +807,7 @@ def edit_fifty_thirty_twenty_expense(request, budget_id):
             is_recurring = 'is_recurring' in request.POST
 
             # Save the current expense
-            updated_expense.is_recurring = is_recurring
-            
+            updated_expense.is_recurring = is_recurring       
             try: 
                 updated_expense.save()
 
@@ -712,6 +827,7 @@ def edit_fifty_thirty_twenty_expense(request, budget_id):
                 return redirect('financeapp:fifty_thirty_twenty_page', budget_id=base_budget.id)
             except IntegrityError:
                 messages.error(request, 'An expense with this description already exists.', extra_tags='edit_fifty_expense_danger')
+                return handle_integrity_error(request, base_budget, form, category_id)
         else:
             print("Form is invalid", form.errors)  # Debugging line
     else:

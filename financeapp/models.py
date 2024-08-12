@@ -91,7 +91,7 @@ def create_initial_transaction(sender, instance, created, **kwargs):
 #Base Category
 class BaseCategory(models.Model):
     assigned_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    month = models.DateField(default=datetime.date.today)
+    month = models.DateField(default=datetime.date.today().replace(day=1))
     
     
     class Meta:
@@ -128,6 +128,7 @@ class FiftyThirtyTwentyCategory(BaseCategory):
 
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='fifty_thirty_twenty_categories')
     name = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+   # month_only = models.DateField(default=datetime.date.today().replace(day=1))
     is_recurring = models.BooleanField(default=True)  # New field to indicate if category is occuring
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -137,7 +138,7 @@ class FiftyThirtyTwentyCategory(BaseCategory):
         return f"{self.name} - {self.budget.budget_name} ({self.month.strftime('%B %Y')})"
 
     class Meta:
-        unique_together = ('budget', 'name', 'month')
+        unique_together = ('budget', 'name', 'month')   
   
 @receiver(post_save, sender=Budget)
 def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
@@ -157,6 +158,7 @@ def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
 class ZeroBasedCategory(BaseCategory):
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='zero_based_categories')
     name = models.CharField(max_length=100) 
+    month_only = models.DateField(default=datetime.date.today().replace(day=1))
     is_recurring = models.BooleanField(default=False)
     class Meta:
         unique_together = ('budget', 'name', 'month')
@@ -170,13 +172,13 @@ class Expense(models.Model):
     description = models.CharField(max_length=255, blank=True, null=True)
     date = models.DateField(auto_now_add=True)
     is_recurring = models.BooleanField(default=False)  # New field to indicate if the expense is recurring
-    #month_only = models.DateField(default=datetime.date.today().replace(day=1))
+    month_only = models.DateField(default=datetime.date.today().replace(day=1))
     
     assigned_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     
     class Meta:
-        unique_together = ('fifty_30_twenty_category', 'description', 'date'), ('category', 'description', 'date')
+        unique_together = ('fifty_30_twenty_category', 'description', 'month_only'), ('category', 'description', 'month_only')
         
 
     def __str__(self):

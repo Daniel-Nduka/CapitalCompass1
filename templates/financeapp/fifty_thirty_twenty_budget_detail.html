@@ -176,7 +176,7 @@
         <form method="post" action="{% url 'financeapp:delete_expense' budget.id %}">
             {% csrf_token %}
             <input type="hidden" name="expense_id" id="delete-expense-id">
-            <input type="hidden" name="category_id" id="delete-expense-category-id">
+            <input type="hidden" name="fifty_30_twenty_category_id" id="delete-expense-category-id">
             <div class="form-group submit-btn">
                 <button type="submit" name="delete_expense" class="btn btn-danger">Delete Expense</button>
             </div>
@@ -289,20 +289,33 @@
         updateCategoryAssignedColor(); // Check and update category assigned amount colors
     
 
-        // Show the Add Expense modal if there are errors related to adding an expense
         {% if messages %}
-            {% for message in messages %}
-                {% if "add_fifty_expense_danger" in message.tags %}
-                    showAddExpenseForm('{{ form.fifty_30_twenty_category_id.value }}', '{{ form.is_recurring.value }}');
-                {% endif %}
-            {% endfor %}
-        {% endif %}
+                {% for message in messages %}
+                    {% if "add_fifty_expense_danger" in message.tags %}
+                    showAddExpenseForm(
+                        '{{ fifty_30_twenty_category_id }}', 
+                        '{{ expense_form.description.value|escapejs }}', 
+                        '{{ expense_form.assigned_amount.value|escapejs }}', 
+                        '{{ expense_form.is_recurring.value|yesno:"true,false" }}', 
+                        '{{ expense_form.is_recurring.value|default:"false" }}'
+                    );
+
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
 
         // Show the Edit Expense modal if there are errors related to editing an expense
         {% if messages %}
             {% for message in messages %}
                 {% if "edit_fifty_expense_danger" in message.tags %}
-                    showEditExpenseForm('{{ form.expense_id.value }}', '{{ form.fifty_30_twenty_category_id.value }}', '{{ form.description.value }}', '{{ form.assigned_amount.value }}', '{{ form.is_category_recurring.value }}', '{{ form.is_recurring.value }}');
+                    showEditExpenseForm(
+                        '{{ form.instance.id|default:"" }}', 
+                        '{{ form.instance.fifty_30_twenty_category.id|default:"" }}', 
+                        '{{ form.description.value|default:"" }}', 
+                        '{{ form.assigned_amount.value|default:"" }}', 
+                        '{{ form.instance.category.is_recurring|yesno:"true,false" }}', 
+                        '{{ form.is_recurring.value|default:"false" }}'
+                    );
                 {% endif %}
             {% endfor %}
         {% endif %}
