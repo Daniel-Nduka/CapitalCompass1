@@ -131,7 +131,7 @@ class FiftyThirtyTwentyCategory(BaseCategory):
     is_recurring = models.BooleanField(default=True)  # New field to indicate if category is occuring
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    month_only = models.DateField(default=datetime.date.today().replace(day=1))
+   # month_only = models.DateField(default=datetime.date.today().replace(day=1))
 
 
     def __str__(self):
@@ -158,7 +158,7 @@ def create_fifty_thirty_twenty_categories(sender, instance, created, **kwargs):
 class ZeroBasedCategory(BaseCategory):
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='zero_based_categories')
     name = models.CharField(max_length=100)
-    month_only = models.DateField(default=datetime.date.today().replace(day=1))
+   # month_only = models.DateField(default=datetime.date.today().replace(day=1))
     is_recurring = models.BooleanField(default=False)
     class Meta:
         unique_together = ('budget', 'name', 'month')
