@@ -127,7 +127,7 @@ main {
   margin-top: 50px; /* Your custom margin */
 }
 
-.add-category-button:hover {
+.add-category-button:hover, .month-button:hover {
   background-color: #0056b3;
 }
 

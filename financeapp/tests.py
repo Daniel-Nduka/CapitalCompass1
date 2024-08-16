@@ -444,12 +444,132 @@ class FinanceAppTests(TestCase):
       ).exists()
       self.assertTrue(next_month_expense)
       
+    #Test Transaction
+    #Test inflow Transaction
+    def test_add_transaction(self):
+      self.set_session()
+      account = Account.objects.create(account_name='Test_Account', account_type='CASH', balance=100, budget=self.budget)
+       # Test that the initial transaction was created
+      initial_transaction = Transaction.objects.filter(account=account, description__startswith='Initial balance').first()
+      self.assertIsNotNone(initial_transaction, "Initial transaction was not created.")
+      self.assertEqual(initial_transaction.inflow, 100)
+      self.assertEqual(initial_transaction.outflow, 0)
+      self.assertTrue(initial_transaction.created_by_account)
+      # Create an inflow transaction
+      inflow_amount = 50
+      transaction_inflow = Transaction.objects.create(
+          account=account,
+          inflow=inflow_amount,
+          outflow=0,
+          description='Test Inflow',
+          date=timezone.now()
+        )
+       # Assert the balance has been correctly updated
+      self.assertEqual(account.balance, 150, "Account balance did not update correctly.")
+      self.assertEqual(transaction_inflow.account, account)
+      self.assertEqual(transaction_inflow.inflow, inflow_amount)
+      
+      self.assertEqual(transaction_inflow.outflow, 0)
+      # Check that the transaction was created and linked to the account
+      self.assertIsNotNone(transaction_inflow.id, "Inflow transaction was not created.")
+      
+      #Test outflow Transaction
+      category = ZeroBasedCategory.objects.create(name='Test Category', assigned_amount=100, budget=self.budget)
+      expense = Expense.objects.create(category=category, description='Test Expense', assigned_amount=50)
+      
+      outflow_amount = 50
+      transaction_outflow = Transaction.objects.create(
+        account=account,
+        expense=expense,
+        inflow=0,
+        outflow=outflow_amount,
+        description='Test Outflow',
+        date=timezone.now()
+       
+      )
+      self.assertEqual(account.balance, 100, "Account balance did not update correctly.")
+      self.assertEqual(transaction_outflow.account, account)
+      self.assertEqual(transaction_outflow.outflow, outflow_amount)
+      self.assertEqual(expense.spent, 50)
+      
+      self.assertEqual(transaction_outflow.inflow, 0)
+      self.assertIsNotNone(transaction_outflow.id, "outflow transaction was not created.")
+      
+      
+    #Test edit Transaction
+    def test_edit_transaction(self):
+      self.set_session()
+      category = ZeroBasedCategory.objects.create(name='Test Category', assigned_amount=100, budget=self.budget)
+      account = Account.objects.create(account_name='Test_Account', account_type='CASH', balance=100, budget=self.budget)
+      expense = Expense.objects.create(category=category, description='Test Expense', assigned_amount=50)
+        
+      outflow_amount = 40
+      transaction = Transaction.objects.create(
+        account=account,
+        expense=expense,
+        inflow=0,
+        outflow=outflow_amount,
+        description='Test Outflow',
+        date=timezone.now().strftime('%Y-%m-%d'),
+          )
+      
+      new_outflow_amount = 60
+      form_data = {
+        'transaction_id': transaction.id,
+        'expense': expense.id,
+        'account': account.id,    
+        'description': 'Test Outflow',
+        'outflow': new_outflow_amount,  # Change the outflow amount
+        'date': timezone.now().strftime('%Y-%m-%d'),  # Ensure the date is in the correct format
+        'inflow': 0,  # Include inflow as it's a required field
+        }
 
       
-      
-   
+      response = self.client.post(reverse('financeapp:edit_transaction'), form_data)
 
+      self.assertEqual(response.status_code, 302)
+      self.assertTrue(Transaction.objects.filter(expense=expense, account=account, description='Test Outflow', outflow=new_outflow_amount).exists())
+      account.refresh_from_db()
+      self.assertEqual(account.balance, 40)  # 100 - 60 = 40
+      expense.refresh_from_db()
+      self.assertEqual(expense.spent, 60)
+        
+    #Test delete Transaction
+    def test_delete_transaction(self):
+      self.set_session()
+      category = ZeroBasedCategory.objects.create(name='Test Category', assigned_amount=100, budget=self.budget)
+      account = Account.objects.create(account_name='Test_Account', account_type='CASH', balance=100, budget=self.budget)
+      expense = Expense.objects.create(category=category, description='Test Expense', assigned_amount=50)
+        
+        
+      outflow_amount = 40
+      transaction_outflow = Transaction.objects.create(
+        account=account,
+        expense=expense,
+        inflow=0,
+        outflow=outflow_amount,
+        description='Test Outflow',
+        date=timezone.now()  
+        )
+      # Assert initial conditions
+      self.assertEqual(account.balance, 60, "Initial balance did not update correctly after transaction.")  # 100 - 40 = 60
       
+      form_data = {
+        'transaction_id': transaction_outflow.id,
+       
+        }
       
-      
-      
+        
+      response = self.client.post(reverse('financeapp:delete_transaction'), form_data)
+      if response.context and 'form' in response.context:
+        print("Form errors:", response.context['form'].errors)  # Print form errors for debugging
+
+      self.assertEqual(response.status_code, 302)
+      # Ensure the transaction has been deleted
+      transaction_exists = Transaction.objects.filter(id=transaction_outflow.id).exists()
+      self.assertFalse(transaction_exists, "Transaction was not deleted.")
+
+      self.assertFalse(Transaction.objects.filter(id=transaction_outflow.id).exists(), "Transaction was not deleted.")  
+      account.refresh_from_db()
+      self.assertEqual(account.balance, 100)
+     

@@ -739,58 +739,7 @@ def add_fifty_thirty_twenty_expense(request, budget_id):
 
     return redirect('financeapp:fifty_thirty_twenty_page', budget_id=budget.id)
 
-'''
-@login_required
-def handle_fifty_thirty_twenty_integrity_error(request, budget, form, category_id=None, template_name='financeapp/fifty_thirty_twenty_budget_detail.html'):
-    # Ensure the correct model and context name are being used
-    CategoryModel = FiftyThirtyTwentyCategory
-    category_context_name = 'fifty_30_twenty_category_id'
-    
-    # Log the category ID and budget details for debugging
-    print(f"Handling IntegrityError for budget: {budget.budget_type}, Category ID: {category_id}")
-    
-    # Retrieve the category based on the category_id
-    category = get_object_or_404(CategoryModel, id=category_id, budget=budget)
-    
-    # Query for the categories in the selected month
-    categories = CategoryModel.objects.filter(budget=budget, month__year=category.month.year, month__month=category.month.month)
-    
-    # Calculate totals
-    total_balance = budget.accounts.aggregate(Sum('balance'))['balance__sum'] or 0
-    budgeted_money = sum(cat.assigned_amount for cat in categories)
-    spent_money = sum(cat.activity for cat in categories)
-    money_available = total_balance - spent_money
-
-    # Determine previous and next month
-    previous_month_date = category.month.replace(day=1) - datetime.timedelta(days=1)
-    next_month_date = category.month.replace(day=28) + datetime.timedelta(days=4)
-    previous_month = previous_month_date.month
-    previous_year = previous_month_date.year
-    next_month = next_month_date.replace(day=1).month
-    next_year = next_month_date.replace(day=1).year
-
-    # Create context dictionary
-    context = {
-        'budget': budget,
-        'category_form': form,  # Pass the bound form to retain values
-        'form': form,
-        category_context_name: category_id,  # Ensure the correct category ID is passed
-        'categories': categories,
-        'total_balance': total_balance,
-        'budgeted_money': budgeted_money,
-        'spent_money': spent_money,
-        'money_available': money_available,
-        'selected_date': category.month,
-        'year': category.month.year,
-        'month': category.month.month,
-        'previous_month': previous_month,
-        'previous_year': previous_year,
-        'next_month': next_month,
-        'next_year': next_year,
-    }
-
-    return render(request, template_name, context)
-'''
+#Edit fifty thirty twenty expense
 @login_required
 def edit_fifty_thirty_twenty_expense(request, budget_id):
     base_budget = get_object_or_404(Budget, id=budget_id, user=request.user, budget_type='fifty_thirty_twenty')
@@ -975,6 +924,8 @@ def delete_transaction(request):
     if request.method == 'POST':
         transaction.delete()
         messages.success(request, 'Transaction deleted successfully.')
+        return redirect('financeapp:transactions')  # Add redirection here
+
     
     return redirect('financeapp:transactions')
 '''

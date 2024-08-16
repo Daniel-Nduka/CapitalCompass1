@@ -67,8 +67,6 @@ class Account(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
-
     def __str__(self):
        return f"{self.account_name} ({self.get_account_type_display()}) - {self.budget.budget_name}"
 
@@ -225,6 +223,28 @@ class Transaction(models.Model):
             if self.outflow > 0 and self.expense:
                 self.expense.spent += Decimal(self.outflow)
                 self.expense.save()
+        else:
+            if self.pk is not None:
+                old_transaction = Transaction.objects.get(pk=self.pk)
+                if old_transaction.inflow > 0:
+                    self.account.balance -= Decimal(old_transaction.inflow)
+                elif old_transaction.outflow > 0:
+                    self.account.balance += Decimal(old_transaction.outflow)
+                
+                    
+                if self.inflow > 0:
+                    self.account.balance += Decimal(self.inflow)
+                    self.outflow = 0
+                elif self.outflow > 0:
+                    self.account.balance -= Decimal(self.outflow)
+                    self.inflow = 0
+                
+                    if self.expense:
+                        self.expense.spent = Decimal(self.outflow)
+                        self.expense.save()
+            self.account.save()
+                
+                
 
         super().save(*args, **kwargs)
 
