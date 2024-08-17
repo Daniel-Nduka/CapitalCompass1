@@ -1,89 +1,238 @@
-/* transactions.css */
 html, body {
   height: 100%;
   width: 100%;
   display: flex;
-  /* justify-content: center; /* Center horizontally */
-
+  font-family: Arial, sans-serif; /* Standard professional font */
 }
 
 /* Main container styling */
 main {
-
-  width: 100%; /* Ensure it doesn't exceed the parent width */
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  background-color: #f5f5f5; /* Light background */
 }
 
 /* Section header styling */
 .transaction-details h1 {
-  margin-bottom: 10px;
-  text-align: center; /* Center the header text */
-  font-size: 30px; /* Your custom font size */
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: #333; /* Darker text color */
 }
 
+/* Add transaction button */
 .add-transaction-class {
-  margin-top: 10px;
-  margin-bottom: 20px;
   display: flex;
   justify-content: center;
+  margin-bottom: 20px;
+  position: relative; 
+}
+/* Position the tooltip text - hidden by default */
+.add-transaction-class .tooltip-text {
+  visibility: hidden;
+  width: 220px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* Position above the button */
+  left: 50%;
+
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Arrow at the bottom of the tooltip */
+.add-transaction-class .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+/* Show the tooltip text when hovering */
+.add-transaction-class:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+
+.add-transaction-class .btn-primary {
+  background-color: #007bff; /* Primary blue */
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.add-transaction-class .btn-primary:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Filter and sort section */
+.filter-sort-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.filter-sort-section label {
+  margin-right: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.filter-sort-section select {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #333;
+}
+
+.filter-sort-section select:hover {
+  border-color: #007bff; /* Highlight border on hover */
 }
 
 /* Table styling */
 table {
-  width: 100%; /* Full width */
-  margin: 0 auto; /* Center horizontally */
-  border-collapse: collapse; /* Collapse borders */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  width: 100%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
-  border: 1px solid #ddd; /* Cell borders */
-  text-align: left; /* Align text to the left */
-  padding: 10px; /* Increased padding for better readability */
-  vertical-align: middle; /* Center text vertically */
+  text-align: left;
+  padding: 12px 15px;
+  vertical-align: middle;
+  border-bottom: 1px solid #ddd;
 }
 
 th {
-  background-color: #f7f7f7; /* Light grey for header background */
-  font-weight: bold; /* Bold text for headers */
-  text-transform: uppercase; /* Uppercase headers */
+  background-color: #f8f9fa; /* Light grey for header background */
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #333;
 }
 
 td {
-  background-color: #fff; /* White background for cells */
-  padding: 12px 15px; /* Additional padding */
+ 
+  
 }
 
-td:hover{
-  background-color: #f1f1f1; /* Light grey for ho */
-}
-/* Specific width for the date column */
-th:nth-child(2), td:nth-child(2) {
-  width: 130px; /* Adjusted width for date column */
+td:hover {
+  background-color: #f1f1f1;
 }
 
-/* Row differentiation for inflow and outflow */
+/* Inflow and outflow row colors */
 .inflow-row {
-  background-color: #e6f7e6; /* Softer green for inflow */
+  background-color: #d4edda; /* Light green background */
+  color: #155724; /* Dark green text */
 }
 
 .outflow-row {
-  background-color: #f7e6e6; /* Softer red for outflow */
+  background-color: #f8d7da; /* Light red background */
+  color: #721c24; /* Dark red text */
 }
 
 /* Hover effect to darken the row color */
 tr:hover {
-  background-color: #f1f1f1; /* Light grey for hover */
+  background-color: #f1f1f1;
+}
+
+/* Pagination styling */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.step-links a {
+  margin: 0 5px;
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.step-links a:hover {
+  background-color: #0056b3;
+}
+
+.step-links .current {
+  margin: 0 5px;
+  padding: 5px 10px;
+  background-color: #6c757d;
+  color: white;
+  border-radius: 5px;
 }
 
 /* Responsive design adjustments */
 @media (max-width: 768px) {
-  th, td {
-    padding: 8px; /* Reduce padding on smaller screens */
-    font-size: 14px; /* Smaller font size */
+  .filter-sort-section {
+      flex-direction: column;
+      align-items: flex-start;
   }
 
-  th:nth-child(2), td:nth-child(2) {
-    width: auto; /* Let the date column adjust */
+  .filter-sort-section select {
+      width: 100%;
+      margin-bottom: 10px;
+  }
+
+  table {
+      font-size: 14px;
   }
 }
+/* Tooltip styling */
+.form-group .tooltip-text {
+  visibility: hidden;
+  width: 250px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  top: -5px;
+  left: 105%; /* Position to the right of the dropdown */
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Arrow for the tooltip */
+.form-group .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%; /* Position to the left of the tooltip */
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #333 transparent transparent;
+}
+

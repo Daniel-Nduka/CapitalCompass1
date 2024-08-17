@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from django.db import IntegrityError
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def csrf_failure(request, reason=""):
     return render(request, 'financeapp/index.html')
@@ -839,6 +840,43 @@ def transaction_list(request):
     month = selected_date.month
 
     # Filter expenses for the selected month
+    if budget.budget_type == 'zero_based':
+        categories = ZeroBasedCategory.objects.filter(budget_id=budget,
+                                                  month__year=year, 
+                                                  month__month=month
+                                                  ).prefetch_related('expenses')
+    else:
+        categories = FiftyThirtyTwentyCategory.objects.filter(budget_id=budget,
+                                                  month__year=year, 
+                                                  month__month=month
+                                                  ).prefetch_related('expenses')
+    
+    account_id = request.GET.get('account_id')
+    sort_by = request.GET.get('sort_by', 'date')
+    sort_order = request.GET.get('sort_order', 'asc')
+    
+    transactions = Transaction.objects.filter(account__budget_id=budget)
+    
+    if account_id:
+        transactions = transactions.filter(account_id=account_id)
+        
+    if sort_order == 'desc':
+        transactions = transactions.order_by(f'-{sort_by}')
+    else:
+        transactions = transactions.order_by(sort_by)
+        
+    paginator = Paginator(transactions, 30)
+    page = request.GET.get('page', 1)
+    
+    try:
+        transactions = paginator.page(page)
+    except PageNotAnInteger:
+        transactions = paginator.page(1)
+    except EmptyPage:
+        transactions = paginator.page(paginator.num_pages)
+    
+        
+    
     
     if (budget.budget_type == 'zero_based'):
         categories = ZeroBasedCategory.objects.filter(budget_id=budget,
@@ -850,14 +888,18 @@ def transaction_list(request):
                                                   month__year=year, 
                                                   month__month=month
                                                   ).prefetch_related('expenses')
-    transactions = Transaction.objects.filter(account__budget_id=budget)
+    
     accounts = Account.objects.filter(budget_id=budget)
     context = {
         'transactions': transactions,
         'accounts': accounts,
         'categories': categories,
         'today': datetime.date.today(),
-        'form': TransactionForm()  # Always provide an empty form here
+        'selected_account_id': account_id,
+        'sort_by': sort_by,
+        'sort_order': sort_order,
+        'form': TransactionForm(),  # Always provide an empty form here
+        'budget': budget,
     }
     return render(request, 'financeapp/transactions.html', context)
 
@@ -1246,3 +1288,4 @@ def account_support(request):
         form = AccountSupportForm(user=request.user)
 
     return render(request, 'financeapp/account_support.html', {'form': form})
+

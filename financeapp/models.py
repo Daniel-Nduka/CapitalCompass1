@@ -192,6 +192,10 @@ class Expense(models.Model):
             self.category.save()
         if self.fifty_30_twenty_category:
             self.fifty_30_twenty_category.save()
+    
+                
+                
+
 
 
 

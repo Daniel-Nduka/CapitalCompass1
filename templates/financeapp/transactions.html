@@ -17,6 +17,34 @@
                 <i class="fas fa-plus"></i> Add Transaction
             </button>   
         </div>
+
+        <div class="filter-sort-section">
+            <form method="GET" action="{% url 'financeapp:transactions' %}">
+                <label for="account-filter">Filter by Account:</label>
+                <select id="account-filter" name="account_id" onchange="this.form.submit()">
+                    <option value="">All Accounts</option>
+                    {% for account in accounts %}
+                    <option value="{{ account.id }}" {% if account.id == selected_account_id %}selected{% endif %}>
+                        {{ account.account_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <label for="sort-by">Sort by:</label>
+                <select id="sort-by" name="sort_by" onchange="this.form.submit()">
+                    <option value="date" {% if sort_by == 'date' %}selected{% endif %}>Date</option>
+                    <option value="description" {% if sort_by == 'description' %}selected{% endif %}>Description</option>
+                    <option value="inflow" {% if sort_by == 'inflow' %}selected{% endif %}>Inflow</option>
+                    <option value="outflow" {% if sort_by == 'outflow' %}selected{% endif %}>Outflow</option>
+                </select>
+
+                <select id="sort-order" name="sort_order" onchange="this.form.submit()">
+                    <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Ascending</option>
+                    <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Descending</option>
+                </select>
+            </form>
+        </div>
+
         <table>
             <thead>
                 <tr>
@@ -48,8 +76,25 @@
                 </tr>
                 {% endfor %}
             </tbody>
-            
         </table>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if transactions.has_previous %}
+                    <a href="?{% if selected_account_id %}account_id={{ selected_account_id }}&{% endif %}sort_by={{ sort_by }}&sort_order={{ sort_order }}&page=1">&laquo; first</a>
+                    <a href="?{% if selected_account_id %}account_id={{ selected_account_id }}&{% endif %}sort_by={{ sort_by }}&sort_order={{ sort_order }}&page={{ transactions.previous_page_number }}">&lsaquo; previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ transactions.number }} of {{ transactions.paginator.num_pages }}.
+                </span>
+
+                {% if transactions.has_next %}
+                    <a href="?{% if selected_account_id %}account_id={{ selected_account_id }}&{% endif %}sort_by={{ sort_by }}&sort_order={{ sort_order }}&page={{ transactions.next_page_number }}">next &rsaquo;</a>
+                    <a href="?{% if selected_account_id %}account_id={{ selected_account_id }}&{% endif %}sort_by={{ sort_by }}&sort_order={{ sort_order }}&page={{ transactions.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
     </section>
 </main>
 
@@ -88,14 +133,15 @@
             </div>
             <div id="add-outflow-fields" style="display: none;">
                 <div class="form-group">
-                    <label for="add-expense">Expense</label>
-                    <select id="add-expense" name="expense" class="form-control">
+                    <label for="edit-expense">Expense</label>
+                    <select id="edit-expense" name="expense" class="form-control" onchange="handleAddExpense(this)">
                         <option value="">-- Select Expense --</option>
                         {% for category in categories %}
                             {% for expense in category.expenses.all %}
-                            <option value="{{ expense.id }}">{{ expense.description }} ({{ category.name }})</option>
+                                <option value="{{ expense.id }}">{{ expense.description }} ({{ category.name }})</option>
                             {% endfor %}
                         {% endfor %}
+                        <option value="add-new-expense">+ Add New Expense</option> <!-- New option added -->
                     </select>
                 </div>
                 <div class="form-group">
@@ -103,6 +149,7 @@
                     <input type="number" id="add-outflow" name="outflow" class="form-control" placeholder="Enter outflow amount">
                 </div>
             </div>
+            
             <div id="add-inflow-fields" style="display: none;">
                 <div class="form-group">
                     <label for="add-inflow">Amount</label>
@@ -151,27 +198,29 @@
                     <input type="text" id="edit-payee" name="payee" class="form-control" placeholder="Enter payee name">
                 </div>
             </div>
-            <div id="edit-outflow-fields" style="display: none;">
+            <div id="edit-outflow-fields" style="position: relative;">
                 <div class="form-group">
                     <label for="edit-expense">Expense</label>
-                    <select id="edit-expense" name="expense" class="form-control">
+                    <select id="edit-expense" name="expense" class="form-control" onchange="handleAddExpense(this)">
                         <option value="">-- Select Expense --</option>
                         {% for category in categories %}
                             {% for expense in category.expenses.all %}
                             <option value="{{ expense.id }}">{{ expense.description }} ({{ category.name }})</option>
                             {% endfor %}
                         {% endfor %}
+                        <option value="add-new-expense">+ Add New Expense</option>
                     </select>
+                    <span class="tooltip-text">No expenses found. Please add the expense you are paying for in the budget section.</span>
                 </div>
                 <div class="form-group">
                     <label for="edit-outflow">Amount</label>
-                    <input type="number" value="0"id="edit-outflow" name="outflow" class="form-control" placeholder="Enter outflow amount">
+                    <input type="number" value="0" id="edit-outflow" name="outflow" class="form-control" placeholder="Enter outflow amount">
                 </div>
             </div>
             <div id="edit-inflow-fields" style="display: none;">
                 <div class="form-group">
                     <label for="edit-inflow">Amount</label>
-                    <input type="number" value="0"id="edit-inflow" name="inflow" class="form-control" placeholder="Enter inflow amount">
+                    <input type="number" value="0" id="edit-inflow" name="inflow" class="form-control" placeholder="Enter inflow amount">
                 </div>
             </div>
             <div class="form-group submit-btn">
@@ -267,77 +316,81 @@
         document.getElementById('edit-inflow-btn').classList.remove('btn-primary');
     }
 
-   // Set default values and validation
-   document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed'); // Debugging output
-    const form = document.getElementById('transaction-form');
-    if (form) {
-        form.addEventListener('submit', function(event) {
-            console.log('Form submit event detected'); // Debugging output
-            const inflowInput = document.getElementById('add-inflow');
-            const outflowInput = document.getElementById('add-outflow');
-
-            // Set default values if the fields are empty or invalid
-            inflowInput.value = inflowInput.value || 0;
-            outflowInput.value = outflowInput.value || 0;
-
-            const account = document.getElementById('add-account').value;
-            const date = document.getElementById('add-date').value;
-            const inflow = parseFloat(inflowInput.value);
-            const outflow = parseFloat(outflowInput.value);
-            expense = document.getElementById('add-expense').value;
-
-            if (outflow > 0 && expense === '') {
-                event.preventDefault();
-                alert('Please select an Expense for the Outflow transaction.');
-            }
-        
-            if (!account || !date || (inflow <= 0 && outflow <= 0)) {
-                event.preventDefault();
-                alert('Please fill out all required fields: Account, Date, and either Inflow or Outflow.');
-            }
-        });
-    } else {
-        console.error('Transaction form not found');
+    function handleAddExpense(selectElement) {
+        if (selectElement.value === "add-new-expense") {
+            // Determine the budget type and redirect accordingly
+            {% if budget.budget_type == 'zero_based' %}
+                window.location.href = "{% url 'financeapp:zero_based_page' budget.id %}";
+            {% elif budget.budget_type == 'fifty_thirty_twenty' %}
+                window.location.href = "{% url 'financeapp:fifty_thirty_twenty_page' budget.id %}";
+            {% else %}
+                // Default or fallback behavior if needed
+                alert("Unknown budget type.");
+            {% endif %}
+        }
     }
-});
+    
+   
+    // Set default values and validation
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('transaction-form');
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                const inflowInput = document.getElementById('add-inflow');
+                const outflowInput = document.getElementById('add-outflow');
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed'); // Debugging output
-    const form = document.getElementById('edit-transaction-form');
-    if (form) {
-        form.addEventListener('submit', function(event) {
-            console.log('Form submit event detected'); // Debugging output
-            const inflowInput = document.getElementById('edit-inflow');
-            const outflowInput = document.getElementById('edit-outflow');
+                // Set default values if the fields are empty or invalid
+                inflowInput.value = inflowInput.value || 0;
+                outflowInput.value = outflowInput.value || 0;
 
-            // Set default values if the fields are empty or invalid
-            inflowInput.value = inflowInput.value || 0;
-            outflowInput.value = outflowInput.value || 0;
+                const account = document.getElementById('add-account').value;
+                const date = document.getElementById('add-date').value;
+                const inflow = parseFloat(inflowInput.value);
+                const outflow = parseFloat(outflowInput.value);
+                const expense = document.getElementById('edit-expense').value;
 
-            const account = document.getElementById('edit-account').value;
-            const date = document.getElementById('edit-date').value;
-            const inflow = parseFloat(inflowInput.value);
-            const outflow = parseFloat(outflowInput.value);
-            expense = document.getElementById('edit-expense').value;
+                if (outflow > 0 && expense === '') {
+                    event.preventDefault();
+                    alert('Please select an Expense for the Outflow transaction.');
+                }
 
-            if (outflow > 0 && expense === '') {
-                event.preventDefault();
-                alert('Please select an Expense for the Outflow transaction.');
-            }
-        
-            if (!account || !date || (inflow <= 0 && outflow <= 0)) {
-                event.preventDefault();
-                alert('Please fill out all required fields: Account, Date, and either Inflow or Outflow.');
-            }
-        });
-    } else {
-        console.error('Edit Transaction form not found');
-    }
+                if (!account || !date || (inflow <= 0 && outflow <= 0)) {
+                    event.preventDefault();
+                    alert('Please fill out all required fields: Account, Date, and either Inflow or Outflow.');
+                }
+            });
+        }
+
+        const editForm = document.getElementById('edit-transaction-form');
+        if (editForm) {
+            editForm.addEventListener('submit', function(event) {
+                const inflowInput = document.getElementById('edit-inflow');
+                const outflowInput = document.getElementById('edit-outflow');
+
+                // Set default values if the fields are empty or invalid
+                inflowInput.value = inflowInput.value || 0;
+                outflowInput.value = outflowInput.value || 0;
+
+                const account = document.getElementById('edit-account').value;
+                const date = document.getElementById('edit-date').value;
+                const inflow = parseFloat(inflowInput.value);
+                const outflow = parseFloat(outflowInput.value);
+                const expense = document.getElementById('edit-expense').value;
+
+                if (outflow > 0 && expense === '') {
+                    event.preventDefault();
+                    alert('Please select an Expense for the Outflow transaction.');
+                }
+
+                if (!account || !date || (inflow <= 0 && outflow <= 0)) {
+                    event.preventDefault();
+                    alert('Please fill out all required fields: Account, Date, and either Inflow or Outflow.');
+                }
+            });
+        }
     });
 
-     // Run on window load
-     window.onload = function() {
+    window.onload = function() {
         closeTransactionForm();
         closeEditTransactionForm();
     }
