@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from .models import Budget, Account, ZeroBasedCategory, Expense, FiftyThirtyTwentyCategory, Transaction
 from django.utils import timezone
 import datetime
+from urllib.parse import urlencode
 
 class FinanceAppTests(TestCase):
   
@@ -572,4 +573,85 @@ class FinanceAppTests(TestCase):
       self.assertFalse(Transaction.objects.filter(id=transaction_outflow.id).exists(), "Transaction was not deleted.")  
       account.refresh_from_db()
       self.assertEqual(account.balance, 100)
+      
+    #Test for Financial Analysis
+    def test_financial_analysis_view(self):
+      self.set_session()
+      response = self.client.get(reverse('financeapp:financial_analysis'))
+      self.assertEqual(response.status_code, 200)
+      self.assertTemplateUsed(response, 'financeapp/financial_analysis.html')
+      
+    def test_financial_analysis_zero_based_category(self):
+      self.set_session()
+      category = ZeroBasedCategory.objects.create(name='Zero Category', assigned_amount=100, budget=self.budget)
+      response = self.client.get(reverse('financeapp:financial_analysis'))
+      self.assertEqual(response.status_code, 200)
+      self.assertIn('Zero Category', response.context['category_labels'])
+    
+    
+    def test_financial_analysis_fifty_thirty_twenty_category(self):
+      self.set_session_for_fifty()
+      category = FiftyThirtyTwentyCategory.objects.create(name='Needs', assigned_amount=150, budget=self.fifty_thirty_twenty_budget)
+      response = self.client.get(reverse('financeapp:financial_analysis'))
+      self.assertEqual(response.status_code, 200)
+      self.assertIn('Needs', response.context['category_labels'])
+      self.assertTemplateUsed(response, 'financeapp/financial_analysis.html')
+      
+    
+    
+    def test_financial_analysis_expenses_zero_based(self):
+      self.set_session()
+      category = ZeroBasedCategory.objects.create(name='Test Category', assigned_amount=200, budget=self.budget)
+      expense = Expense.objects.create(category=category, description='Test Expense', assigned_amount=100)
+    
+      url = reverse('financeapp:financial_analysis')
+      query_params = urlencode({'analysis_type': 'all_expenses'})
+      response = self.client.get(f'{url}?{query_params}')
+    
+      self.assertEqual(response.status_code, 200)
+      self.assertIn('Test Expense', response.context['expense_labels'])
+      self.assertTemplateUsed(response, 'financeapp/financial_analysis.html')
+    
+    def test_financial_analysis_expenses_fifty_thirty_twenty(self):
+      self.set_session_for_fifty()
+      category = FiftyThirtyTwentyCategory.objects.create(name='Needs', assigned_amount=150, budget=self.fifty_thirty_twenty_budget)
+      expense = Expense.objects.create(fifty_30_twenty_category=category, description='Test Expense', assigned_amount=50)
+      
+      url = reverse('financeapp:financial_analysis')
+      query_params = urlencode({'analysis_type': 'all_expenses'})
+      response = self.client.get(f'{url}?{query_params}')
+      
+      self.assertEqual(response.status_code, 200)
+      self.assertIn('Test Expense', response.context['expense_labels'])
+      self.assertTemplateUsed(response, 'financeapp/financial_analysis.html')
+    
+  
+    def test_financial_analysis_expenses_within_category_zero_based(self):
+      self.set_session()
+      category = ZeroBasedCategory.objects.create(name='Test Category', assigned_amount=200, budget=self.budget)
+      expense = Expense.objects.create(category=category, description='Test Expense', assigned_amount=100)
+    
+      url = reverse('financeapp:financial_analysis')
+      query_params = urlencode({'analysis_type': 'expenses_within_category', 'category_id': category.id})
+      response = self.client.get(f'{url}?{query_params}')
+      
+      self.assertEqual(response.status_code, 200)
+      self.assertIn('Test Expense', response.context['expense_labels'])
+      self.assertTemplateUsed(response, 'financeapp/financial_analysis.html')
+   
+    def test_financial_analysis_expenses_within_category_fifty_thirty_twenty(self):
+      self.set_session_for_fifty()
+      category = FiftyThirtyTwentyCategory.objects.create(name='Needs', assigned_amount=150, budget=self.fifty_thirty_twenty_budget)
+      expense = Expense.objects.create(fifty_30_twenty_category=category, description='Test Expense', assigned_amount=50)
+      
+      url = reverse('financeapp:financial_analysis')
+      query_params = urlencode({'analysis_type': 'expenses_within_category', 'category_id': category.id})
+      response = self.client.get(f'{url}?{query_params}')
+      
+      self.assertEqual(response.status_code, 200)
+      self.assertIn('Test Expense', response.context['expense_labels'])
+      self.assertTemplateUsed(response, 'financeapp/financial_analysis.html')
+
+      
+      
      
