@@ -299,9 +299,9 @@ color: #0056b3;
   background-color: #5a6268;
 }
 
-/* Modal container */
+/* Modal container 
 .modal {
-  display: none; /* Hidden by default */
+  display: none; /
   position: fixed;
   z-index: 1;
   left: 0;
@@ -315,7 +315,7 @@ color: #0056b3;
   display: flex;
 }
 
-/* Modal content */
+/* Modal content
 .modal-content {
   background-color: white;
   padding: 20px;
@@ -325,6 +325,7 @@ color: #0056b3;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   position: relative;
 }
+  */
 
 /* Close button */
 .close-button {
@@ -585,4 +586,154 @@ margin-top: 10px;/* Add space between expenses and buttons */
   padding: 5px 10px; /* Add some padding */
   border-radius: 5px; /* Rounded corners */
   display: inline-block;
+}
+
+/* Modal Background */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.styled-modal-content {
+  background-color: #fefefe;
+  margin: 5% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 90%; /* Could be more or less, depending on screen size */
+  max-width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Close Button */
+.styled-close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.styled-close-button:hover,
+.styled-close-button:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Modal Title */
+.styled-modal-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Input Fields */
+.styled-label {
+  font-weight: 500;
+  color: #555;
+}
+
+.styled-input {
+  width: 100%;
+  padding: 8px 12px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+/* Checkbox */
+.styled-checkbox {
+  margin-left: 5px;
+}
+
+/* Buttons */
+.styled-btn-primary {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.styled-btn-primary:hover {
+  background-color: #218838;
+}
+
+.styled-btn-secondary {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 48%;
+  margin-right: 4%;
+  font-size: 16px;
+}
+
+.styled-btn-secondary:hover {
+  background-color: #0069d9;
+}
+
+.styled-btn-tertiary {
+  background-color: #6c757d;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 48%;
+  font-size: 16px;
+}
+
+.styled-btn-tertiary:hover {
+  background-color: #5a6268;
+}
+
+.styled-btn-danger {
+  background-color: #dc3545;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 16px;
+}
+
+.styled-btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Error Message */
+.styled-error {
+  margin-top: 10px;
+  font-size: 14px;
+  color: red;
+}
+
+/* Group buttons to maintain space between them */
+.form-group.submit-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
 }

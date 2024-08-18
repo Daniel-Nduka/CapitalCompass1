@@ -99,42 +99,42 @@
 </main>
 
 <!-- Add Transaction Modal -->
-<div id="transaction-form-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-button" onclick="closeTransactionForm()">&times;</span>
-        <h2>New Transaction</h2>
-        <div class="transaction-type-buttons" style="text-align: center;">
-            <button id="inflow-btn" class="btn btn-primary" onclick="showInflowForm()">Inflow</button>
-            <button id="outflow-btn" class="btn btn-secondary" onclick="showOutflowForm()">Outflow</button>
+<div id="transaction-form-modal" class="styled-modal">
+    <div class="styled-modal-content">
+        <span class="styled-close-button" onclick="closeTransactionForm()">&times;</span>
+        <h2 class="styled-modal-title">New Transaction</h2>
+        <div class="styled-transaction-type-buttons styled-submit-btn">
+            <button id="inflow-btn" class="styled-btn-primary styled-half-width" onclick="showInflowForm()">Revenue</button>
+            <button id="outflow-btn" class="styled-btn-secondary styled-half-width" onclick="showOutflowForm()">Payments</button>
         </div>
         <form id="transaction-form" method="post" action="{% url 'financeapp:add_transaction' %}">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="add-account">Account</label>
-                <select id="add-account" name="account" class="form-control">
+            <div class="styled-form-group">
+                <label for="add-account" class="styled-label">Account</label>
+                <select id="add-account" name="account" class="styled-input">
                     {% for account in accounts %}
                     <option value="{{ account.id }}">{{ account.account_name }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="form-group">
-                <label for="add-date">Date</label>
-                <input type="date" id="add-date" name="date" class="form-control" value="{{ today|date:'Y-m-d' }}">
+            <div class="styled-form-group">
+                <label for="add-date" class="styled-label">Date</label>
+                <input type="date" id="add-date" name="date" class="styled-input" value="{{ today|date:'Y-m-d' }}">
             </div>
             <div id="common-fields">
-                <div class="form-group">
-                    <label for="add-description">Description</label>
-                    <input type="text" id="add-description" name="description" class="form-control" placeholder="Enter description">
+                <div class="styled-form-group">
+                    <label for="add-description" class="styled-label">Description</label>
+                    <input type="text" id="add-description" name="description" class="styled-input" placeholder="Enter description">
                 </div>
-                <div class="form-group">
-                    <label for="add-payee">Payee</label>
-                    <input type="text" id="add-payee" name="payee" class="form-control" placeholder="Enter payee name">
+                <div class="styled-form-group">
+                    <label for="add-payee" class="styled-label">Payee</label>
+                    <input type="text" id="add-payee" name="payee" class="styled-input" placeholder="Enter payee name">
                 </div>
             </div>
             <div id="add-outflow-fields" style="display: none;">
-                <div class="form-group">
-                    <label for="edit-expense">Expense</label>
-                    <select id="edit-expense" name="expense" class="form-control" onchange="handleAddExpense(this)">
+                <div class="styled-form-group">
+                    <label for="edit-expense" class="styled-label">Expense</label>
+                    <select id="edit-expense" name="expense" class="styled-input" onchange="handleAddExpense(this)">
                         <option value="">-- Select Expense --</option>
                         {% for category in categories %}
                             {% for expense in category.expenses.all %}
@@ -144,64 +144,64 @@
                         <option value="add-new-expense">+ Add New Expense</option> <!-- New option added -->
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="add-outflow">Amount</label>
-                    <input type="number" id="add-outflow" name="outflow" class="form-control" placeholder="Enter outflow amount">
+                <div class="styled-form-group">
+                    <label for="add-outflow" class="styled-label">Amount</label>
+                    <input type="number" id="add-outflow" name="outflow" class="styled-input" placeholder="Enter outflow amount">
                 </div>
             </div>
             
             <div id="add-inflow-fields" style="display: none;">
-                <div class="form-group">
-                    <label for="add-inflow">Amount</label>
-                    <input type="number" id="add-inflow" name="inflow" class="form-control" placeholder="Enter inflow amount">
+                <div class="styled-form-group">
+                    <label for="add-inflow" class="styled-label">Amount</label>
+                    <input type="number" id="add-inflow" name="inflow" class="styled-input" placeholder="Enter inflow amount">
                 </div>
             </div>
-            <div class="form-group submit-btn">
-                <button type="submit" class="btn btn-primary">Add Transaction</button>
-                <button type="button" class="btn btn-secondary" onclick="closeTransactionForm()">Cancel</button>
+            <div class="styled-form-group styled-submit-btn">
+                <button type="submit" class="styled-btn-primary styled-half-width">Add Transaction</button>
+                <button type="button" class="styled-btn-tertiary styled-half-width" onclick="closeTransactionForm()">Cancel</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Edit Transaction Modal -->
-<div id="edit_transaction_modal" class="modal">
-    <div class="modal-content">
-        <span class="close-button" onclick="closeEditTransactionForm()">&times;</span>
-        <h2>Edit Transaction</h2>
-        <div class="transaction-type-buttons" style="text-align: center;">
-            <button id="edit-inflow-btn" class="btn btn-primary" onclick="showEditInflowForm()">Inflow</button>
-            <button id="edit-outflow-btn" class="btn btn-secondary" onclick="showEditOutflowForm()">Outflow</button>
+<div id="edit_transaction_modal" class="styled-modal">
+    <div class="styled-modal-content">
+        <span class="styled-close-button" onclick="closeEditTransactionForm()">&times;</span>
+        <h2 class="styled-modal-title">Edit Transaction</h2>
+        <div class="styled-transaction-type-buttons styled-submit-btn">
+            <button id="edit-inflow-btn" class="styled-btn-primary styled-half-width" onclick="showEditInflowForm()">Revenue</button>
+            <button id="edit-outflow-btn" class="styled-btn-secondary styled-half-width" onclick="showEditOutflowForm()">Payments</button>
         </div>
         <form id="edit-transaction-form" method="post" action="{% url 'financeapp:edit_transaction' %}">
             {% csrf_token %}
             <input type="hidden" name="transaction_id" id="edit-transaction-id">
-            <div class="form-group">
-                <label for="edit-account">Account</label>
-                <select id="edit-account" name="account" class="form-control">
+            <div class="styled-form-group">
+                <label for="edit-account" class="styled-label">Account</label>
+                <select id="edit-account" name="account" class="styled-input">
                     {% for account in accounts %}
                     <option value="{{ account.id }}">{{ account.account_name }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="form-group">
-                <label for="edit-date">Date</label>
-                <input type="date" id="edit-date" name="date" class="form-control">
+            <div class="styled-form-group">
+                <label for="edit-date" class="styled-label">Date</label>
+                <input type="date" id="edit-date" name="date" class="styled-input">
             </div>
             <div id="edit-common-fields">
-                <div class="form-group">
-                    <label for="edit-description">Description</label>
-                    <input type="text" id="edit-description" name="description" class="form-control" placeholder="Enter description">
+                <div class="styled-form-group">
+                    <label for="edit-description" class="styled-label">Description</label>
+                    <input type="text" id="edit-description" name="description" class="styled-input" placeholder="Enter description">
                 </div>
-                <div class="form-group">
-                    <label for="edit-payee">Payee</label>
-                    <input type="text" id="edit-payee" name="payee" class="form-control" placeholder="Enter payee name">
+                <div class="styled-form-group">
+                    <label for="edit-payee" class="styled-label">Payee</label>
+                    <input type="text" id="edit-payee" name="payee" class="styled-input" placeholder="Enter payee name">
                 </div>
             </div>
             <div id="edit-outflow-fields" style="position: relative;">
-                <div class="form-group">
-                    <label for="edit-expense">Expense</label>
-                    <select id="edit-expense" name="expense" class="form-control" onchange="handleAddExpense(this)">
+                <div class="styled-form-group">
+                    <label for="edit-expense" class="styled-label">Expense</label>
+                    <select id="edit-expense" name="expense" class="styled-input" onchange="handleAddExpense(this)">
                         <option value="">-- Select Expense --</option>
                         {% for category in categories %}
                             {% for expense in category.expenses.all %}
@@ -212,31 +212,38 @@
                     </select>
                     <span class="tooltip-text">No expenses found. Please add the expense you are paying for in the budget section.</span>
                 </div>
-                <div class="form-group">
-                    <label for="edit-outflow">Amount</label>
-                    <input type="number" value="0" id="edit-outflow" name="outflow" class="form-control" placeholder="Enter outflow amount">
+                <div class="styled-form-group">
+                    <label for="edit-outflow" class="styled-label">Amount</label>
+                    <input type="number" value="0" id="edit-outflow" name="outflow" class="styled-input" placeholder="Enter outflow amount">
                 </div>
             </div>
             <div id="edit-inflow-fields" style="display: none;">
-                <div class="form-group">
-                    <label for="edit-inflow">Amount</label>
-                    <input type="number" value="0" id="edit-inflow" name="inflow" class="form-control" placeholder="Enter inflow amount">
+                <div class="styled-form-group">
+                    <label for="edit-inflow" class="styled-label">Amount</label>
+                    <input type="number" value="0" id="edit-inflow" name="inflow" class="styled-input" placeholder="Enter inflow amount">
                 </div>
             </div>
-            <div class="form-group submit-btn">
-                <button type="submit" class="btn btn-primary">Edit Transaction</button>
-                <button type="button" class="btn btn-secondary" onclick="closeEditTransactionForm()">Cancel</button>
+            <div class="styled-form-group styled-submit-btn">
+                <button type="submit" class="styled-btn-primary styled-half-width">Edit Transaction</button>
+                <button type="button" class="styled-btn-tertiary styled-half-width" onclick="closeEditTransactionForm()">Cancel</button>
             </div>
         </form>
         <form method="post" action="{% url 'financeapp:delete_transaction' %}">
             {% csrf_token %}
             <input type="hidden" name="transaction_id" id="delete-transaction-id">
-            <div class="form-group submit-btn">
-                <button type="submit" name="delete_transaction" class="btn btn-danger">Delete Transaction</button>
+            <div class="styled-form-group styled-submit-btn">
+                <button type="submit" name="delete_transaction" class="styled-btn-danger styled-half-width">Delete Transaction</button>
             </div>
         </form>
     </div>
 </div>
+
+
+
+
+
+
+
 
 <script>
     // Show and hide the Add Transaction form

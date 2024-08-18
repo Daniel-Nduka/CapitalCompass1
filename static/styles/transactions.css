@@ -236,3 +236,133 @@ tr:hover {
   border-color: transparent #333 transparent transparent;
 }
 
+.styled-modal {
+  position: fixed;
+  z-index: 1000; /* Ensure it appears above other content */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; /* Adjust this if necessary */
+  height: 100%; /* Full-screen modal */
+  background: rgba(0, 0, 0, 0.5); /* Optional background overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.styled-modal-content {
+  background-color: #fefefe;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+
+/* Close Button */
+.styled-close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.styled-close-button:hover,
+.styled-close-button:focus {
+  color: black;
+  text-decoration: none;
+}
+
+/* Modal Title */
+.styled-modal-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Form Group and Input Fields */
+.styled-form-group {
+  margin-bottom: 15px;
+}
+
+.styled-label {
+  font-weight: 500;
+  color: #555;
+}
+
+.styled-input {
+  width: 100%;
+  padding: 8px 12px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+/* Buttons */
+.styled-submit-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+
+}
+
+.styled-half-width {
+  width: 48%; /* Adjust to ensure there's enough space between buttons */
+  margin-bottom: 20px;
+}
+
+.styled-btn-primary,
+.styled-btn-secondary,
+.styled-btn-tertiary {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.styled-btn-primary {
+  background-color: #28a745;
+  color: white;
+}
+
+.styled-btn-primary:hover {
+  background-color: #218838;
+}
+
+.styled-btn-secondary {
+  background-color: #007bff;
+  color: white;
+}
+
+.styled-btn-secondary:hover {
+  background-color: #0069d9;
+}
+
+.styled-btn-tertiary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.styled-btn-tertiary:hover {
+  background-color: #5a6268;
+}
+
+/* Error Message */
+.styled-error {
+  margin-top: 10px;
+  font-size: 14px;
+  color: red;
+}

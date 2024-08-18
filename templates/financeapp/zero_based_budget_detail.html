@@ -104,180 +104,186 @@
     <!-- Add Category Modal -->
     <!-- Add Category Modal -->
 <div id="add-category-form" class="modal">
-    <div class="modal-content">
-        <span class="close-button" onclick="closeAddCategoryForm()">&times;</span>
-        <h2>New Category</h2>
+    <div class="styled-modal-content">
+        <span class="styled-close-button" onclick="closeAddCategoryForm()">&times;</span>
+        <h2 class="styled-modal-title">New Category</h2>
         <form method="post" action="{% url 'financeapp:add_zero_category' budget.id %}">
             {% csrf_token %}
             <div class="form-group">
-                <label for="id_name">Category Name:</label>
-                <input type="text" name="name" id="id_name" required>
+                <label for="id_name" class="styled-label">Category Name:</label>
+                <input type="text" name="name" id="id_name" class="styled-input" required>
                 {% if messages %}
                 {% for message in messages %}
                     {% if "add_zero_category_danger" in message.tags %}
-                        <div class="error" style="color: red;">{{ message }}</div>
+                        <div class="styled-error">{{ message }}</div>
                     {% endif %}
                 {% endfor %}
                 {% endif %}
             </div>
             <div class="form-group">
-                <label for="id_assigned_amount">Assigned Amount:</label>
-                <input type="number" name="assigned_amount" id="id_assigned_amount" required>
+                <label for="id_assigned_amount" class="styled-label">Assigned Amount:</label>
+                <input type="number" name="assigned_amount" id="id_assigned_amount" class="styled-input" required>
             </div>
             <div class="form-group">
-                <label for="id_is_recurring">Recurring:</label>
-                <input type="checkbox" name="is_recurring" id="id_is_recurring">
+                <label for="id_is_recurring" class="styled-label">Repeat Monthly :</label>
+                <input type="checkbox" name="is_recurring" id="id_is_recurring" class="styled-checkbox">
             </div>
             <div class="form-group submit-btn">
-                <button type="submit" name="add_category" class="btn btn-primary">Add Category</button>
-                <button type="button" class="btn btn-secondary" onclick="closeAddCategoryForm()">Cancel</button>
+                <button type="submit" name="add_category" class="styled-btn-primary">Add Category</button>
+                <button type="button" class="styled-btn-tertiary" onclick="closeAddCategoryForm()">Cancel</button>
             </div>
         </form>
     </div>
 </div>
+
 
     
 
     <!-- Edit Category Modal -->
     <div id="edit-category-form" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeEditCategoryForm()">&times;</span>
-            <h2>Edit Category</h2>
+        <div class="styled-modal-content">
+            <span class="styled-close-button" onclick="closeEditCategoryForm()">&times;</span>
+            <h2 class="styled-modal-title">Edit Category</h2>
             <form method="post" action="{% url 'financeapp:edit_zero_category' budget.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="category_id" id="edit-category-id">
                 <div class="form-group">
-                    <label for="edit-category-name">Category Name:</label>
-                    <input type="text" name="name" id="edit-category-name" required>
+                    <label for="edit-category-name" class="styled-label">Category Name:</label>
+                    <input type="text" name="name" id="edit-category-name" class="styled-input" required>
                     {% if messages %}
                     {% for message in messages %}
                         {% if "edit_zero_category_danger" in message.tags %}
-                            <div class="error" style="color: red;">{{ message }}</div>
+                            <div class="styled-error">{{ message }}</div>
                         {% endif %}
                     {% endfor %}
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    <label for="edit-category-assigned-amount">Assigned Amount:</label>
-                    <input type="number" name="assigned_amount" id="edit-category-assigned-amount" required>
+                    <label for="edit-category-assigned-amount" class="styled-label">Assigned Amount:</label>
+                    <input type="number" name="assigned_amount" id="edit-category-assigned-amount" class="styled-input" required>
                 </div>
-
+    
                 <div class="form-group">
-                    <label for="edit-category-is_recurring">Recurring:</label>
-                    <input type="checkbox" name="is_recurring" id="edit-category-is_recurring">
+                    <label for="edit-category-is_recurring" class="styled-label">Repeat Monthly</label>
+                    <input type="checkbox" name="is_recurring" id="edit-category-is_recurring" class="styled-checkbox">
                 </div>
                 <div class="form-group submit-btn">
-                    <button type="submit" name="edit_category" class="btn btn-primary">Save Changes</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeEditCategoryForm()">Cancel</button>
+                    <button type="submit" name="edit_category" class="styled-btn-primary">Save Changes</button>
+                    <button type="button" class="styled-btn-tertiary" onclick="closeEditCategoryForm()">Cancel</button>
                 </div>
             </form>
             <form method="post" action="{% url 'financeapp:delete_zero_category' budget.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="category_id" id="delete-category-id">
-                <div class="form-group submit-btn">
-                    <button type="submit" name="delete_category" class="btn btn-danger">Delete Category</button>
+                <div class="form-group submit-btn delete-group">
+                    <button type="submit" name="delete_category" class="styled-btn-danger">Delete Category</button>
                 </div>
             </form>
         </div>
     </div>
+    
 
     <!-- Add Expense Modal -->
-   <!-- Add Expense Modal -->
-<div id="add-expense-form" class="modal">
-    <div class="modal-content">
-        <span class="close-button" onclick="closeAddExpenseForm()">&times;</span>
-        <h2>New Expense</h2>
-        <form method="post" action="{% url 'financeapp:add_zero_expense' budget.id %}">
+    <div id="add-expense-form" class="modal">
+        <div class="styled-modal-content">
+            <span class="styled-close-button" onclick="closeAddExpenseForm()">&times;</span>
+            <h2 class="styled-modal-title">New Expense</h2>
+            <form method="post" action="{% url 'financeapp:add_zero_expense' budget.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_description" class="styled-label">Expense Description:</label>
+                    <input type="text" name="description" id="id_description" class="styled-input" required>
+                    {% if messages %}
+                    {% for message in messages %}
+                        {% if "add_zero_expense_danger" in message.tags %}
+                            <div class="styled-error">{{ message }}</div>
+                        {% endif %}
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="id_assigned_amount" class="styled-label">Cost:</label>
+                    <input type="number" name="assigned_amount" id="id_assigned_amount" class="styled-input" required>
+                </div>
+                <input type="hidden" name="category_id" id="expense-category-id">
+                <div id="add-expense-recurring-container" style="display: none;">
+                    <div class="form-group">
+                        <label for="id_is_recurring" class="styled-label">Repeat Monthly:</label>
+                        <input type="checkbox" name="is_recurring" id="id_is_recurring" class="styled-checkbox">
+                    </div>
+                </div>
+                <div class="form-group submit-btn">
+                    <button type="submit" name="add_expense" class="styled-btn-primary">Add Expense</button>
+                    <button type="button" class="styled-btn-tertiary" onclick="closeAddExpenseForm()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+
+
+<!-- Edit Expense Modal -->
+<div id="edit-expense-form" class="modal">
+    <div class="modal-content styled-modal-content">
+        <span class="close-button styled-close-button" onclick="closeEditExpenseForm()">&times;</span>
+        <h2 class="styled-modal-title">Edit Expense</h2>
+        <form method="post" action="{% url 'financeapp:edit_zero_expense' budget.id %}">
             {% csrf_token %}
+            <input type="hidden" name="expense_id" id="edit-expense-id">
+            <input type="hidden" name="category_id" id="edit-expense-category-id">
+            <input type="hidden" id="edit-is-category-recurring" name="is_category_recurring">
+            
             <div class="form-group">
-                <label for="id_description">Expense Description:</label>
-                <input type="text" name="description" id="id_description" required>
+                <label for="edit-expense-description" class="styled-label">Expense Description:</label>
+                <input type="text" name="description" id="edit-expense-description" class="form-control styled-input" required>
                 {% if messages %}
                 {% for message in messages %}
-                    {% if "add_zero_expense_danger" in message.tags %}
-                        <div class="error" style="color: red;">{{ message }}</div>
+                    {% if "edit_zero_expense_danger" in message.tags %}
+                        <div class="error styled-error">{{ message }}</div>
                     {% endif %}
                 {% endfor %}
                 {% endif %}
             </div>
+            
             <div class="form-group">
-                <label for="id_assigned_amount">Cost:</label>
-                <input type="number" name="assigned_amount" id="id_assigned_amount" required>
+                <label for="edit-expense-assigned" class="styled-label">Cost:</label>
+                <input type="number" name="assigned_amount" id="edit-expense-assigned" class="form-control styled-input" required>
             </div>
-            <!--
+            
             <div class="form-group">
-                <label for="id_spent">Paid:</label>
-                <input type="number" name="spent" id="id_spent" value="0" required>
+                <label for="edit-is_recurring_expense" class="styled-label">Repeat Monthly:</label>
+                <input type="checkbox" name="is_recurring" id="edit-is_recurring_expense" class="form-check-input styled-checkbox">
             </div>
-        -->
-            <input type="hidden" name="category_id" id="expense-category-id">
-            <div id="add-expense-recurring-container" style="display: none;">
-                <div class="form-group">
-                    <label for="id_is_recurring">Recurring:</label>
-                    <input type="checkbox" name="is_recurring" id="id_is_recurring">
-                </div>
+
+            <div class="form-group submit-btn mt-4">
+                <button type="button" class="btn btn-success styled-btn-primary" onclick="redirectToTransactionPage()">Make Payment</button>
             </div>
+
+            <div class="form-group submit-btn mt-3">
+                <button type="submit" name="edit_expense" class="btn btn-primary styled-btn-secondary">Save Changes</button>
+                <button type="button" class="btn btn-secondary styled-btn-tertiary" onclick="closeEditExpenseForm()">Cancel</button>
+            </div>
+        </form>
+        
+        <form method="post" action="{% url 'financeapp:delete_zero_expense' budget.id %}" class="mt-3">
+            {% csrf_token %}
+            <input type="hidden" name="expense_id" id="delete-expense-id">
+            <input type="hidden" name="category_id" id="delete-expense-category-id">
             <div class="form-group submit-btn">
-                <button type="submit" name="add_expense" class="btn btn-primary">Add Expense</button>
-                <button type="button" class="btn btn-secondary" onclick="closeAddExpenseForm()">Cancel</button>
+                <button type="submit" name="delete_expense" class="btn btn-danger styled-btn-danger">Delete Expense</button>
             </div>
         </form>
     </div>
 </div>
 
 
-    <!-- Edit Expense Modal -->
-    <div id="edit-expense-form" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeEditExpenseForm()">&times;</span>
-            <h2>Edit Expense</h2>
-            <form method="post" action="{% url 'financeapp:edit_zero_expense' budget.id %}">
-                {% csrf_token %}
-                <input type="hidden" name="expense_id" id="edit-expense-id">
-                <input type="hidden" name="category_id" id="edit-expense-category-id">
-                <input type="hidden" id="edit-is-category-recurring" name="is_category_recurring">
-                <div class="form-group">
-                    <label for="edit-expense-description">Expense Description:</label>
-                    <input type="text" name="description" id="edit-expense-description" required>
-                    {% if messages %}
-                    {% for message in messages %}
-                        {% if "edit_zero_expense_danger" in message.tags %}
-                            <div class="error" style="color: red;">{{ message }}</div>
-                        {% endif %}
-                    {% endfor %}
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="edit-expense-assigned">Cost:</label>
-                    <input type="number" name="assigned_amount" id="edit-expense-assigned" required>
-                </div>
-                <!--
-                <div class="form-group">
-                    <label for="edit-expense-spent">Paid:</label>
-                    <input type="number" name="spent" id="edit-expense-spent" required>
-                </div>
-            -->
-                <div clss="form-group">
-                    <label for="edit-is_recurring_expense">Recurring:</label>
-                    <input type="checkbox" name="is_recurring" id="edit-is_recurring_expense">
-                </div>
-                <div class="form-group submit-btn">
-                    <button type="submit" name="edit_expense" class="btn btn-primary">Save Changes</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeEditExpenseForm()">Cancel</button>
-                </div>
-            </form>
-            <form method="post" action="{% url 'financeapp:delete_zero_expense' budget.id %}">
-                {% csrf_token %}
-                <input type="hidden" name="expense_id" id="delete-expense-id">
-                <input type="hidden" name="category_id" id="delete-expense-category-id">
-                <div class="form-group submit-btn">
-                    <button type="submit" name="delete_expense" class="btn btn-danger">Delete Expense</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script>
+        function redirectToTransactionPage() {
+            const expenseId = document.getElementById('edit-expense-id').value;
+            const accountId = document.getElementById('edit-expense-category-id').value;
+            // Redirect to the transactions page, you can customize the URL as needed
+            window.location.href = "{% url 'financeapp:transactions' %}?account_id=" + accountId + "&expense_id=" + expenseId;
+        }
         /* add category */
         
         function showAddCategoryForm() {
