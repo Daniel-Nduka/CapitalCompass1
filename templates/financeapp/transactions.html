@@ -111,10 +111,12 @@
             {% csrf_token %}
             <div class="styled-form-group">
                 <label for="add-account" class="styled-label">Account</label>
-                <select id="add-account" name="account" class="styled-input">
+                <select id="add-account" name="account" class="styled-input" onchange="handleAddAccount(this)">
+                    <option value="">-- Select Account --</option>
                     {% for account in accounts %}
                     <option value="{{ account.id }}">{{ account.account_name }}</option>
-                    {% endfor %}
+                    {% endfor %}   
+                    <option value="add-new-account">+ Add New Account </option> <!-- New option added -->
                 </select>
             </div>
             <div class="styled-form-group">
@@ -178,7 +180,8 @@
             <input type="hidden" name="transaction_id" id="edit-transaction-id">
             <div class="styled-form-group">
                 <label for="edit-account" class="styled-label">Account</label>
-                <select id="edit-account" name="account" class="styled-input">
+
+                <select id="edit-account" name="account" class="styled-input" onchange="handleAddAccount(this)">
                     {% for account in accounts %}
                     <option value="{{ account.id }}">{{ account.account_name }}</option>
                     {% endfor %}
@@ -202,7 +205,6 @@
                 <div class="styled-form-group">
                     <label for="edit-expense" class="styled-label">Expense</label>
                     <select id="edit-expense" name="expense" class="styled-input" onchange="handleAddExpense(this)">
-                        <option value="">-- Select Expense --</option>
                         {% for category in categories %}
                             {% for expense in category.expenses.all %}
                             <option value="{{ expense.id }}">{{ expense.description }} ({{ category.name }})</option>
@@ -210,7 +212,7 @@
                         {% endfor %}
                         <option value="add-new-expense">+ Add New Expense</option>
                     </select>
-                    <span class="tooltip-text">No expenses found. Please add the expense you are paying for in the budget section.</span>
+                 
                 </div>
                 <div class="styled-form-group">
                     <label for="edit-outflow" class="styled-label">Amount</label>
@@ -237,13 +239,6 @@
         </form>
     </div>
 </div>
-
-
-
-
-
-
-
 
 <script>
     // Show and hide the Add Transaction form
@@ -334,6 +329,12 @@
                 // Default or fallback behavior if needed
                 alert("Unknown budget type.");
             {% endif %}
+        }
+    }
+
+    function handleAddAccount(selectElement) {
+        if (selectElement.value === "add-new-account") {
+            window.location.href = "{% url 'financeapp:account_list' %}";
         }
     }
     

@@ -163,6 +163,19 @@ class ZeroBasedCategory(BaseCategory):
 
     def __str__(self):
         return self.name
+    
+# Signal to create a default category when a Zero-Based Budget is created
+@receiver(post_save, sender=Budget)
+def create_default_zero_based_category(sender, instance, created, **kwargs):
+    if created and instance.budget_type == 'zero_based':
+        # Check if a default category already exists to avoid duplication
+        if not ZeroBasedCategory.objects.filter(budget=instance, name='General Expenses').exists():
+            ZeroBasedCategory.objects.create(
+                budget=instance,
+                name='General Expenses',  # Use the chosen name here
+                assigned_amount=Decimal(0.00),  # Default assigned amount, can be modified as needed
+            )
+
 
 class Expense(models.Model):
     fifty_30_twenty_category = models.ForeignKey(FiftyThirtyTwentyCategory, on_delete=models.CASCADE, related_name='expenses', null=True, blank=True)
@@ -192,11 +205,20 @@ class Expense(models.Model):
             self.category.save()
         if self.fifty_30_twenty_category:
             self.fifty_30_twenty_category.save()
+            
+    def delete(self, *args, **kwargs):
+        # Update the account balance based on the transaction before deleting it
+         # Reverse the effect of all transactions associated with this expense
+        for transaction in self.transactions.all():
+            # If it's an outflow transaction, add the amount back to the account
+            if transaction.outflow > 0:
+                transaction.account.balance += transaction.outflow
+            # Save the updated account balance
+            transaction.account.save()
+
+        # Now delete the expense
+        super().delete(*args, **kwargs)
     
-                
-                
-
-
 
 
 class Transaction(models.Model):

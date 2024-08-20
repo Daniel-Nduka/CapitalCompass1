@@ -26,6 +26,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import hashlib
 
 def csrf_failure(request, reason=""):
     return render(request, 'financeapp/index.html')
@@ -1000,6 +1001,13 @@ def get_categories_for_date(request):
     return JsonResponse({'categories': category_data})
 '''
 
+def generate_colour_for_name(name):
+    # Create a hash of the name
+    hash_object = hashlib.md5(name.encode())
+    # Use the first 6 characters of the hash to generate a color
+    color = '#' + hash_object.hexdigest()[:6]
+    return color
+
 @login_required   
 def financial_analysis(request, year=None, month=None):
     # Fetch categories and their assigned amounts
@@ -1033,7 +1041,7 @@ def financial_analysis(request, year=None, month=None):
     assigned_amounts = [category.assigned_amount for category in categories]
     total_assigned_amount = categories.aggregate(Sum('assigned_amount'))['assigned_amount__sum'] or 1
     category_data = [float(category.assigned_amount / total_assigned_amount) * 100 for category in categories]
-    category_colors = ['#'+''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in categories]
+    category_colors = [generate_colour_for_name(category.name) for category in categories]
     
     
     # Create a dictionary for easy lookup of previous category amounts
@@ -1060,7 +1068,8 @@ def financial_analysis(request, year=None, month=None):
     total_expense_amount = expenses.aggregate(Sum('assigned_amount'))['assigned_amount__sum'] or 1
     expense_labels = [expense.description for expense in expenses]
     expense_data = [float(expense.assigned_amount / total_expense_amount) * 100 for expense in expenses]
-    expense_colors = ['#' + ''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in expenses]
+    expense_colors = [generate_colour_for_name(expense.description) for expense in expenses]
+    max_expense = expenses.order_by('-assigned_amount').first()
     max_expense = expenses.order_by('-assigned_amount').first()
     min_expense = expenses.order_by('assigned_amount').first()
     
@@ -1123,7 +1132,7 @@ def financial_analysis(request, year=None, month=None):
 
             expense_labels = [expense.description for expense in expenses_within_category]
             expense_data = [float(expense.assigned_amount / total_expense_within_category_amount) * 100 for expense in expenses_within_category]
-            expense_colors = ['#' + ''.join([random.choice('0123456789ABCDEF') for j in range(6)]) for i in expenses_within_category]
+            expense_colors = [generate_colour_for_name(expense.description) for expense in expenses_within_category]
 
             max_expense = expenses_within_category.order_by('-assigned_amount').first()
             min_expense = expenses_within_category.order_by('assigned_amount').first()
