@@ -9,7 +9,7 @@
 {% block body_block %}
 <main>
     <section class="zero-based-budget-overview">
-        <h1>{{ budget.budget_name }} Zero-Based Budget</h1>
+       <!-- <h1>{{ budget.budget_name }} Zero-Based Budget</h1> -->
         <div class="add-money-container">
             <button class="add-money-button" onclick="location.href='{% url 'financeapp:account_list' %}'">Add Money</button>
         </div>
@@ -75,10 +75,12 @@
                             <span class="spent-container">
                                 <span class="spent-paid-container">
                                     <span class="spent-expense">£{{ expense.spent }}</span>
-                                    {% if expense.spent >= expense.assigned_amount %}
-                                        <span class="paid"> Complete </span>
+                                    {% if expense.spent == expense.assigned_amount %}
+                                        <span class="paid">Complete</span>
+                                    {% elif expense.spent > expense.assigned_amount %}
+                                        <span class="paid">Overpaid</span>
                                     {% else %}
-                                        <span class="paid"> Paid </span>
+                                        <span class="paid">Paid</span>
                                     {% endif %}
                                 </span>
                                 <span class="edit-icon" onclick="showEditExpenseForm('{{ expense.id }}', '{{ category.id }}', '{{ expense.description }}', '{{ expense.assigned_amount }}', '{{ category.is_recurring|yesno:'true,false' }}', '{{ expense.is_recurring|yesno:'true,false' }}')" data-is-recurring="{{ expense.is_recurring|yesno:'true,false' }}">
