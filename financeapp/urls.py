@@ -73,6 +73,9 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', views.CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', views.CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
     
-
+    path('create-link-token/', views.create_link_token, name='create_link_token'),
+   # path('exchange-public-token/', views.exchange_public_token, name='exchange_public_token'),
+   # path('get-balance/<int:account_id>/', views.get_balance, name='get_balance'),
+   path('create-and-link-account/', views.create_and_link_account, name='create_and_link_account'),
     
 ]

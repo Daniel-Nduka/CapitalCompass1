@@ -4,6 +4,7 @@
 
 {% block head_block %}
 <link rel="stylesheet" href="{% static 'styles/accounts.css' %}">
+<script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
 {% endblock %}
 
 {% block body_block %}
@@ -14,7 +15,8 @@
             <p>Total Balance: £<span id="total-balance">{{ total_balance }}</span></p>
         </div>
         <div class="add-button-class">
-             <button class="btn btn-primary" onclick="showAddAccountForm()"> Add Account </button>
+             <button class="btn btn-primary" onclick="showAddAccountForm()">Add Account Manually</button>
+             <button class="btn btn-primary" id="link-button" onclick="showPlaid()">Link Your Bank Account</button>
         </div>
         <div class="account-list">
             <ul>
@@ -62,7 +64,7 @@
                 </select>
             </div>
             <div class="form-group submit-btn">
-                <button type="submit" name="add_account" class="btn btn-primary">Add Account</button>
+                <button type="submit" class="btn btn-primary">Add Account</button>
                 <button type="button" class="btn btn-secondary" onclick="closeAddAccountForm()">Cancel</button>
             </div>
         </form>
@@ -90,7 +92,7 @@
                 </select>
             </div>
             <div class="form-group submit-btn">
-                <button type="submit" name="edit_account" class="btn btn-primary">Save Changes</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
                 <button type="button" class="btn btn-secondary" onclick="closeEditAccountForm()">Cancel</button>
             </div>
         </form>
@@ -110,7 +112,7 @@
                 <input type="number" name="amount" id="id_amount" required>
             </div>
             <div class="form-group submit-btn">
-                <button type="submit" name="add_money" class="btn btn-primary">Add Money</button>
+                <button type="submit" class="btn btn-primary">Add Money</button>
                 <button type="button" class="btn btn-secondary" onclick="closeAddMoneyForm()">Cancel</button>
             </div>
         </form>
@@ -118,13 +120,15 @@
 </div>
 
 <script>
-    /* Add account */
+    // Function to show the Add Account Modal
     function showAddAccountForm() {
         document.getElementById('add-account-form-modal').style.display = 'flex';
     }
     function closeAddAccountForm() {
         document.getElementById('add-account-form-modal').style.display = 'none';
     }
+
+    // Function to show the Edit Account Modal
     function showEditAccountForm(accountId, accountName, accountType) {
         document.getElementById('edit-account-id').value = accountId;
         document.getElementById('edit-account-name').value = accountName;
@@ -134,15 +138,51 @@
     function closeEditAccountForm() {
         document.getElementById('edit-account-form').style.display = 'none';
     }
+
+    // Function to show the Add Money Modal
     function showAddMoneyForm(accountId) {
         document.getElementById('add-money-account-id').value = accountId;
         document.getElementById('add-money-form-modal').style.display = 'flex';
     }
-
     function closeAddMoneyForm() {
         document.getElementById('add-money-form-modal').style.display = 'none';
     }
-    // Run the update function on page load
+
+    // Plaid Link integration
+    function showPlaid() {
+        const handler = Plaid.create({
+            token: '{{ link_token }}',
+            onSuccess: function(public_token, metadata) {
+                // Send the public token to the server
+                fetch('/create-and-link-account/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({ public_token: public_token })
+                }).then(response => response.json())
+                .then(data => {
+                    console.log(data); // Add this line
+                    if (data.success) {
+
+                        // Reload the page to show the new account
+                        location.reload();
+                    } else {
+                        alert('There was an error linking your account');
+                    }
+                });
+            },
+            onExit: function(err, metadata) {
+                if (err) {
+                    console.error('Link exited with error:', err);
+                }
+            },
+        });
+        handler.open();
+    }
+
+    // Initialize modals visibility on page load
     window.onload = function() {
         closeAddAccountForm();
         closeEditAccountForm();

@@ -57,22 +57,42 @@ class Account(models.Model):
     ACCOUNT_TYPES = [
        ('CHECKING', 'checking'),
        ('SAVINGS', 'savings'),
-      # ('CREDIT', 'credit'),
+       # ('CREDIT', 'credit'),  # Commented out or use if necessary
        ('CASH', 'cash'),
+       ('OTHER', 'other'),
     ]
     budget = models.ForeignKey(Budget, on_delete=models.CASCADE, related_name='accounts')
     account_name = models.CharField(max_length=100)
-    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES)
+    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES, blank=True, default='OTHER')  # Ensure choices is added
+    custom_account_type = models.CharField(max_length=100, blank=True, null=True)
     balance = models.DecimalField(max_digits=15, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-       return f"{self.account_name} ({self.get_account_type_display()}) - {self.budget.budget_name}"
+        # Add a debug print to check the account type value
+        print(f"Debug: account_type={self.account_type}")
+        if self.account_type == 'OTHER' and self.custom_account_type:
+            return f"{self.account_name} ({self.custom_account_type}) - {self.budget.budget_name}"
+        return f"{self.account_name} ({self.get_account_type_display()}) - {self.budget.budget_name}"
 
     def save(self, *args, **kwargs):
+        if self.custom_account_type and self.account_type not in dict(self.ACCOUNT_TYPES).keys():
+            self.account_type = 'OTHER'
         super().save(*args, **kwargs)
         self.budget.update_fifty_thirty_twenty_categories()
+
+
+class PlaidAccount(models.Model):
+    account = models.OneToOneField(Account, on_delete=models.CASCADE, related_name='plaid_account')
+    access_token = models.CharField(max_length=100)
+    item_id = models.CharField(max_length=100)
+    plaid_account_id = models.CharField(max_length=100)  # Plaid's account ID for this specific account
+    institution_name = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return f"{self.institution_name} - {self.account.account_name}"
+
 
 @receiver(post_save, sender=Account)
 def create_initial_transaction(sender, instance, created, **kwargs):

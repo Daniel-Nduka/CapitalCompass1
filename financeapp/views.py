@@ -2,13 +2,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.views import View
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+
 from django.contrib import messages
 from django.contrib.auth.models import User
 import datetime
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
-from .models import UserProfile, Budget, ZeroBasedCategory, Expense, Account, FiftyThirtyTwentyCategory, Transaction, ContactMessage, AccountSupport
+from .models import UserProfile, Budget, ZeroBasedCategory, Expense, Account, FiftyThirtyTwentyCategory, Transaction, ContactMessage, AccountSupport , PlaidAccount
 from .forms import UserForm, AccountForm, BudgetForm, ZeroBudgetForm, ExpenseForm, Fifty_Twenty_ThirtyForm, TransactionForm, ContactMessageForm, AccountSupportForm, AddMoneyForm
 from django.db.models import Sum
 import random
@@ -27,6 +29,20 @@ from django.urls import reverse_lazy
 from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import hashlib
+import plaid
+import json  # Import the json module here
+from plaid.api import plaid_api
+from plaid import ApiException
+from plaid.model.link_token_create_request import LinkTokenCreateRequest
+from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
+from plaid.model.country_code import CountryCode
+from plaid.model.products import Products
+from plaid.model.accounts_get_request import AccountsGetRequest
+
+
+
+
+
 
 def csrf_failure(request, reason=""):
     return render(request, 'financeapp/index.html')
@@ -96,14 +112,137 @@ def account_list(request):
 
     accounts = Account.objects.filter(budget=budget)
     total_balance = sum(account.balance for account in accounts)
- 
+
+    # Call the create_link_token function to generate the link token
+    link_token_response = create_link_token(request)
     
+    # Extract the link token from the JSON response
+    link_token = json.loads(link_token_response.content).get('link_token')
+
     context = {
         'budget': budget,
         'accounts': accounts,
         'total_balance': total_balance,
+        'link_token': link_token,  # Pass the link token to the template
     }
     return render(request, 'financeapp/accounts.html', context)
+configuration = plaid.Configuration(
+    host=plaid.Environment.Sandbox,  # Change to Development or Production as needed
+    api_key={
+        'clientId': settings.PLAID_CLIENT_ID,
+        'secret': settings.PLAID_SECRET,
+    }
+)
+client = plaid.ApiClient(configuration)
+plaid_client = plaid_api.PlaidApi(client)
+
+
+def create_link_token(request):
+    user = LinkTokenCreateRequestUser(client_user_id=str(request.user.id))
+    
+    link_token_request = LinkTokenCreateRequest(
+        user=user,
+        client_name="financeapp",
+        products=[Products('auth'), Products('transactions')],  # Correctly lis
+        country_codes=[CountryCode('GB')],  # Use 'GB' for United Kingdom
+        language="en",
+    )
+    
+    response = plaid_client.link_token_create(link_token_request)
+    return JsonResponse(response.to_dict())
+@csrf_exempt
+@login_required
+def create_and_link_account(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        public_token = data.get('public_token')
+        try:
+            exchange_response = plaid_client.item_public_token_exchange({'public_token': public_token})
+            access_token = exchange_response['access_token']
+            item_id = exchange_response['item_id']
+            
+            accounts_response = plaid_client.accounts_get(AccountsGetRequest(access_token))
+            accounts_info = accounts_response['accounts']
+            
+            # Get the budget from the session
+            budget = request.session.get('selected_budget_id')
+
+            # Process each account
+            for account_info in accounts_info:
+                account_name = account_info['name']
+                account_type = account_info['subtype']
+                plaid_account_id = account_info['account_id']
+                institution_name = accounts_response['item'].get('institution_name', 'Unknown Institution')
+                balance = account_info['balances']['current']
+
+                # Create a new Account
+                account = Account.objects.create(
+                    budget_id=budget,
+                    account_name=account_name,
+                    custom_account_type=account_type,
+                    balance=balance,
+                )
+
+                # Link the Plaid account
+                PlaidAccount.objects.create(
+                    account=account,
+                    access_token=access_token,
+                    item_id=item_id,
+                    plaid_account_id=plaid_account_id,
+                    institution_name=institution_name
+                )
+
+            return JsonResponse({'success': True})
+        except ApiException as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+    return JsonResponse({'success': False, 'message': 'Invalid request method'})
+'''
+@csrf_exempt
+@login_required
+def create_and_link_account(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        public_token = data.get('public_token')
+        try:
+            exchange_response = plaid_client.item_public_token_exchange({'public_token': public_token})
+            access_token = exchange_response['access_token']
+            item_id = exchange_response['item_id']
+            
+            accounts_response = plaid_client.accounts_get(AccountsGetRequest(access_token))
+            accounts_info = accounts_response['accounts'][0]
+            
+            account_name = accounts_info['name']
+            account_type = accounts_info['subtype']
+            
+            plaid_account_id = accounts_info['account_id']
+            institution_name = accounts_response['item'].get('institution_name', 'Unknown Institution')  # Attempt to get the institution name
+            # Get the balance from the account information
+            balance = accounts_info['balances']['current']  # Use the current balance
+
+
+            # Create a new Account
+            budget = request.session.get('selected_budget_id')
+            account = Account.objects.create(
+                budget_id=budget,
+                account_name=account_name,
+                account_type=account_type,
+                balance=balance,  # Initialize with a balance of 0; you can update this later
+            )
+
+            # Link the Plaid account
+            PlaidAccount.objects.create(
+                account=account,
+                access_token=access_token,
+                item_id=item_id,
+                plaid_account_id=plaid_account_id,
+                institution_name=institution_name
+            )
+
+            return JsonResponse({'status': 'success'})
+        except ApiException as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+'''
 
 @login_required
 def add_account(request):

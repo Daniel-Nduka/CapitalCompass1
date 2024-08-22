@@ -11,7 +11,7 @@ class UserForm(forms.ModelForm):
 
 #Account form
 class AccountForm(forms.ModelForm):
-   # income_recurring = forms.BooleanField(required=False, label='Recurring')
+    account_type = forms.ChoiceField(choices=Account.ACCOUNT_TYPES, required=True)
     class Meta:
         model = Account
         fields = ['account_name', 'account_type', 'balance']
