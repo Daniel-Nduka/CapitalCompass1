@@ -39,7 +39,12 @@ from plaid.model.country_code import CountryCode
 from plaid.model.products import Products
 from plaid.model.accounts_get_request import AccountsGetRequest
 
+import logging
+from plaid.model.transactions_get_request import TransactionsGetRequest
 
+logger = logging.getLogger(__name__)
+from decimal import Decimal
+from django.db.models import Case, When, Value, IntegerField, F
 
 
 
@@ -150,6 +155,9 @@ def create_link_token(request):
     
     response = plaid_client.link_token_create(link_token_request)
     return JsonResponse(response.to_dict())
+
+import time
+
 @csrf_exempt
 @login_required
 def create_and_link_account(request):
@@ -160,14 +168,12 @@ def create_and_link_account(request):
             exchange_response = plaid_client.item_public_token_exchange({'public_token': public_token})
             access_token = exchange_response['access_token']
             item_id = exchange_response['item_id']
-            
+
             accounts_response = plaid_client.accounts_get(AccountsGetRequest(access_token))
             accounts_info = accounts_response['accounts']
-            
-            # Get the budget from the session
+
             budget = request.session.get('selected_budget_id')
 
-            # Process each account
             for account_info in accounts_info:
                 account_name = account_info['name']
                 account_type = account_info['subtype']
@@ -175,15 +181,14 @@ def create_and_link_account(request):
                 institution_name = accounts_response['item'].get('institution_name', 'Unknown Institution')
                 balance = account_info['balances']['current']
 
-                # Create a new Account
                 account = Account.objects.create(
                     budget_id=budget,
                     account_name=account_name,
                     custom_account_type=account_type,
                     balance=balance,
+                    plaid_enabled=True,
                 )
 
-                # Link the Plaid account
                 PlaidAccount.objects.create(
                     account=account,
                     access_token=access_token,
@@ -192,10 +197,49 @@ def create_and_link_account(request):
                     institution_name=institution_name
                 )
 
+                start_date = (datetime.datetime.now() - datetime.timedelta(days=30)).date()
+                end_date = datetime.datetime.now().date()
+
+                retries = 5
+                while retries > 0:
+                    try:
+                        transactions_response = plaid_client.transactions_get(TransactionsGetRequest(
+                            access_token=access_token,
+                            start_date=start_date,
+                            end_date=end_date,
+                        ))
+                        transactions_info = transactions_response['transactions']
+                    
+
+                        for transaction_info in transactions_info:
+                            outflow_amount = Decimal(transaction_info['amount']) if transaction_info['amount'] > 0 else Decimal(0)
+                            inflow_amount = Decimal(-transaction_info['amount']) if transaction_info['amount'] < 0 else Decimal(0)
+                            Transaction.objects.create(
+                                account=account,
+                                date=transaction_info['date'],
+                                description=transaction_info['name'],
+                                payee=transaction_info.get('merchant_name', 'Unknown Payee'),
+                                inflow=inflow_amount,
+                                outflow=outflow_amount,
+                                plaid_imported=True,
+                            )
+                        break
+                    except ApiException as e:
+                        error_code = json.loads(e.body).get('error_code')
+                        if error_code == "PRODUCT_NOT_READY":
+                            retries -= 1
+                            time.sleep(10)  # Wait for 10 seconds before retrying
+                        else:
+                            logger.error(f"Error fetching transactions: {e}")
+                            return JsonResponse({'success': False, 'message': str(e)})
+
             return JsonResponse({'success': True})
         except ApiException as e:
+            logger.error(f"Plaid API Error: {e}")
             return JsonResponse({'success': False, 'message': str(e)})
     return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+
 '''
 @csrf_exempt
 @login_required
@@ -1000,10 +1044,32 @@ def transaction_list(request):
     if account_id:
         transactions = transactions.filter(account_id=account_id)
         
-    if sort_order == 'desc':
-        transactions = transactions.order_by(f'-{sort_by}')
+    if sort_by == 'inflow':
+        transactions = transactions.annotate(
+            is_inflow = Case(
+                When(inflow__gt=0, then=Value(1)),
+                default = Value(0),
+                output_field = IntegerField()
+        )
+        ).order_by(
+            F('is_inflow').desc(),
+            F('inflow').desc() if sort_order == 'desc' else F('inflow').asc()
+        )
+    elif sort_by == 'outflow':
+        transactions = transactions.annotate(
+            is_outflow = Case(
+                When(outflow__gt=0, then=Value(1)),
+                default = Value(0),
+                output_field = IntegerField()
+        )
+        ).order_by(
+            F('is_outflow').desc(),
+            F('outflow').desc() if sort_order == 'desc' else F('outflow').asc()
+        )
     else:
-        transactions = transactions.order_by(sort_by)
+        transactions = transactions.order_by(
+            sort_by if sort_order == 'asc' else f'-{sort_by}'
+        )
         
     paginator = Paginator(transactions, 30)
     page = request.GET.get('page', 1)
@@ -1015,19 +1081,6 @@ def transaction_list(request):
     except EmptyPage:
         transactions = paginator.page(paginator.num_pages)
     
-        
-    
-    
-    if (budget.budget_type == 'zero_based'):
-        categories = ZeroBasedCategory.objects.filter(budget_id=budget,
-                                                  month__year=year, 
-                                                  month__month=month
-                                                  ).prefetch_related('expenses')
-    else:
-        categories = FiftyThirtyTwentyCategory.objects.filter(budget_id=budget,
-                                                  month__year=year, 
-                                                  month__month=month
-                                                  ).prefetch_related('expenses')
     
     accounts = Account.objects.filter(budget_id=budget)
     context = {

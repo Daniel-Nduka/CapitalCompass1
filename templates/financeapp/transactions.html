@@ -65,7 +65,17 @@
                     <td>{{ transaction.date|date:"d-m-Y" }}</td>
                     <td>{{ transaction.description }}</td>
                     <td>{{ transaction.payee }}</td>
-                    <td>{% if transaction.expense %}{{ transaction.expense.description }}{% else %}N/A{% endif %}</td>
+                    <td>
+                        {% if transaction.outflow > 0 %}
+                            {% if transaction.expense %}
+                                {{ transaction.expense.description }}
+                            {% else %}
+                            <span style="color: red; font-weight: bold; font-size: 14px; text-transform: uppercase;">Select Expense</span>
+                            {% endif %}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                     <td>{{ transaction.outflow }}</td>
                     <td>{{ transaction.inflow }}</td>
                     <td>
@@ -206,6 +216,7 @@
                 <div class="styled-form-group">
                     <label for="edit-expense" class="styled-label">Expense</label>
                     <select id="edit-expense" name="expense" class="styled-input" onchange="handleAddExpense(this)">
+                        <option value="">-- Select Expense --</option>
                         {% for category in categories %}
                             {% for expense in category.expenses.all %}
                             <option value="{{ expense.id }}">{{ expense.description }} ({{ category.name }})</option>
@@ -358,10 +369,6 @@
                 const outflow = parseFloat(outflowInput.value);
                 const expense = document.getElementById('edit-expense').value;
 
-                if (outflow > 0 && expense === '') {
-                    event.preventDefault();
-                    alert('Please select an Expense for the Outflow transaction.');
-                }
 
                 if (!account || !date || (inflow <= 0 && outflow <= 0)) {
                     event.preventDefault();
@@ -385,11 +392,6 @@
                 const inflow = parseFloat(inflowInput.value);
                 const outflow = parseFloat(outflowInput.value);
                 const expense = document.getElementById('edit-expense').value;
-
-                if (outflow > 0 && expense === '') {
-                    event.preventDefault();
-                    alert('Please select an Expense for the Outflow transaction.');
-                }
 
                 if (!account || !date || (inflow <= 0 && outflow <= 0)) {
                     event.preventDefault();

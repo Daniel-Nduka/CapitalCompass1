@@ -22,16 +22,24 @@
             <ul>
                 {% for account in accounts %}
                 <li class="account-box">
+                    <div class="account-header">
+                        <div class="account-type">
+                            {% if account.plaid_account %} {{ account.custom_account_type }} {% else %} {{ account.account_type }}{% endif %} - {% if account.plaid_account %}Linked Account{% else %}Manually Added{% endif %}
+                        </div>
+                        <div class="dropdown">
+                            <button class="dropbtn">⋮</button>
+                            <div class="dropdown-content">
+                                <button onclick="showEditAccountForm({{ account.id }}, '{{ account.account_name }}', '{{ account.account_type }}')">Edit</button>
+                                {% if account.plaid_account %} {% else %}<button onclick="showAddMoneyForm({{ account.id }})">Add Money</button> {% endif %}
+                                <form method="get" action="{% url 'financeapp:delete_account' account.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                     <div class="account-details">
                         {{ account.account_name }}: Current Balance: £{{ account.balance }}
-                    </div>
-                    <div class="account-actions">
-                        <button class="btn btn-primary" onclick="showEditAccountForm({{ account.id }}, '{{ account.account_name }}', '{{ account.account_type }}')">Edit</button>
-                        <button class="btn btn-primary" onclick="showAddMoneyForm({{ account.id }})">Add Money</button>
-                        <form method="get" action="{% url 'financeapp:delete_account' account.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
                     </div>
                 </li>
                 {% endfor %}
@@ -39,6 +47,7 @@
         </div>
     </section>
 </main>
+
 
 <!-- Add Account Modal -->
 <div id="add-account-form-modal" class="modal">

@@ -68,6 +68,7 @@ class Account(models.Model):
     balance = models.DecimalField(max_digits=15, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    plaid_enabled = models.BooleanField(default=False)
 
     def __str__(self):
         # Add a debug print to check the account type value
@@ -96,7 +97,7 @@ class PlaidAccount(models.Model):
 
 @receiver(post_save, sender=Account)
 def create_initial_transaction(sender, instance, created, **kwargs):
-    if created:
+    if created and not instance.plaid_enabled:
         Transaction.objects.create(
             account=instance,
             date=timezone.now(),
@@ -250,64 +251,68 @@ class Transaction(models.Model):
     inflow = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     outflow = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     created_by_account = models.BooleanField(default=False)
+    plaid_imported = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.date} - {self.description} ({self.inflow} / {self.outflow})"
 
     def save(self, *args, **kwargs):
-        if self.pk is None and not self.created_by_account :  # This check is for a new transaction
+        if not self.plaid_imported:
+            if self.pk is None and not self.created_by_account :  # This check is for a new transaction
+                if self.inflow > 0:
+                    self.account.balance += Decimal(self.inflow)
+                    self.outflow = 0
+                if self.outflow > 0:
+                    self.account.balance -= Decimal(self.outflow)
+                    self.inflow = 0
+
+                self.account.save()
+
+                # If this is an outflow, update the linked expense
+                if self.outflow > 0 and self.expense:
+                    self.expense.spent += Decimal(self.outflow)
+                    self.expense.save()
+            else:
+                if self.pk is not None:
+                    old_transaction = Transaction.objects.get(pk=self.pk)
+                    if old_transaction.inflow > 0:
+                        self.account.balance -= Decimal(old_transaction.inflow)
+                    elif old_transaction.outflow > 0:
+                        self.account.balance += Decimal(old_transaction.outflow)
+                    
+                    # Revert the impact on the old expense if different
+                    if old_transaction.expense and old_transaction.expense != self.expense:
+                        old_transaction.expense.spent -= Decimal(old_transaction.outflow)
+                        old_transaction.expense.save()
+                
+                    
+                    if self.inflow > 0:
+                        self.account.balance += Decimal(self.inflow)
+                        self.outflow = 0
+                    elif self.outflow > 0:
+                        self.account.balance -= Decimal(self.outflow)
+                        self.inflow = 0
+                
+                        if self.expense:
+                            self.expense.spent = Decimal(self.outflow)
+                            self.expense.save()
+                self.account.save()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Update the account balance based on the transaction before deleting it
+        if not self.plaid_imported:
             if self.inflow > 0:
-                self.account.balance += Decimal(self.inflow)
-                self.outflow = 0
+                self.account.balance -= Decimal(self.inflow)
             if self.outflow > 0:
-                self.account.balance -= Decimal(self.outflow)
-                self.inflow = 0
+                self.account.balance += Decimal(self.outflow)
 
             self.account.save()
 
             # If this is an outflow, update the linked expense
             if self.outflow > 0 and self.expense:
-                self.expense.spent += Decimal(self.outflow)
+                self.expense.spent -= Decimal(self.outflow)
                 self.expense.save()
-        else:
-            if self.pk is not None:
-                old_transaction = Transaction.objects.get(pk=self.pk)
-                if old_transaction.inflow > 0:
-                    self.account.balance -= Decimal(old_transaction.inflow)
-                elif old_transaction.outflow > 0:
-                    self.account.balance += Decimal(old_transaction.outflow)
-                
-                    
-                if self.inflow > 0:
-                    self.account.balance += Decimal(self.inflow)
-                    self.outflow = 0
-                elif self.outflow > 0:
-                    self.account.balance -= Decimal(self.outflow)
-                    self.inflow = 0
-                
-                    if self.expense:
-                        self.expense.spent = Decimal(self.outflow)
-                        self.expense.save()
-            self.account.save()
-                
-                
-
-        super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        # Update the account balance based on the transaction before deleting it
-        if self.inflow > 0:
-            self.account.balance -= Decimal(self.inflow)
-        if self.outflow > 0:
-            self.account.balance += Decimal(self.outflow)
-
-        self.account.save()
-
-        # If this is an outflow, update the linked expense
-        if self.outflow > 0 and self.expense:
-            self.expense.spent -= Decimal(self.outflow)
-            self.expense.save()
-
         super().delete(*args, **kwargs)
 
 #contactus model
