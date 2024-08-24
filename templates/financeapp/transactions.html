@@ -24,11 +24,22 @@
                 <select id="account-filter" name="account_id" onchange="this.form.submit()">
                     <option value="">All Accounts</option>
                     {% for account in accounts %}
-                    <option value="{{ account.id }}" {% if account.id == selected_account_id %}selected{% endif %}>
+                    <option value="{{ account.id }}" {% if account.id|stringformat:"s" == selected_account_id|stringformat:"s" %}selected{% endif %}>
                         {{ account.account_name }}
                     </option>
                     {% endfor %}
                 </select>
+
+                <label for"category-filter">Filter by Category:</label>
+                <select id="category-filter" name="category_id" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category.id|stringformat:"s" == selected_category_id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+               
 
                 <label for="sort-by">Sort by:</label>
                 <select id="sort-by" name="sort_by" onchange="this.form.submit()">

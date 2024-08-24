@@ -94,7 +94,7 @@ class PlaidAccount(models.Model):
     def __str__(self):
         return f"{self.institution_name} - {self.account.account_name}"
 
-
+# Signal to create an initial transaction when an account is created manually. if plaid is not enabled
 @receiver(post_save, sender=Account)
 def create_initial_transaction(sender, instance, created, **kwargs):
     if created and not instance.plaid_enabled:
@@ -240,8 +240,7 @@ class Expense(models.Model):
         # Now delete the expense
         super().delete(*args, **kwargs)
     
-
-
+#Transaction Model
 class Transaction(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions')
     expense = models.ForeignKey(Expense, on_delete=models.CASCADE, related_name='transactions', null=True, blank=True)

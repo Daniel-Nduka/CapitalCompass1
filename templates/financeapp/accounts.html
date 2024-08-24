@@ -24,13 +24,28 @@
                 <li class="account-box">
                     <div class="account-header">
                         <div class="account-type">
-                            {% if account.plaid_account %} {{ account.custom_account_type }} {% else %} {{ account.account_type }}{% endif %} - {% if account.plaid_account %}Linked Account{% else %}Manually Added{% endif %}
+                            {% if account.plaid_account %} 
+                                {{ account.custom_account_type }} 
+                            {% else %} 
+                                {{ account.account_type }}
+                            {% endif %} - 
+                            {% if account.plaid_account %}
+                                Linked Account 
+                                <button class="btn btn-sm btn-outline-secondary" onclick="refreshAccount('{{ account.id }}')">Refresh</button>
+                            {% else %}
+                                Manually Added
+                            {% endif %}
                         </div>
                         <div class="dropdown">
                             <button class="dropbtn">⋮</button>
                             <div class="dropdown-content">
+                                <form method="get" action="{% url 'financeapp:transactions' %}">
+                                    <input type="hidden" name="account_id" value="{{ account.id }}">
+                                    <button type="submit">View Transactions</button>
                                 <button onclick="showEditAccountForm({{ account.id }}, '{{ account.account_name }}', '{{ account.account_type }}')">Edit</button>
-                                {% if account.plaid_account %} {% else %}<button onclick="showAddMoneyForm({{ account.id }})">Add Money</button> {% endif %}
+                                {% if not account.plaid_account %}
+                                    <button onclick="showAddMoneyForm({{ account.id }})">Add Money</button>
+                                {% endif %}
                                 <form method="get" action="{% url 'financeapp:delete_account' account.id %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn-danger">Delete</button>
@@ -45,6 +60,7 @@
                 {% endfor %}
             </ul>
         </div>
+        
     </section>
 </main>
 
@@ -190,6 +206,28 @@
         });
         handler.open();
     }
+    // Function to refresh a specific account
+function refreshAccount() {
+    fetch(`/refresh-account-transaction/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}',
+        }
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload the page to reflect updated account information
+            location.reload();
+        } else {
+            alert('There was an error refreshing the account.');
+        }
+    }).catch(error => {
+        console.error('Error refreshing account:', error);
+        alert('An error occurred while refreshing the account.');
+    });
+}
+
 
     // Initialize modals visibility on page load
     window.onload = function() {

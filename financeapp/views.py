@@ -132,7 +132,7 @@ def account_list(request):
     }
     return render(request, 'financeapp/accounts.html', context)
 configuration = plaid.Configuration(
-    host=plaid.Environment.Sandbox,  # Change to Development or Production as needed
+    host=plaid.Environment.Sandbox,  # Using Sandbox environment for testing with fake data
     api_key={
         'clientId': settings.PLAID_CLIENT_ID,
         'secret': settings.PLAID_SECRET,
@@ -158,6 +158,7 @@ def create_link_token(request):
 
 import time
 
+#create and link account from plaid
 @csrf_exempt
 @login_required
 def create_and_link_account(request):
@@ -239,55 +240,54 @@ def create_and_link_account(request):
             return JsonResponse({'success': False, 'message': str(e)})
     return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
-
-'''
+#refresh account and transactions from plaid
 @csrf_exempt
 @login_required
-def create_and_link_account(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        public_token = data.get('public_token')
-        try:
-            exchange_response = plaid_client.item_public_token_exchange({'public_token': public_token})
-            access_token = exchange_response['access_token']
-            item_id = exchange_response['item_id']
+def refresh_account_and_transactions(request):
+    try: 
+        budget = request.session.get('selected_budget_id')
+        accounts = Account.objects.filter(budget=budget, plaid_enabled=True)
+        
+        for account in accounts:
+            plaid_account = PlaidAccount.objects.get(account=account)
+            accounts_response = plaid_client.accounts_get(AccountsGetRequest(plaid_account.access_token))
+            account_info = next(acc for acc in accounts_response['accounts'] if acc['account_id'] == plaid_account.plaid_account_id)
+            account.balance = Decimal(account_info['balances']['current'])
+            account.save()
+            # Refresh transactions
+            start_date = (datetime.datetime.now() - datetime.timedelta(days=30)).date()
+            end_date = datetime.datetime.now().date()
             
-            accounts_response = plaid_client.accounts_get(AccountsGetRequest(access_token))
-            accounts_info = accounts_response['accounts'][0]
+            transactions_response = plaid_client.transactions_get(TransactionsGetRequest(
+                access_token=plaid_account.access_token,
+                start_date=start_date,
+                end_date=end_date,
+            ))
             
-            account_name = accounts_info['name']
-            account_type = accounts_info['subtype']
+            transactions_info = transactions_response['transactions']
             
-            plaid_account_id = accounts_info['account_id']
-            institution_name = accounts_response['item'].get('institution_name', 'Unknown Institution')  # Attempt to get the institution name
-            # Get the balance from the account information
-            balance = accounts_info['balances']['current']  # Use the current balance
+            for transaction_info in transactions_info:
+                outflow_amount = Decimal(transaction_info['amount']) if transaction_info['amount'] > 0 else Decimal(0)
+                inflow_amount = Decimal(-transaction_info['amount']) if transaction_info['amount'] < 0 else Decimal(0)
+                
+                Transaction.objects.create(
+                    account=account,
+                    date=transaction_info['date'],
+                    description=transaction_info['name'],
+                    payee=transaction_info.get('merchant_name', 'Unknown Payee'),
+                    inflow=inflow_amount,
+                    outflow=outflow_amount,
+                    plaid_imported=True,
+                )
+        
+        return JsonResponse({'success': True})
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
 
 
-            # Create a new Account
-            budget = request.session.get('selected_budget_id')
-            account = Account.objects.create(
-                budget_id=budget,
-                account_name=account_name,
-                account_type=account_type,
-                balance=balance,  # Initialize with a balance of 0; you can update this later
-            )
 
-            # Link the Plaid account
-            PlaidAccount.objects.create(
-                account=account,
-                access_token=access_token,
-                item_id=item_id,
-                plaid_account_id=plaid_account_id,
-                institution_name=institution_name
-            )
-
-            return JsonResponse({'status': 'success'})
-        except ApiException as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
-'''
-
+#Add account function. It allows users to add an account to the budget manually.
 @login_required
 def add_account(request):
     budget = request.selected_budget
@@ -303,6 +303,7 @@ def add_account(request):
             return redirect('financeapp:account_list')
     return redirect('financeapp:account_list')
 
+#Delete account function. It allows users to delete an account from the budget.
 @login_required
 def delete_account(request, account_id):
     budget = request.selected_budget
@@ -318,6 +319,7 @@ def delete_account(request, account_id):
     }
     return render(request, 'financeapp/delete_account.html', context)
 
+#Edit account function. It allows users to edit an account in the budget.
 @login_required
 def edit_account(request):
     account_id = request.POST.get('account_id')
@@ -362,11 +364,7 @@ def add_money_to_account(request):
             messages.error(request, 'There was an error adding money. Please try again.')
 
     return redirect('financeapp:account_list')
-'''
 
-def transactions(request):
-    return render(request, 'financeapp/transactions.html')
-'''
 #This is the profile page. It allows users to update their profile information.
 @login_required
 def profile(request):
@@ -1036,29 +1034,41 @@ def transaction_list(request):
                                                   ).prefetch_related('expenses')
     
     account_id = request.GET.get('account_id')
+    category_id = request.GET.get('category_id')
     sort_by = request.GET.get('sort_by', 'date')
     sort_order = request.GET.get('sort_order', 'asc')
+    
     
     transactions = Transaction.objects.filter(account__budget_id=budget)
     
     if account_id:
         transactions = transactions.filter(account_id=account_id)
+    if category_id:
+       transactions = transactions.filter(expense__category_id=category_id)
         
     if sort_by == 'inflow':
         transactions = transactions.annotate(
             is_inflow = Case(
-                When(inflow__gt=0, then=Value(1)),
+                When(inflow__gt=0, then=Value(1)), #when inflow is greater than 0, then default = Value(1)
                 default = Value(0),
                 output_field = IntegerField()
         )
-        ).order_by(
-            F('is_inflow').desc(),
-            F('inflow').desc() if sort_order == 'desc' else F('inflow').asc()
         )
+        if sort_order == 'asc':
+            transactions = transactions.order_by(
+                F('is_inflow').desc(),
+                F('inflow').asc()
+            )
+        else: 
+            transactions = transactions.order_by(
+                F('is_inflow').desc(),
+                F('inflow').desc()
+            )
+            
     elif sort_by == 'outflow':
         transactions = transactions.annotate(
             is_outflow = Case(
-                When(outflow__gt=0, then=Value(1)),
+                When(outflow__gt=0, then=Value(1)), # When outflow is greater than 0, set is_outflow to 1
                 default = Value(0),
                 output_field = IntegerField()
         )
@@ -1089,6 +1099,7 @@ def transaction_list(request):
         'categories': categories,
         'today': datetime.date.today(),
         'selected_account_id': account_id,
+        'selected_category_id': category_id,
         'sort_by': sort_by,
         'sort_order': sort_order,
         'form': TransactionForm(),  # Always provide an empty form here

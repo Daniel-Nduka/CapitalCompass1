@@ -77,5 +77,6 @@ urlpatterns = [
    # path('exchange-public-token/', views.exchange_public_token, name='exchange_public_token'),
    # path('get-balance/<int:account_id>/', views.get_balance, name='get_balance'),
    path('create-and-link-account/', views.create_and_link_account, name='create_and_link_account'),
+   path('refresh-account-transaction/', views.refresh_account_and_transactions, name='refresh_account_and_transactions'),
     
 ]

@@ -118,8 +118,8 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', default='your-default-secret-key')
 CSRF_FAILURE_VIEW = 'financeapp.views.csrf_failure'
 
 # settings.py
-PLAID_CLIENT_ID = '66c5c17b3871db001a2d2358'
-PLAID_SECRET = '4e0c0d9d9d2b1496a3e6abf9d07c35'
+PLAID_CLIENT_ID = env('PLAID_CLIENT_ID')
+PLAID_SECRET = env('PLAID_SECRET')
 PLAID_ENV = 'sandbox' 
 PLAID_PRODUCTS = ['auth', 'transactions', 'balance'] 
 PLAID_COUNTRY_CODES = ["GB"]
