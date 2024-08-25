@@ -376,34 +376,35 @@ def profile(request):
 
     if request.method == 'POST':
         if 'profile_form' in request.POST:
-            user_form = UserForm(request.POST, instance=user)
-        #    profile_form = UserProfileForm(request.POST, instance=user_profile)
+            user_form = UserForm(request.POST, instance=user)     
             if user_form.is_valid():
                 user_form.save()
-              #  profile = profile_form.save(commit=False)
-              #  profile.user = user  # Ensure the user field is set
-             ##   profile.save()
                 messages.success(request, 'Your profile has been updated successfully.')
                 return redirect('financeapp:profile')
             else:
                 messages.error(request, 'Please correct the errors below.')
+                
         elif 'password_form' in request.POST:
+            user_form = UserForm(instance=user)
             password_form = PasswordChangeForm(user, request.POST)
-            if password_form.is_valid():
-                user = password_form.save()
-                update_session_auth_hash(request, user)  # Keep the user logged in
-                messages.success(request, 'Your password has been changed successfully.')
-                return redirect('financeapp:profile')
-            else:
-                messages.error(request, 'Please correct the errors below.')
+            
+            try:
+                if password_form.is_valid():
+                    user = password_form.save()
+                    update_session_auth_hash(request, user)  # Keep the user logged in
+                    messages.success(request, 'Your password has been changed successfully.')
+                    return redirect('financeapp:profile')
+                else:
+                    messages.error(request, 'Your password could not be changed. Please try again.')
+            except ValueError as e:
+                messages.error(request, 'An error occurred. Please try again.')
+                
     else:
         user_form = UserForm(instance=user)
-       # profile_form = UserProfileForm(instance=user_profile)
         password_form = PasswordChangeForm(user)
 
     context = {
         'user_form': user_form,
-       # 'profile_form': profile_form,
         'password_form': password_form,
         'user_profile': user_profile,
     }
@@ -1406,52 +1407,6 @@ def contact(request):
 
     return render(request, 'financeapp/contact.html', {'form': form})
 
-
-'''
-def contactLoggedIn(request):
-    if request.method == 'POST':
-        form = ContactMessageForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Save form data to the database
-            contact_message = form.save()
-
-            # Prepare email content
-            subject = f"New Contact Message from {contact_message.name}"
-            message = (
-                f"Name: {contact_message.name}\n"
-                f"Email: {contact_message.email}\n"
-                f"Subject: {contact_message.subject}\n"
-                f"Message:\n{contact_message.message}\n"
-            )
-            from_email = settings.DEFAULT_FROM_EMAIL
-            recipient_list = [settings.CONTACT_EMAIL]
-
-            # Send the email
-            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
-            
-            # Prepare the confirmation email content to the sender
-            sender_subject = "Thank you for contacting us!"
-            sender_message = (
-                f"Dear {contact_message.name},\n\n"
-                "Thank you for reaching out to us. We have received your message and will get back to you soon.\n\n"
-                "Best regards,\n"
-                "The CapitalCompass Team"
-            )
-            recipient_list = [contact_message.email]
-
-            # Send the confirmation email to the sender
-            send_mail(sender_subject, sender_message, from_email, recipient_list, fail_silently=False)
-
-            # Display success message and redirect
-            messages.success(request, 'Your message has been sent successfully.')
-            return redirect('financeapp:contact')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        form = ContactMessageForm()
-
-    return render(request, 'financeapp/contactLoggedin.html', {'form': form})
-'''
 
 @login_required  
 def account_support(request):
