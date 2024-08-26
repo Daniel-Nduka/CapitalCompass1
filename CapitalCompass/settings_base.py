@@ -121,6 +121,7 @@ CSRF_FAILURE_VIEW = 'financeapp.views.csrf_failure'
 PLAID_CLIENT_ID = env('PLAID_CLIENT_ID')
 PLAID_SECRET = env('PLAID_SECRET')
 PLAID_ENV = 'sandbox' 
+#PLAID_ENV = 'production'
 PLAID_PRODUCTS = ['auth', 'transactions', 'balance'] 
 PLAID_COUNTRY_CODES = ["GB"]
 

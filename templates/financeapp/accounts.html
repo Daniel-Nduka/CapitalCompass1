@@ -42,6 +42,7 @@
                                 <form method="get" action="{% url 'financeapp:transactions' %}">
                                     <input type="hidden" name="account_id" value="{{ account.id }}">
                                     <button type="submit">View Transactions</button>
+                                </form>
                                 <button onclick="showEditAccountForm({{ account.id }}, '{{ account.account_name }}', '{{ account.account_type }}')">Edit</button>
                                 {% if not account.plaid_account %}
                                     <button onclick="showAddMoneyForm({{ account.id }})">Add Money</button>

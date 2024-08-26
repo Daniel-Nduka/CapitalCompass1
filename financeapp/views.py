@@ -131,8 +131,11 @@ def account_list(request):
         'link_token': link_token,  # Pass the link token to the template
     }
     return render(request, 'financeapp/accounts.html', context)
+
+#Plaid API integration
+#Step 1: Create a Plaid client
 configuration = plaid.Configuration(
-    host=plaid.Environment.Sandbox,  # Using Sandbox environment for testing with fake data
+    host=plaid.Environment.Production,  # Using Sandbox environment for testing with fake data
     api_key={
         'clientId': settings.PLAID_CLIENT_ID,
         'secret': settings.PLAID_SECRET,
@@ -140,8 +143,10 @@ configuration = plaid.Configuration(
 )
 client = plaid.ApiClient(configuration)
 plaid_client = plaid_api.PlaidApi(client)
+logger.debug(f"Using Plaid client_id: {settings.PLAID_CLIENT_ID} and secret: {settings.PLAID_SECRET}")
 
 
+#Step 2: Create a link token
 def create_link_token(request):
     user = LinkTokenCreateRequestUser(client_user_id=str(request.user.id))
     
@@ -149,7 +154,7 @@ def create_link_token(request):
         user=user,
         client_name="financeapp",
         products=[Products('auth'), Products('transactions')],  # Correctly lis
-        country_codes=[CountryCode('GB')],  # Use 'GB' for United Kingdom
+        country_codes=[CountryCode('GB')],  # GB is the country code for the United Kingdom
         language="en",
     )
     
@@ -158,7 +163,7 @@ def create_link_token(request):
 
 import time
 
-#create and link account from plaid
+#Step 3: Exchange public token from frontend for access token
 @csrf_exempt
 @login_required
 def create_and_link_account(request):
@@ -174,7 +179,8 @@ def create_and_link_account(request):
             accounts_info = accounts_response['accounts']
 
             budget = request.session.get('selected_budget_id')
-
+            
+            #Step 4: Store account and transactions in the database
             for account_info in accounts_info:
                 account_name = account_info['name']
                 account_type = account_info['subtype']
