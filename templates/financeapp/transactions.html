@@ -29,7 +29,6 @@
                     </option>
                     {% endfor %}
                 </select>
-
                 <label for"category-filter">Filter by Category:</label>
                 <select id="category-filter" name="category_id" onchange="this.form.submit()">
                     <option value="">All Categories</option>
@@ -50,8 +49,8 @@
                 </select>
 
                 <select id="sort-order" name="sort_order" onchange="this.form.submit()">
-                    <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Ascending</option>
                     <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Descending</option>
+                    <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Ascending</option>
                 </select>
             </form>
         </div>
@@ -90,7 +89,7 @@
                     <td>{{ transaction.outflow }}</td>
                     <td>{{ transaction.inflow }}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="showEditTransactionForm('{{ transaction.id }}', '{{ transaction.account.id }}', '{{ transaction.date|date:'Y-m-d' }}', '{{ transaction.description }}', '{{ transaction.payee }}', '{{ transaction.expense.id }}', '{{ transaction.outflow }}', '{{ transaction.inflow }}')">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="showEditTransactionForm('{{ transaction.id }}', '{{ transaction.account_id }}', '{{ transaction.date|date:"Y-m-d" }}', '{{ transaction.description }}', '{{ transaction.payee|escapejs }}', '{{ transaction.expense_id|default:"null" }}', '{{ transaction.outflow }}', '{{ transaction.inflow }}')">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
                     </td>
@@ -235,7 +234,6 @@
                         {% endfor %}
                         <option value="add-new-expense">+ Add New Expense</option>
                     </select>
-                 
                 </div>
                 <div class="styled-form-group">
                     <label for="edit-outflow" class="styled-label">Amount</label>

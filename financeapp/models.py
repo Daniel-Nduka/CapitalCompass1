@@ -243,7 +243,7 @@ class Expense(models.Model):
 #Transaction Model
 class Transaction(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions')
-    expense = models.ForeignKey(Expense, on_delete=models.CASCADE, related_name='transactions', null=True, blank=True)
+    expense = models.ForeignKey(Expense, on_delete=models.SET_NULL, related_name='transactions', null=True, blank=True)
     date = models.DateField(default=timezone.now)
     description = models.CharField(max_length=255, blank=True, null=True)
     payee = models.CharField(max_length=255, blank=True, null=True)
@@ -264,7 +264,6 @@ class Transaction(models.Model):
                 if self.outflow > 0:
                     self.account.balance -= Decimal(self.outflow)
                     self.inflow = 0
-
                 self.account.save()
 
                 # If this is an outflow, update the linked expense
@@ -296,6 +295,23 @@ class Transaction(models.Model):
                             self.expense.spent = Decimal(self.outflow)
                             self.expense.save()
                 self.account.save()
+        elif self.plaid_imported:
+            if self.pk is None and not self.created_by_account : 
+                if self.outflow > 0 and self.expense:
+                    self.expense.spent += Decimal(self.outflow)
+                    self.expense.save()
+            else:
+                if self.pk is not None:
+                    old_transaction = Transaction.objects.get(pk=self.pk)
+                    if old_transaction.outflow > 0 and old_transaction.expense:
+                        old_transaction.expense.spent -= Decimal(old_transaction.outflow)
+                        old_transaction.expense.save()
+                    
+                    if self.outflow > 0 and self.expense:
+                        self.expense.spent = Decimal(self.outflow)
+                        self.expense.save()
+       
+
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
@@ -307,11 +323,10 @@ class Transaction(models.Model):
                 self.account.balance += Decimal(self.outflow)
 
             self.account.save()
-
-            # If this is an outflow, update the linked expense
-            if self.outflow > 0 and self.expense:
-                self.expense.spent -= Decimal(self.outflow)
-                self.expense.save()
+       
+        if self.outflow > 0 and self.expense:
+            self.expense.spent -= Decimal(self.outflow)
+            self.expense.save()
         super().delete(*args, **kwargs)
 
 #contactus model

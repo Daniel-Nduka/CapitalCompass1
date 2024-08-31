@@ -135,7 +135,7 @@ def account_list(request):
 #Plaid API integration
 #Step 1: Create a Plaid client
 configuration = plaid.Configuration(
-    host=plaid.Environment.Production,  # Using Sandbox environment for testing with fake data
+    host=plaid.Environment.Sandbox,  # Using Sandbox environment for testing with fake data
     api_key={
         'clientId': settings.PLAID_CLIENT_ID,
         'secret': settings.PLAID_SECRET,
@@ -1043,7 +1043,7 @@ def transaction_list(request):
     account_id = request.GET.get('account_id')
     category_id = request.GET.get('category_id')
     sort_by = request.GET.get('sort_by', 'date')
-    sort_order = request.GET.get('sort_order', 'asc')
+    sort_order = request.GET.get('sort_order', 'desc')
     
     
     transactions = Transaction.objects.filter(account__budget_id=budget)
@@ -1051,7 +1051,10 @@ def transaction_list(request):
     if account_id:
         transactions = transactions.filter(account_id=account_id)
     if category_id:
-       transactions = transactions.filter(expense__category_id=category_id)
+        if budget.budget_type == 'zero_based':
+            transactions = transactions.filter(expense__category_id=category_id)
+        else:
+            transactions = transactions.filter(expense__fifty_30_twenty_category_id=category_id)
         
     if sort_by == 'inflow':
         transactions = transactions.annotate(
