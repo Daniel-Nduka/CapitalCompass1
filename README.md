@@ -4,12 +4,12 @@ CapitalCompass is a web-based personal finance management application designed t
 
 Key Features
 
-- User Authentication:** Secure user registration and login.
-- Budget Management:** Create, edit, and delete budgets using Zero-Based or Fifty-Thirty-Twenty Budgeting methods.
-- Expense Tracking:** Add, edit, and delete expenses within budgets, ensuring accurate financial tracking.
-- Financial Analysis:** Visualize spending patterns and compare monthly financial data with interactive charts.
-- Bank Integration:** Link bank accounts via Plaid API for automatic transaction imports and account balance updates.
-- Responsive Design:** Optimized for larger screens such as tablets and laptops for a detailed view of financial data.
+- User Authentication: Secure user registration and login.
+- Budget Management: Create, edit, and delete budgets using Zero-Based or Fifty-Thirty-Twenty Budgeting methods.
+- Expense Tracking: Add, edit, and delete expenses within budgets, ensuring accurate financial tracking.
+- Financial Analysis: Visualize spending patterns and compare monthly financial data with interactive charts.
+- Bank Integration: Link bank accounts via Plaid API for automatic transaction imports and account balance updates.
+- Responsive Design: Optimised for larger screens such as tablets and laptops for a detailed view of financial data.
 
 Live Demo
 
@@ -20,19 +20,16 @@ Getting Started
 To run CapitalCompass locally, follow these steps:
 
 
-1. Clone the Repository:**
+1. Clone the Repository:
 
-   bash
    git clone https://github.com/yourusername/capitalcompass.git
    cd capitalcompass
-   `
 
 
 2. Install Dependencies:
 
    Install the required Python packages using `requirements.txt`.
 
-   bash
    pip install -r requirements.txt
    
 3. Get Plaid API Keys from Plaid Sandbox
@@ -55,15 +52,13 @@ To run CapitalCompass locally, follow these steps:
 
    Apply database migrations to set up your SQLite database.
 
-   ```bash
    python manage.py migrate
-   ```
+
 
 6. Create a Superuser (Optional):
 
    If you want to access the Django admin panel, create a superuser.
 
-   bash
    python manage.py createsuperuser
    
 
@@ -71,7 +66,6 @@ To run CapitalCompass locally, follow these steps:
 
    Start the Django development server.
 
-   bash
    python manage.py runserver
    
 
@@ -85,17 +79,8 @@ To ensure everything is working correctly, you can run the automated tests:
 
 python manage.py test
 
-Deployment
 
-For deploying CapitalCompass on a production server, ensure you:
-
-- Set `DEBUG=False` in your environment variables.
-- Use a production-grade database like PostgreSQL or MySQL.
-- Set up a web server (like Gunicorn) and reverse proxy (like Nginx).
-- Secure your environment with SSL/TLS.
-
-
-## Acknowledgments
+Acknowledgments
 
 - Django: For providing a robust framework that simplifies web development.
 - Plaid: For offering secure financial data APIs.
