@@ -32,6 +32,22 @@ class FinanceAppTests(TestCase):
         self.client.login(username='testuser', password='testpass')
         self.budget = Budget.objects.create(user=self.user, budget_name='Test Budget', budget_type='zero_based')
         self.fifty_thirty_twenty_budget = Budget.objects.create(user=self.user, budget_name='Test Fifty Budget', budget_type='fifty_thirty_twenty')
+    
+    # Test accessing a non-existent budget
+    def test_access_non_existent_budget(self):
+      self.set_session()
+
+      # Use an invalid budget ID that doesn't exist
+      non_existent_budget_id = 9999  
+
+      # Attempt to access the Zero-Based Budget page with the non-existent ID
+      response = self.client.get(reverse('financeapp:zero_based_page', args=[non_existent_budget_id]))
+      self.assertEqual(response.status_code, 404, "Expected 404 not found error when accessing non-existent budget.")
+    
+      # Attempt to access the Fifty Thirty Twenty Budget page with the non-existent ID
+      response = self.client.get(reverse('financeapp:fifty_thirty_twenty_page', args=[non_existent_budget_id]))
+      self.assertEqual(response.status_code, 404, "Expected 404 not found error when accessing non-existent budget.")
+
         
         
     #Post Logged in Test for Zero Based Budget
@@ -91,6 +107,17 @@ class FinanceAppTests(TestCase):
           account_type='CASH', 
           budget=self.budget
           ) .exists() )
+      
+      #edge case for negative balance
+      form_data_negative = { 
+        'account_name': 'Negative Account',
+        'account_type': 'CASH',
+        'balance': -100
+      }
+      
+      response = self.client.post(reverse('financeapp:add_account'), form_data_negative)
+      self.assertEqual(response.status_code, 302)
+      self.assertTrue(Account.objects.filter(account_name='Negative Account', balance=-100, account_type='CASH', budget=self.budget).exists())
       self.assertRedirects(response, reverse('financeapp:account_list'))
       
     #Test for Edit Account
@@ -116,12 +143,15 @@ class FinanceAppTests(TestCase):
       self.set_session()
       
       account = Account.objects.create(account_name='Delete Account', account_type='CASH', balance=100, budget=self.budget)
+  
       
       response = self.client.post(reverse('financeapp:delete_account', args=[account.id]))
       self.assertEqual(response.status_code, 302)
      
       self.assertFalse(Account.objects.filter(account_name='Delete Account', balance=100, account_type='CASH', budget=self.budget).exists())
-      self.assertRedirects(response, reverse('financeapp:account_list'))
+      self.assertRedirects(response, reverse('financeapp:account_list')) 
+     
+      
       
     #Test for Add Money to Account 
     def test_add_money_to_account_view(self):
@@ -138,6 +168,16 @@ class FinanceAppTests(TestCase):
       self.assertEqual(response.status_code, 302)
       self.assertTrue(Account.objects.filter(account_name='Test Account', balance=200, account_type='CASH', budget=self.budget).exists())
       self.assertRedirects(response, reverse('financeapp:account_list'))
+      
+      #edge case for negative amount
+      form_data_negative = {
+        'account_id': account.id,
+        'amount': -100
+      }
+      
+      response = self.client.post(reverse('financeapp:add_money_to_account'), form_data_negative)
+      self.assertEqual(response.status_code, 302)
+      self.assertTrue(Account.objects.filter(account_name='Test Account', balance=100, account_type='CASH', budget=self.budget).exists())
       
     #Test for Profile
     def test_user_profile_view(self):
@@ -495,6 +535,24 @@ class FinanceAppTests(TestCase):
       
       self.assertEqual(transaction_outflow.inflow, 0)
       self.assertIsNotNone(transaction_outflow.id, "outflow transaction was not created.")
+      
+      #edge case for add a transaction with both inflow and outflow
+      inflow_amount = 50
+      outflow_amount = 30
+      form_data_edge = {
+          'account': account.id,
+          'inflow': inflow_amount,
+          'outflow': outflow_amount,
+          'description': 'Invalid Transaction',
+          'date': timezone.now().strftime('%Y-%m-%d'),
+      }
+    
+      response = self.client.post(reverse('financeapp:add_transaction'), form_data_edge)
+    
+      # Assert that the transaction was not created
+      self.assertFalse(Transaction.objects.filter(account=account, description='Invalid Transaction').exists(), "Transaction with both inflow and outflow was created.")
+      
+      
       
       
     #Test edit Transaction
