@@ -14,7 +14,7 @@
           {% for budget in budgets %}
               <div class="budget-card">
                   <div class="budgets-thumbnails">
-                      <img class="budget-photos" src="{% static 'images/image1.webp' %}" alt="Budget Icon">
+                      <img class="budget-photos" src="{% static 'images/budget-image.jpg' %}" alt="Budget Icon">
                   </div>
                   <div class="budget-details">
                       <h3>{{ budget.budget_name }}</h3>
@@ -39,5 +39,13 @@
           </div>
       </div>
   </section>
+
+  <div style="text-align: center; margin-top: 20px;">
+    <a href="https://www.freepik.com/free-ai-image/close-up-money-put-aside-savings_234840089.htm#query=british%20pound%20save&amp;position=16&amp;from_view=keyword&amp;track=ais_hybrid&amp;uuid=37149d0c-549c-4998-a0be-6a57469010f9" target="_blank" referrerpolicy="no-referrer">
+        Image by freepik
+    </a>
+</div>
+
 </main>
+
 {% endblock %}
